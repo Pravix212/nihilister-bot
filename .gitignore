@@ -382,4 +382,4 @@ agent/
 ## Python pip/env files
 Pipfile
 Pipfile.lock
-.venv
+.venvdeploy.ps1

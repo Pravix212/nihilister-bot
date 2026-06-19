@@ -296,3 +296,9 @@ whosplaying:
   params:
     - game:
         desc: The name of the game being played by the users.
+donate:
+  desc: Shows ways to support the Nihilister bot.
+  ex:
+    - ''
+  params:
+    - {}

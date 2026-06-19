@@ -485,40 +485,43 @@ public sealed partial class Help : NadekoModule<HelpService>
         await Response().Error(strs.command_not_found).SendAsync();
     }
 
-    [Cmd]
-    [Priority(1)]
-    public async Task H([Leftover] CommandInfo com = null)
+[Cmd]
+[Priority(1)]
+public async Task H([Leftover] CommandInfo com = null)
+{
+    var channel = ctx.Channel;
+    if (com is null)
     {
-        var channel = ctx.Channel;
-        if (com is null)
-        {
-            try
-            {
-                var ch = channel is ITextChannel ? await ctx.User.CreateDMChannelAsync() : channel;
-                var data = await GetHelpString();
-                if (data == default)
-                    return;
+        var clientId = await _lazyClientId.Value;
+        var inviteLink = $"https://discordapp.com/oauth2/authorize?client_id={clientId}&scope=bot&permissions=66186303";
+        var supportLink = "https://discord.com/invite/2DPjFc7XVT";
+        var commandsLink = "https://prav.lol/nihilister/commands";
 
-                await Response().Channel(ch).Text(data).SendAsync();
-                try
-                {
-                    await ctx.OkAsync();
-                }
-                catch
-                {
-                } // ignore if bot can't react
-            }
-            catch (Exception)
-            {
-                await Response().Error(strs.cant_dm).SendAsync();
-            }
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("Nihilister Help")
+            .WithDescription($"To invite me to your server, use this [link]({inviteLink})")
+            .WithThumbnailUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl())
+            .AddField("Useful help commands",
+                $"{Format.Code(".modules")} Lists all bot modules.\n"
+                + $"{Format.Code(".h CommandName")} Shows some help about a specific command.\n"
+                + $"{Format.Code(".commands ModuleName")} Lists all commands in a module.",
+                false)
+            .AddField("List of all Commands",
+                $"[View all commands]({commandsLink})",
+                false)
+            .AddField("Nihilister Support",
+                $"[Join the support server]({supportLink})",
+                false)
+            .WithFooter($"Prefix: {prefix} | Use .h <command> for command help");
 
-            return;
-        }
-
-        var embed = _cus.GetCommandHelp(com, ctx.Guild);
-        await _sender.Response(channel).Embed(embed).SendAsync();
+        await ctx.Channel.SendMessageAsync(embed: eb.Build());
+        return;
     }
+
+    var embed = _cus.GetCommandHelp(com, ctx.Guild);
+    await _sender.Response(channel).Embed(embed).SendAsync();
+}
 
     [Cmd]
     [OwnerOnly]

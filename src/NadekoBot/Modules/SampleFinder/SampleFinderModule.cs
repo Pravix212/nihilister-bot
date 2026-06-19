@@ -4,32 +4,26 @@ using Discord.WebSocket;
 using System.Net.Http;
 using System.Text.Json;
 using NadekoBot.Common.Attributes;
-using NadekoBot.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NadekoBot.Modules.SampleFinder;
 
 [Group]
 public class SampleFinderModule : NadekoModule
 {
-    private readonly SampleFinderConfig _config;
-    private readonly IHttpClientFactory _httpFactory;
-
-    public SampleFinderModule(SampleFinderConfig config, IHttpClientFactory httpFactory)
-    {
-        _config = config;
-        _httpFactory = httpFactory;
-    }
-
     [Cmd]
     [Aliases("sf")]
     public async Task SampleFind([Remainder] string input)
     {
-        var apiKey = _config.Data.ApiKey;
+        var config = ctx.Services.GetRequiredService<SampleFinderConfig>();
+        var apiKey = config.Data.ApiKey;
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            await ReplyErrorLocalizedAsync("sample_no_apikey");
+            await ctx.Channel.SendMessageAsync("❌ Freesound API key is not configured. Use `.samplefinderconfig apikey YOUR_KEY` to set one.");
             return;
         }
+
+        var httpFactory = ctx.Services.GetRequiredService<IHttpClientFactory>();
 
         var parts = input.Split(',');
         var query = parts[0].Trim();
@@ -52,7 +46,7 @@ public class SampleFinderModule : NadekoModule
 
         var url = $"https://freesound.org/apiv2/search/text/?query={Uri.EscapeDataString(searchQuery)}&fields=name,url,previews,description&page_size=20&token={apiKey}";
 
-        using var http = _httpFactory.CreateClient();
+        using var http = httpFactory.CreateClient();
         var response = await http.GetStringAsync(url);
         var json = JsonDocument.Parse(response);
         var results = json.RootElement.GetProperty("results");
@@ -85,7 +79,7 @@ public class SampleFinderModule : NadekoModule
 
         if (samples.Count == 0)
         {
-            await ReplyErrorLocalizedAsync("sample_no_results");
+            await ctx.Channel.SendMessageAsync("❌ No samples found for that search.");
             return;
         }
 
@@ -98,15 +92,10 @@ public class SampleFinderModule : NadekoModule
             var mp3Bytes = await http.GetByteArrayAsync(previewUrl);
             using var stream = new System.IO.MemoryStream(mp3Bytes);
 
-            string headerText;
-            if (minBpm != null)
-                headerText = GetText("sample_header_with_bpm", query, key, minBpm, maxBpm);
-            else if (key != null)
-                headerText = GetText("sample_header_with_key", query, key);
-            else
-                headerText = GetText("sample_header", query);
-
-            headerText += "\n" + GetText("sample_item", i + 1, samples.Count, name, pageLink);
+            var headerText = $"**Freesound: {query}**";
+            if (key != null) headerText += $" | Key: {key}";
+            if (minBpm != null) headerText += $" | BPM: {minBpm}-{maxBpm}";
+            headerText += $"\n**[{i + 1}/{samples.Count}] {name}**\n{pageLink}";
 
             var components = new ComponentBuilder()
                 .WithButton("◀", "prev", ButtonStyle.Secondary, disabled: samples.Count <= 1)

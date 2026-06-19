@@ -9,7 +9,7 @@ namespace NadekoBot.Services
     public class UptimeService : INService, IReadyExecutor
     {
         private readonly DiscordSocketClient _client;
-        private Timer _timer;
+        private Timer? _timer;
         private readonly DateTime _startTime;
 
         public UptimeService(DiscordSocketClient client)

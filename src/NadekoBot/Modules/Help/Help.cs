@@ -1,4 +1,5 @@
 #nullable disable
+using Discord;
 using NadekoBot.Modules.Help.Common;
 using NadekoBot.Modules.Help.Services;
 using Nadeko.Common.Medusa;
@@ -542,47 +543,29 @@ public sealed partial class Help : NadekoModule<HelpService>
     {
         var eb = CreateEmbed()
             .WithOkColor()
-            .WithTitle("Thank you for considering to donate to the NadekoBot project!");
-
-        eb
+            .WithTitle("Support Nihilister")
             .WithDescription("""
-                             NadekoBot relies on donations to keep the servers, services and APIs running.
-                             Donating will give you access to some exclusive features. You can read about them on the [patreon page](https://patreon.com/join/nadekobot)
+                             Keeping the heretic alive costs real money every month.
+                             
+                             **Monthly Costs:**
+                             • DigitalOcean VPS — $6-12/month
+                             • Grok AI API — $15-30/month
+                             • Domain & SSL — $10/year
+                             
+                             Every donation helps keep the bot running 24/7.
                              """)
-            .AddField("Donation Instructions",
-                $"""
-                 🗒️ Before pledging it is recommended to open your DMs as Nadeko will send you a welcome message with instructions after you pledge has been processed and confirmed.
+            .WithFooter("Thank you for supporting the Heathen's Garden ❤️");
 
-                 **Step 1:** ❤️ Pledge on Patreon ❤️
+        var button = new ButtonBuilder(
+            label: "💰 Donate",
+            url: "https://prav.lol/nihilister/donate.html",
+            style: ButtonStyle.Link
+        );
 
-                 `1.` Go to <https://patreon.com/join/nadekobot> and choose a tier.
-                 `2.` Make sure your payment is processed and accepted.
+        var components = new ComponentBuilder()
+            .WithButton(button)
+            .Build();
 
-                 **Step 2** 🤝 Connect your Discord account 🤝
-
-                 `1.` Go to your profile settings on Patreon and connect your Discord account to it.
-                 *please make sure you're logged into the correct Discord account*
-
-                 If you do not know how to do it, you may [follow instructions here](https://support.patreon.com/hc/en-us/articles/212052266-How-do-I-connect-Discord-to-Patreon-Patron-)
-
-                 **Step 3** ⏰ Wait a short while (usually 1-3 minutes) ⏰
-                   
-                 Nadeko will DM you the welcome instructions, and you will receive your rewards!
-                 🎉 **Enjoy!** 🎉
-                 """);
-
-        try
-        {
-            await Response()
-                .Channel(await ctx.User.CreateDMChannelAsync())
-                .Embed(eb)
-                .SendAsync();
-
-            _ = ctx.OkAsync();
-        }
-        catch
-        {
-            await Response().Error(strs.cant_dm).SendAsync();
-        }
+        await ctx.Channel.SendMessageAsync(embed: eb.Build(), components: components);
     }
 }

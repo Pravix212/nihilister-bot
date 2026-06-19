@@ -13,7 +13,7 @@ commands:
       args:
         desc: How to display the list of commands.
 donate:
-  desc: Provides instructions for helping the project financially.
+  desc: Shows ways to support the Nihilister bot financially.
   ex:
     - ''
   params:

@@ -84,12 +84,12 @@ forwardtochannel:
   params:
     - {}
 leave:
-  desc: Makes Nadeko leave the server. Either server name or server ID is required.
+  desc: Makes Nihilister leave the server. Either server name or server ID is required.
   ex:
     - 123123123331
   params:
     - guildStr:
-        desc: The name of the server where Nadeko should leave.
+        desc: The name of the server where Nihilister should leave.
 restart:
   desc: Restarts the bot. Might not work.
   ex:

@@ -1,6 +1,6 @@
 eventstart:
   desc: |-
-    Starts one of the events seen on public Nadeko.
+    Starts one of the events seen on public Nihilister.
     Events: `reaction`, `gamestatus`
   ex:
     - reaction

@@ -51,7 +51,7 @@ mute:
         desc: The optional reason provided helps to explain why the user was muted.
 muterole:
   desc: |-
-    Sets a name of the role which will be assigned to people who should be muted. Provide no arguments to see currently set mute role. Default is nadeko-mute.
+    Sets a name of the role which will be assigned to people who should be muted. Provide no arguments to see currently set mute role. Default is Nihilister-mute.
   ex:
     - ''
     - Silenced

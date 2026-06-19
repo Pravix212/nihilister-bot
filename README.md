@@ -1,50 +1,58 @@
-# NadekoBot
+# Nihilister
 
-[![CI/CD](https://github.com/nadeko-bot/nadekobot/actions/workflows/ci.yml/badge.svg)](https://github.com/nadeko-bot/nadekobot/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/Pravix212/nihilister-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/Pravix212/nihilister-bot/actions/workflows/ci.yml)
 
-NadekoBot is an open source Discord bot. It is written in C# and is built on .NET 8.
+Nihilister is a powerful Discord bot forked from [NadekoBot](https://github.com/nadeko-bot/nadekobot). Built on .NET 9 with a custom AI agent powered by Grok, advanced gambling systems, moderation tools, and more.
 
-If you want to run your own instance of NadekoBot, please check out the [Self hosting Guides and Docs](https://docs.nadeko.bot).
+This is a personal fork maintained by Pravix212, with custom features, branding, and improvements.
 
-If you have any questions, please visit our [Discord support server](https://discord.nadeko.bot).
+## Features
+
+- **AI Agent** — Powered by Grok for intelligent Discord conversations
+- **Gambling & Economy** — Custom currency system with slots, betting, leaderboards
+- **Moderation** — Advanced admin tools, auto-moderation, greet/bye messages
+- **Music** — YouTube playback with queue management
+- **Utility** — Custom commands, aliases, XP system, and more
+- **Uptime Display** — Live status showing bot uptime
 
 ## Installation
 
-### Default option
+### Self-Hosting
 
-You may want to consider using [upeko](https://github.com/nadeko-bot/upeko/releases) if you want to run bot on your PC.+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/Pravix212/nihilister-bot.git
+   cd nihilister-bot
+   ```
 
-### Hosting on a linux server
+2. Install .NET 9 SDK
 
-If you want your bot to be online 24/7, you should [host it on a linux vps](https://docs.nadeko.bot/guides/linux-guide).
+3. Configure `src/NadekoBot/data/creds.yml` and `src/NadekoBot/data/ai-agent.yml`
+
+4. Build and run:
+   ```bash
+   cd src/NadekoBot
+   dotnet run
+   ```
+
+### Linux VPS (Recommended for 24/7)
+
+See [NadekoBot Linux Guide](https://docs.nadeko.bot/guides/linux-guide) for server setup instructions.
 
 ### Docker
 
-There is an official Docker image for a [simple setup](https://docs.nadeko.bot/guides/docker-guide/)
-Short version:
-  ```sh
-    docker run -d --name nadeko ghcr.io/nadeko-bot/nadekobot:v6 -e bot_token=YOUR_TOKEN_HERE -v "./data:/app/data" && docker logs -f --tail 500 nadeko
-  ```
+```bash
+docker run -d --name nihilister ghcr.io/Pravix212/nihilister-bot:v6   -e bot_token=YOUR_TOKEN_HERE   -v "./data:/app/data"   && docker logs -f --tail 500 nihilister
+```
 
-## Contributing to NadekoBot
+## Original Project
 
-We love your input! We want to make contributing to this project as easy as possible, whether it's:
+Nihilister is a fork of [NadekoBot](https://github.com/nadeko-bot/nadekobot) by Kwoth. The original project is licensed under AGPL-3.0. This fork maintains compliance with that license while adding custom features and branding.
 
-- Reporting a bug
-- Discussing the current state of the code
-- Submitting a fix
-- Proposing new features
-- Becoming a maintainer
+## Support
 
-### Contribution
+For issues, feature requests, or donations, visit [nihilister.bot](https://nihilister.bot) (coming soon).
 
-By submitting code, content, or materials via pull request or similar means ("Contribution"), you irrevocably assign all
-intellectual property rights (including copyright and patents) to NadekoBot Repository Owner and affirm you either:
+---
 
-- (a) own the Contribution outright, or
-- (b) it is licensed under compatible terms permitting unrestricted relicensing.
-
-You grant the NadekoBot Repository Owner perpetual, worldwide rights to use, modify, distribute, and sublicense the
-Contribution under AGPLv3, a commercial license, or any other terms without compensation.
-
-These terms survive termination of this agreement.
+**Nihilister** — *Not just a bot. An experience.*

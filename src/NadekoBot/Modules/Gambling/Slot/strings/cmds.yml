@@ -1,6 +1,6 @@
 slot:
   desc: |-
-    Play Nadeko slots by placing your bet.
+    Play Nihilister slots by placing your bet.
     You can specify 'all', 'half' or 'X%' instead of the amount to bet that part of your current balance.
   ex:
     - 5

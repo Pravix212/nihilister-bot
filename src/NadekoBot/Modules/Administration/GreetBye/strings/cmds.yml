@@ -17,7 +17,7 @@ boostmsg:
   desc: |-
     Sets a new boost announcement message which will be shown in the current channel.
     Using this command with no message will show the current boost message.
-    Supports [placeholders](https://docs.nadeko.bot/en/latest/placeholders/) and [embeds](https://docs.nadeko.bot/en/latest/embeds/)
+    Supports [placeholders](https://docs.Nihilister.bot/en/latest/placeholders/) and [embeds](https://docs.Nihilister.bot/en/latest/embeds/)
   ex:
     - '%user.mention% has boosted the server!!!'
   params:
@@ -52,7 +52,7 @@ byemsg:
   desc: |-
     Sets a new leave announcement message which will be shown in the current channel.
     Using this command with no message will show the current bye message.
-    Supports [placeholders](https://docs.nadeko.bot/en/latest/placeholders/) and [embeds](https://eb.nadeko.bot/)
+    Supports [placeholders](https://docs.Nihilister.bot/en/latest/placeholders/) and [embeds](https://eb.Nihilister.bot/)
   ex:
     - '%user.name% has left.'
   params:
@@ -91,7 +91,7 @@ greetdm:
     - {}
 greetdmmsg:
   desc: |-
-    Sets a new join announcement message which will be sent to the user who joined. Type `%user.mention%` if you want to mention the new member. Using it with no message will show the current DM greet message. You can use embed json from <https://eb.nadeko.bot> instead of a regular text, if you want the message to be embedded.
+    Sets a new join announcement message which will be sent to the user who joined. Type `%user.mention%` if you want to mention the new member. Using it with no message will show the current DM greet message. You can use embed json from <https://eb.Nihilister.bot> instead of a regular text, if you want the message to be embedded.
   ex:
     - Welcome to the server, %user.mention%
   params:
@@ -110,7 +110,7 @@ greetmsg:
   desc: |-
     Sets a new join announcement message which will be shown in the current channel.
     Using this command with no message will show the current greet message.
-    Supports [placeholders](https://docs.nadeko.bot/en/latest/placeholders/) and [embeds](https://eb.nadeko.bot/)
+    Supports [placeholders](https://docs.Nihilister.bot/en/latest/placeholders/) and [embeds](https://eb.Nihilister.bot/)
   ex:
     - Welcome, %user.mention%.
   params:

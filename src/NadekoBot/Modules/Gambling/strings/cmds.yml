@@ -201,7 +201,7 @@ rakeback:
     - {}
 rps:
   desc: |-
-    Play a game of Rocket-Paperclip-Scissors with Nadeko.
+    Play a game of Rocket-Paperclip-Scissors with Nihilister.
     You can bet on it. Winning awards you 1.95x of the bet.
     You can specify 'all', 'half' or 'X%' instead of the amount to bet that part of your current balance.
   ex:

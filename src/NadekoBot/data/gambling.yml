@@ -5,7 +5,7 @@ currency:
   # What is the emoji/character which represents the currency
   sign: "🌸"
   # What is the name of the currency
-  name: Nadeko Flower
+  name: Nihilister Flower
   # For how long (in days) will the transactions be kept in the database (curtrs)
   # Set 0 to disable cleanup (keep transactions forever)
   transactionsLifetime: 0
@@ -248,7 +248,7 @@ waifu:
       price: 50000
       name: Moon
 # Amount of currency selfhosters will get PER pledged dollar CENT.
-# 1 = 100 currency per $. Used almost exclusively on public nadeko.
+# 1 = 100 currency per $. Used almost exclusively on public Nihilister.
 patreonCurrencyPerCent: 1
 # Currency reward per vote.
 # This will work only if you've set up VotesApi and correct credentials for topgg and/or discords voting

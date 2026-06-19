@@ -1,3 +1,4 @@
+sample_no_apikey: Freesound API key is not configured. Set it with `.samplefinderconfig apikey YOUR_KEY`.
 sample_no_results: No samples found for that search.
 sample_header: "**Freesound: {0}**"
 sample_header_with_key: "**Freesound: {0}** | Key: {1}"

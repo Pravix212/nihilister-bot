@@ -1,6 +1,7 @@
-﻿#Manually added files
+#Manually added files
 
 src/NadekoBot/data/last_known_version.txt
+src/NadekoBot/data/ai-agent.yml
 scripts/
 **/DESIGN.md
 src/NadekoBot/data/music_cache/

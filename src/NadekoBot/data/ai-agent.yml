@@ -1,12 +1,13 @@
-# DO NOT CHANGE THE VERSION MANUALLY
+﻿# DO NOT CHANGE THE VERSION MANUALLY
 version: 8
 # Whether the AI agent feature is enabled. Default false
 enabled: true
 # Base URL for the OpenAI-compatible API.
 # DO NOT add /v1/chat/completions suffix.
-apiUrl: https://openrouter.ai/api
+apiUrl: https://api.x.ai
+apiKey: xai-dEvaa7FE6g6ded9mbWtpNIF6L1ZjQpRY25cLAxQ6cogEfexJSseU6RilQI4tKWIdWR4wj6IKTtaQGS9T
 # Which model to use for the agent. Must support tool/function calling.
-modelName: inception/mercury-2
+modelName: grok-4.3
 # Optional list of model IDs for providers that support fallback routing (e.g. OpenRouter).
 # If set, this is sent as "models" instead of "model" in the request body.
 # Example: ["openai/gpt-5.4", "anthropic/claude-opus-4", "google/gemini-3.1-pro"]

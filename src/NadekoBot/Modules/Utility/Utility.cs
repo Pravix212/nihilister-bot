@@ -1,4 +1,4 @@
-using NadekoBot.Modules.Utility.Services;
+﻿using NadekoBot.Modules.Utility.Services;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -790,7 +790,7 @@ public partial class Utility : NadekoModule
     [Cmd]
     public async Task Afk([Leftover] string text = "No reason specified.")
     {
-        var succ = await _afkService.SetAfkAsync(ctx.User.Id, text);
+        var succ = await _afkService.SetAfkAsync((IGuildUser)ctx.User, text);
 
         if (succ)
         {

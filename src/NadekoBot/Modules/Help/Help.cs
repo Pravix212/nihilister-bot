@@ -538,7 +538,6 @@ public sealed partial class Help : NadekoModule<HelpService>
             .SendAsync();
 
     [Cmd]
-    [OnlyPublicBot]
     public async Task Donate()
     {
         var eb = CreateEmbed()

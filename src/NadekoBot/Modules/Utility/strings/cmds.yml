@@ -1,4 +1,4 @@
-﻿afk:
+afk:
   desc: |-
     Toggles AFK status for yourself with the specified message. 
     If you don't provide a message it default to a generic one.
@@ -309,10 +309,3 @@ ship:
         desc: First user to ship. Defaults to yourself if only one user is provided.
     - user2:
         desc: Second user to ship (optional).
-edate:
-  desc: |-
-    Picks a random user from the server and matches them with the one executing the command.
-  ex:
-    - ''
-    
-

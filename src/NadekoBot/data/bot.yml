@@ -25,7 +25,7 @@ checkForUpdates: true
 forwardOptOutOwnerIds: []
 # Any messages sent by users in Bot's DM will be forwarded to the specified channel.
 # When set, this overrides individual owner DM forwarding.
-forwardToChannel: 
+forwardToChannel: 1517296704955617332
 # Should the bot ignore messages from other bots?
 # Settings this to false might get your bot banned if it gets into a spam loop with another bot.
 # This will only affect command executions, other features will still block bots from access.
@@ -49,7 +49,7 @@ dmHelpTextKeywords:
 helpText: |-
   {
     "title": "To invite me to your server, use this link",
-    "description": "https://discordapp.com/oauth2/authorize?client_id=983066412417441822{0}&scope=bot&permissions=66186303",
+    "description": "https://discordapp.com/oauth2/authorize?client_id={0}&scope=bot&permissions=66186303",
     "color": 53380,
     "thumbnail": "https://i.imgur.com/zVbdpw2.png",
     "fields": [
@@ -62,11 +62,11 @@ helpText: |-
       },
       {
         "name": "List of all Commands",
-        "value": "Currently under Construction",
+        "value": "Currently Under Construction...",
         "inline": false
       },
       {
-        "name": "Nihilister Support",
+        "name": "Nihilister Support Server",
         "value": "https://discord.com/invite/2DPjFc7XVT",
         "inline": true
       }

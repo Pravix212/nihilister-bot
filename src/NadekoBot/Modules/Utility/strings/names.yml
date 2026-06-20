@@ -1,4 +1,4 @@
-﻿afk:
+afk:
   - afk
 channelid:
   - channelid
@@ -71,10 +71,6 @@ ship:
   - ship
   - love
   - compatibility
-edate:
-  - edate
-  - match
-  - date
 snipe:
   - snipe
   - sn

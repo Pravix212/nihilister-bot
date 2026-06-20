@@ -1,4 +1,4 @@
-# DO NOT CHANGE
+﻿# DO NOT CHANGE
 version: 6
 # Which engine should .search command
 # 'google_scrape' - default. Scrapes the webpage for results. May break. Requires no api keys.

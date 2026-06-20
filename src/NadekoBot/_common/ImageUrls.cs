@@ -1,12 +1,11 @@
-#nullable disable
+﻿#nullable disable
 using NadekoBot.Common.Yml;
 
 namespace NadekoBot.Common;
 
 public sealed class ImageUrls
 {
-    [Comment("DO NOT CHANGE THE VERSION MANUALLY")]
-    public int Version { get; set; } = 11;
+    public int Version { get; set; } = 12;
 
     public CoinData Coins { get; set; }
     public Uri[] Currency { get; set; }
@@ -40,5 +39,6 @@ public sealed class ImageUrls
         public Uri[] Kiss { get; set; }
         public Uri[] Pat { get; set; }
         public Uri[] Nom { get; set; }
+        public Uri[] Spit { get; set; }
     }
 }

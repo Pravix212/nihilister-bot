@@ -1,11 +1,11 @@
-# DO NOT CHANGE
+﻿# DO NOT CHANGE
 version: 13
 # Currency settings
 currency:
   # What is the emoji/character which represents the currency
-  sign: "🌸"
+  sign: " 🔥Flame"
   # What is the name of the currency
-  name: Nihilister Flower
+  name: Nihilister Flames
   # For how long (in days) will the transactions be kept in the database (curtrs)
   # Set 0 to disable cleanup (keep transactions forever)
   transactionsLifetime: 0
@@ -17,7 +17,7 @@ maxBet: 0
 # Settings for betflip command
 betFlip:
   # Bet multiplier if user guesses correctly
-  multiplier: 1.95
+  multiplier: 2
 # Settings for betroll command
 betRoll:
   # When betroll is played, user will roll a number 0-100.
@@ -35,7 +35,7 @@ generation:
   # when currency is generated, should it also have a random password
   # associated with it which users have to type after the .pick command
   # in order to get it
-  hasPassword: true
+  hasPassword: false
   # Every message sent has a certain % chance to generate the currency
   # specify the percentage here (1 being 100%, 0 being 0% - for example
   # default is 0.02, which is 2%

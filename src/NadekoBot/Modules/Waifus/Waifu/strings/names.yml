@@ -1,4 +1,4 @@
-waifu:
+﻿waifu:
   - waifu
   - w
 waifuhelp:
@@ -38,6 +38,8 @@ pat:
   - pat
 nom:
   - nom
+spit:
+  - spit
 waifugiftshop:
   - waifugiftshop
   - wgiftshop

@@ -5,5 +5,6 @@ public enum WaifuAction
     Hug,
     Kiss,
     Pat,
-    Nom
+    Nom,
+    Spit
 }

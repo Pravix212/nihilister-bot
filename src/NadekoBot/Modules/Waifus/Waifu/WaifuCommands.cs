@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using NadekoBot.Common.TypeReaders;
 using NadekoBot.Modules.Gambling.Bank;
 using NadekoBot.Modules.Waifus.Waifu;
@@ -564,6 +564,7 @@ public partial class Waifus
             WaifuAction.Kiss => strs.waifu_kissed(name),
             WaifuAction.Pat => strs.waifu_patted(name),
             WaifuAction.Nom => strs.waifu_nommed(name),
+            WaifuAction.Spit => strs.waifu_spat(name),
             _ => strs.waifu_hugged(name)
         });
 
@@ -575,6 +576,7 @@ public partial class Waifus
             WaifuAction.Kiss => ic.Data.Waifu?.Kiss,
             WaifuAction.Pat => ic.Data.Waifu?.Pat,
             WaifuAction.Nom => ic.Data.Waifu?.Nom,
+            WaifuAction.Spit => ic.Data.Waifu?.Spit,
             _ => null
         };
 
@@ -673,6 +675,11 @@ public partial class Waifus
 
     [Cmd]
     [Priority(0)]
+    public Task Spit(params IUser[] users)
+        => ActionWithUsersAsync(WaifuAction.Spit, users);
+
+    [Cmd]
+    [Priority(0)] 
     public Task Hug([Leftover] string input)
         => ActionGifOnlyAsync(WaifuAction.Hug);
 

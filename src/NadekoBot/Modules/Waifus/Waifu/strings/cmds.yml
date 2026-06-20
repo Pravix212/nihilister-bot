@@ -1,4 +1,4 @@
-waifu:
+﻿waifu:
   desc: |-
     Shows waifu/hubby information including stats, fans, and returns.
     If you're a fan and use it without arguments, it shows your target waifu's card.
@@ -135,6 +135,15 @@ nom:
         desc: "One or more users to feed."
     - input:
         desc: "Arbitrary text. Shows a GIF without stat effects."
+spit:
+  desc: |-
+    Spits on one or more users.
+  ex:
+    - '@user'
+    - '@user1 @user2 @user3'
+  params:
+    - users:
+        desc: "The users to spit on."
 waifugiftshop:
   desc: |-
     Shows today's available gift items. Items rotate daily at 00:00 UTC.

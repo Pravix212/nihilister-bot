@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
@@ -33,7 +33,7 @@ namespace NadekoBot.Services
             try
             {
                 var uptime = DateTime.UtcNow - _startTime;
-                var status = $"Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m";
+                var status = $"Watching over Heathen's Garden - Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
                 _ = _client.SetGameAsync(status);
             }
             catch { /* ignore */ }

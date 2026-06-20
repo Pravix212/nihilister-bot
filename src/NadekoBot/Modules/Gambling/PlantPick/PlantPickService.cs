@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using NadekoBot.Common.ModuleBehaviors;
@@ -316,6 +316,11 @@ public class PlantPickService(
 
             //get the image
             var (stream, ext) = await GetRandomCurrencyImageAsync(pass);
+            if (ext is null)
+            {
+                var msg = await ch.SendMessageAsync(msgToSend);
+                return msg.Id;
+            }
             // send it
             await using (stream)
             {

@@ -1,4 +1,4 @@
-﻿namespace NadekoBot.Services;
+namespace NadekoBot.Services;
 
 public sealed class ImageCache : IImageCache, INService
 {
@@ -31,9 +31,16 @@ public sealed class ImageCache : IImageCache, INService
                     return await File.ReadAllBytesAsync(url.LocalPath);
                 }
 
-                using var http = _httpFactory.CreateClient();
-                var bytes = await http.GetByteArrayAsync(url);
-                return bytes;
+                try
+                {
+                    using var http = _httpFactory.CreateClient();
+                    var bytes = await http.GetByteArrayAsync(url);
+                    return bytes;
+                }
+                catch (HttpRequestException)
+                {
+                    return null;
+                }
             },
             expiry: TimeSpan.FromHours(48));
 

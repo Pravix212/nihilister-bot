@@ -24,7 +24,7 @@ namespace NadekoBot.Services
                 _ => UpdateStatus(),
                 null,
                 TimeSpan.FromSeconds(1),
-                TimeSpan.FromSeconds(1));
+                TimeSpan.FromSeconds(15));
             return Task.CompletedTask;
         }
 
@@ -33,9 +33,8 @@ namespace NadekoBot.Services
             try
             {
                 var uptime = DateTime.UtcNow - _startTime;
-                var status = $"Watc" +
-                    $"Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
-                _ = _client.SetGameAsync(status);
+                var status = $"Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+                _ = _client.SetGameAsync(status, type: ActivityType.Watching);
             }
             catch { /* ignore */ }
         }

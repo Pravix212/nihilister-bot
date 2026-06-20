@@ -13,14 +13,25 @@ modelName: grok-build-0.1
 # Example: ["openai/gpt-5.4", "anthropic/claude-opus-4", "google/gemini-3.1-pro"]
 models: []
 # Maximum number of tool calls the agent can make per invocation. Default 10
-maxToolCalls: 10
+# Reduced to 2 to prevent loops. Most chat queries should need 0 tools.
+maxToolCalls: 2
 # Maximum tokens for LLM responses. Default 2048
 maxTokens: 2048
 # Temperature for LLM responses. Lower = more deterministic. Default 0.3
 temperature: 0.3
 # List of allowed tool names. If empty, all tools are available.
-# Example: ["send_message", "get_message"]
-allowedTools: []
+# Removed send_message because the AI was sending messages via tools AND the final
+# response was also being sent, causing duplicate/triple messages.
+# Only read-only tools remain for safety.
+allowedTools:
+  - get_message
+  - list_channels
+  - get_channel_info
+  - get_user_info
+  - list_user_roles
+  - compute_timestamp
+  - ask_user
+  - close_session
 # Number of recent messages per channel the agent remembers. 0 to disable. Default 20
 channelMessageMemory: 20
 # Minutes of inactivity before channel memory expires and stops observing. Default 30

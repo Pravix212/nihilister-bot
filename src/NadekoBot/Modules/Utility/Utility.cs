@@ -1,4 +1,4 @@
-﻿using NadekoBot.Modules.Utility.Services;
+using NadekoBot.Modules.Utility.Services;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -888,6 +888,78 @@ public partial class Utility : NadekoModule
 
         ctx.Message.DeleteAfter(1);
         await Response().Embed(eb).SendAsync();
+    }
+
+    [Cmd]
+    [RequireContext(ContextType.Guild)]
+    public async Task Ship(IGuildUser? user1 = null, IGuildUser? user2 = null)
+    {
+        if (user1 is null && user2 is null)
+        {
+            await Response()
+                .Error("You need to mention at least one user! Usage: `.ship @user` or `.ship @user1 @user2`")
+                .SendAsync();
+            return;
+        }
+
+        // If only one user is provided, ship the caller with that user
+        if (user2 is null)
+        {
+            user2 = user1;
+            user1 = (IGuildUser)ctx.User;
+        }
+
+        var percentage = CalculateLovePercentage(user1.Id, user2.Id);
+        var description = GetShipDescription(percentage);
+        var bar = BuildProgressBar(percentage);
+
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("💕 Love Calculator")
+            .WithDescription(
+                $"**{user1.DisplayName}** ❤️ **{user2.DisplayName}**\n\n" +
+                $"**{percentage}%** — {description}\n" +
+                $"{bar}")
+            .WithThumbnailUrl(user1.GetDisplayAvatarUrl() ?? user1.GetDefaultAvatarUrl())
+            .WithFooter($"Shipped by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
+
+        await Response().Embed(eb).SendAsync();
+    }
+
+    private static int CalculateLovePercentage(ulong id1, ulong id2)
+    {
+        var a = Math.Min(id1, id2);
+        var b = Math.Max(id1, id2);
+        // DJB2-like hash for deterministic, commutative results
+        int hash = 5381;
+        hash = ((hash << 5) + hash) + (int)(a & 0xFFFFFFFF);
+        hash = ((hash << 5) + hash) + (int)(a >> 32);
+        hash = ((hash << 5) + hash) + (int)(b & 0xFFFFFFFF);
+        hash = ((hash << 5) + hash) + (int)(b >> 32);
+        return Math.Abs(hash) % 101;
+    }
+
+    private static string GetShipDescription(int percentage)
+    {
+        return percentage switch
+        {
+            0 => "💔 Not a match at all...",
+            <= 20 => "😅 Maybe just friends?",
+            <= 40 => "🤔 There's a spark...",
+            <= 60 => "😊 A decent match!",
+            <= 80 => "😍 Pretty compatible!",
+            <= 95 => "💖 Strong connection!",
+            _ => "🔥 Perfect match! Soulmates!"
+        };
+    }
+
+    private static string BuildProgressBar(int percentage)
+    {
+        var filled = (int)Math.Round(percentage / 10.0);
+        var empty = 10 - filled;
+        var filledPart = new string('█', filled);
+        var emptyPart = new string('░', empty);
+        return $"`{filledPart}{emptyPart}`";
     }
 
 }

@@ -296,3 +296,16 @@ whosplaying:
   params:
     - game:
         desc: The name of the game being played by the users.
+ship:
+  desc: |-
+    Calculates a love compatibility percentage between two users.
+    Mention one user to ship yourself with them, or mention two users to ship them together.
+    The percentage is deterministic — the same pair always gets the same result!
+  ex:
+    - '@Someone'
+    - '@User1 @User2'
+  params:
+    - user1:
+        desc: First user to ship. Defaults to yourself if only one user is provided.
+    - user2:
+        desc: Second user to ship (optional).

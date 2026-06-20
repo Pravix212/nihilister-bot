@@ -30,7 +30,7 @@ saradd:
         desc: The role that can be assigned by the user.
 sarautodelete:
   desc: |-
-    Toggles the automatic deletion of the user's message and Nadeko's confirmations for `{0}iam` and `{0}iamn` commands.
+    Toggles the automatic deletion of the user's message and Nihilister's confirmations for `{0}iam` and `{0}iamn` commands.
   ex:
     - ''
   params:

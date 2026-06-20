@@ -1,0 +1,15 @@
+[Unit]
+Description=Nihilister Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/bot-publish
+ExecStart=/root/bot-publish/NadekoBot
+Restart=always
+RestartSec=5
+Environment=DOTNET_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target

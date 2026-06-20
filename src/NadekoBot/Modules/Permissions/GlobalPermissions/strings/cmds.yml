@@ -1,4 +1,4 @@
-dmcommand:
+﻿dmcommand:
   desc: Toggles whether a command can be used in DMs.
   ex:
     - '{0}stats'

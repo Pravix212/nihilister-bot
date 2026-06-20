@@ -23,8 +23,16 @@ public sealed class AfkService : INService, IReadyExecutor
     private static TypedKey<bool> GetRecentlySentKey(ulong userId, ulong channelId)
         => new($"afk:recent:{userId}:{channelId}");
 
-    public async Task<bool> SetAfkAsync(ulong userId, string text)
-        => await _cache.AddAsync(GetKey(userId), text, _maxAfkDuration, overwrite: true);
+    // Accepts IGuildUser to immediately apply the [AFK] prefix to the nickname
+    public async Task<bool> SetAfkAsync(IGuildUser user, string text)
+    {
+        var success = await _cache.AddAsync(GetKey(user.Id), text, _maxAfkDuration, overwrite: true);
+        if (success)
+        {
+            _ = Task.Run(async () => await TryChangeNicknameAsync(user, true));
+        }
+        return success;
+    }
 
     public Task OnReadyAsync()
     {
@@ -42,23 +50,29 @@ public sealed class AfkService : INService, IReadyExecutor
 
         _ = Task.Run(async () =>
         {
-            await TryClearSelfAfkInternalAsync(sm.Author.Id, tc);
+            if (sm.Author is IGuildUser gUser)
+            {
+                await TryClearSelfAfkInternalAsync(gUser, tc);
+            }
             await TryReplyAfkOnMentionInternalAsync(sm, uMsg, tc);
         });
 
         return Task.CompletedTask;
     }
 
-    private async Task TryClearSelfAfkInternalAsync(ulong userId, ITextChannel tc)
+    private async Task TryClearSelfAfkInternalAsync(IGuildUser user, ITextChannel tc)
     {
         try
         {
-            var key = GetKey(userId);
+            var key = GetKey(user.Id);
             var result = await _cache.GetAsync(key);
             if (!result.TryPickT0(out _, out _))
                 return;
 
             await _cache.RemoveAsync(key);
+
+            // Revert nickname back to normal asynchronously
+            _ = Task.Run(async () => await TryChangeNicknameAsync(user, false));
 
             var msg = await _mss.Response(tc).Confirm("AFK message cleared!").SendAsync();
             msg.DeleteAfter(5);
@@ -66,6 +80,47 @@ public sealed class AfkService : INService, IReadyExecutor
         catch (Exception ex)
         {
             Log.Warning("Unexpected error clearing afk: {Message}", ex.Message);
+        }
+    }
+
+    // Safely changes or updates nicknames with Discord boundary conditions handled
+    private async Task TryChangeNicknameAsync(IGuildUser user, bool isGoingAfk)
+    {
+        try
+        {
+            var currentNickname = user.Nickname ?? user.GlobalName ?? user.Username;
+
+            if (isGoingAfk)
+            {
+                if (currentNickname.StartsWith("[AFK] ", StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                string newNick = $"[AFK] {currentNickname}";
+                if (newNick.Length > 32)
+                    newNick = newNick[..32];
+
+                await user.ModifyAsync(properties => properties.Nickname = newNick);
+            }
+            else
+            {
+                if (currentNickname.StartsWith("[AFK] ", StringComparison.OrdinalIgnoreCase))
+                {
+                    string originalNick = currentNickname["[AFK] ".Length..];
+
+                    if (originalNick == (user.GlobalName ?? user.Username))
+                        await user.ModifyAsync(properties => properties.Nickname = null);
+                    else
+                        await user.ModifyAsync(properties => properties.Nickname = originalNick);
+                }
+            }
+        }
+        catch (HttpException ex) when (ex.HttpCode == System.Net.HttpStatusCode.Forbidden)
+        {
+            Log.Warning("Failed to update nickname for {User} due to Discord hierarchy or missing permissions.", user.Username);
+        }
+        catch (Exception ex)
+        {
+            Log.Warning("Unexpected error modifying nickname: {Message}", ex.Message);
         }
     }
 

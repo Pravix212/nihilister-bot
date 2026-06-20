@@ -19,7 +19,7 @@ patrons:
 patronmessage:
   desc: |-
     Sends a message to all patrons of the specified tier and higher.
-    Supports [embeds](https://eb.nadeko.bot/)
+    Supports [embeds](https://eb.Nihilister.bot/)
   ex:
     - x hello
   params:

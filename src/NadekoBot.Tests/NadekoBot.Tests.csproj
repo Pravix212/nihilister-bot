@@ -6,36 +6,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NUnit" Version="4.3.2"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-        <PackageReference Include="NSubstitute" Version="5.3.0"/>
-        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0"/>
+        <PackageReference Include="NUnit" Version="4.3.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="NSubstitute" Version="5.3.0" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0" />
     </ItemGroup>
 
 
     <ItemGroup>
-        <ProjectReference Include="..\NadekoBot\NadekoBot.csproj"/>
-        <ProjectReference Include="..\NadekoBot.StringsMerger\NadekoBot.StringsMerger.csproj" GlobalPropertiesToRemove="OutputPath"/>
+        <ProjectReference Include="..\NadekoBot\NadekoBot.csproj" />
+        <ProjectReference Include="..\NadekoBot.StringsMerger\NadekoBot.StringsMerger.csproj" GlobalPropertiesToRemove="OutputPath" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="testdata/**/*" CopyToOutputDirectory="PreserveNewest"/>
+        <Content Include="testdata/**/*" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 
-    <UsingTask
-        TaskName="MergeStringsTask"
-        AssemblyFile="$(MSBuildThisFileDirectory)../NadekoBot.StringsMerger/bin/$(Configuration)/netstandard2.0/NadekoBot.StringsMerger.dll"/>
+    <UsingTask TaskName="MergeStringsTask" AssemblyFile="$(MSBuildThisFileDirectory)../NadekoBot.StringsMerger/bin/$(Configuration)/netstandard2.0/NadekoBot.StringsMerger.dll" />
 
     <ItemGroup>
-        <ResToMerge Include="../NadekoBot/Modules/**/strings/*.yml"/>
+        <ResToMerge Include="../NadekoBot/Modules/**/strings/*.yml" />
     </ItemGroup>
 
     <Target Name="MergeStringsTask" BeforeTargets="AfterBuild">
-        <MergeStringsTask
-            InputYmls="@(ResToMerge)"
-            OutputDir="$(TargetDir)strings/"
-        />
+        <MergeStringsTask InputYmls="@(ResToMerge)" OutputDir="$(TargetDir)strings/" />
     </Target>
 
 </Project>

@@ -38,6 +38,17 @@ public sealed class ImagesConfig : ConfigServiceBase<ImageUrls>
                 c.Version = 11;
             });
         }
+
+        if (Data.Version < 12)
+        {
+            ModifyConfig(c =>
+            {
+                c.Waifu ??= new ImageUrls.WaifuActionData();
+                c.Waifu.Spit = [new Uri("https://media.tenor.com/aKSY2XuSpcwAAAAd/anime-spit.gif")];
+                c.Version = 12;
+            });
+        }
+
     }
 
     private static ImageUrls.WaifuActionData CreateDefaultWaifuActions()
@@ -47,5 +58,6 @@ public sealed class ImagesConfig : ConfigServiceBase<ImageUrls>
             Kiss = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/kiss/kiss_{i}.gif")).ToArray(),
             Pat = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/pat/pat_{i}.gif")).ToArray(),
             Nom = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/nom/nom_{i}.gif")).ToArray(),
+            Spit = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/spit/spit_{i}.gif")).ToArray(),
         };
 }

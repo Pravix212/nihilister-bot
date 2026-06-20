@@ -1,4 +1,4 @@
-using NadekoBot.Common.Yml;
+﻿using NadekoBot.Common.Yml;
 
 namespace NadekoBot.Modules.Utility.AiAgent;
 

@@ -1,0 +1,11 @@
+samplefind:
+  desc: |-
+    Searches for audio samples on Freesound.org. Use `.samplefind query, key, bpm-min-max` to search.
+    Example: `.samplefind kick, C, 120-130`
+  ex:
+    - kick drum
+    - snare, D
+    - hi-hat, C, 120-130
+  params:
+    - input:
+        desc: Search query with optional key and BPM range separated by commas.

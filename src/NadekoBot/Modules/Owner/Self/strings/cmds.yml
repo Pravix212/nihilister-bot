@@ -84,12 +84,12 @@ forwardtochannel:
   params:
     - {}
 leave:
-  desc: Makes Nadeko leave the server. Either server name or server ID is required.
+  desc: Makes Nihilister leave the server. Either server name or server ID is required.
   ex:
     - 123123123331
   params:
     - guildStr:
-        desc: The name of the server where Nadeko should leave.
+        desc: The name of the server where Nihilister should leave.
 restart:
   desc: Restarts the bot. Might not work.
   ex:
@@ -140,7 +140,7 @@ setactivity:
         desc: The status text to display.
 setavatar:
   desc: |-
-    Sets a new avatar image for the NadekoBot. Parameter is a direct link to an image.
+    Sets a new avatar image for the Nihilister. Parameter is a direct link to an image.
   ex:
     - https://i.imgur.com/xTG3a1I.jpg
   params:
@@ -148,7 +148,7 @@ setavatar:
         desc: The URL of the image file to be displayed as the bot's avatar.
 setbanner:
   desc: |-
-    Sets a new banner image for the NadekoBot. Parameter is a direct link to an image. Supports gifs.
+    Sets a new banner image for the Nihilister. Parameter is a direct link to an image. Supports gifs.
   ex:
     - https://i.imgur.com/xTG3a1I.jpg
   params:

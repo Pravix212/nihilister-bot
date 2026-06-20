@@ -928,15 +928,8 @@ public partial class Utility : NadekoModule
 
     private static int CalculateLovePercentage(ulong id1, ulong id2)
     {
-        var a = Math.Min(id1, id2);
-        var b = Math.Max(id1, id2);
-        // DJB2-like hash for deterministic, commutative results
-        int hash = 5381;
-        hash = ((hash << 5) + hash) + (int)(a & 0xFFFFFFFF);
-        hash = ((hash << 5) + hash) + (int)(a >> 32);
-        hash = ((hash << 5) + hash) + (int)(b & 0xFFFFFFFF);
-        hash = ((hash << 5) + hash) + (int)(b >> 32);
-        return Math.Abs(hash) % 101;
+        // Random percentage for fun — same pair gets different results every time!
+        return Random.Shared.Next(0, 101);
     }
 
     private static string GetShipDescription(int percentage)

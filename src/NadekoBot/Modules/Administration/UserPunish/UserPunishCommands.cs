@@ -1,5 +1,7 @@
 #nullable disable
 using CommandLine;
+using System.IO;
+using System.Text.Json;
 using NadekoBot.Common.TypeReaders.Models;
 using NadekoBot.Modules.Administration.Services;
 using NadekoBot.Db.Models;
@@ -1099,6 +1101,122 @@ public partial class Administration
                 .AddField(GetText(strs.invalid(missing)), missStr)
                 .WithOkColor()
                 .Build());
+        }
+
+        [Cmd]
+        [RequireContext(ContextType.Guild)]
+        [UserPerm(GuildPerm.ModerateMembers)]
+        [BotPerm(GuildPerm.ModerateMembers)]
+        public async Task MikuMikuBeam(IGuildUser user)
+        {
+            if (!await CheckRoleHierarchy(user))
+                return;
+
+            await user.SetTimeOutAsync(TimeSpan.FromMinutes(1));
+            await LogMikuBeamAsync(ctx.Guild.Id, user.Id, ctx.User.Id, user.ToString(), ctx.User.ToString());
+
+            var eb = CreateEmbed()
+                .WithOkColor()
+                .WithTitle("🎵 Miku Miku Beam! ✨")
+                .WithDescription($"**{user.DisplayName}** has been hit by the Miku Miku Beam!\n\n" +
+                    $"They have been timed out for **1 minute**! 💫")
+                .WithImageUrl("https://i.imgur.com/H7oPIq3.gif")
+                .WithFooter($"Beamed by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
+
+            await Response().Embed(eb).SendAsync();
+        }
+
+        [Cmd]
+        [RequireContext(ContextType.Guild)]
+        [UserPerm(GuildPerm.ModerateMembers)]
+        public async Task MikuMikuLog(IGuildUser user = null)
+        {
+            var logs = await GetMikuBeamLogsAsync(ctx.Guild.Id, user?.Id);
+            if (logs.Count == 0)
+            {
+                await Response().Error(user is null
+                    ? "No Miku Miku Beams have been recorded in this server yet!"
+                    : $"No Miku Miku Beams found for **{user.DisplayName}**!").SendAsync();
+                return;
+            }
+
+            var eb = CreateEmbed()
+                .WithOkColor()
+                .WithTitle("🎵 Miku Miku Beam Log");
+
+            foreach (var log in logs.Take(10))
+            {
+                eb.AddField(
+                    $"{log.Timestamp:yyyy-MM-dd HH:mm}",
+                    $"**Target:** {log.TargetName}\n**Beamed by:** {log.ModeratorName}",
+                    true);
+            }
+
+            await Response().Embed(eb).SendAsync();
+        }
+
+        private static readonly string MikuBeamLogPath = Path.Combine("data", "mikumikubeam_log.json");
+
+        private static async Task LogMikuBeamAsync(ulong guildId, ulong targetId, ulong moderatorId, string targetName, string moderatorName)
+        {
+            var logEntry = new MikuBeamLogEntry
+            {
+                GuildId = guildId,
+                TargetId = targetId,
+                ModeratorId = moderatorId,
+                TargetName = targetName,
+                ModeratorName = moderatorName,
+                Timestamp = DateTime.UtcNow
+            };
+
+            List<MikuBeamLogEntry> logs = new();
+            try
+            {
+                if (File.Exists(MikuBeamLogPath))
+                {
+                    var json = await File.ReadAllTextAsync(MikuBeamLogPath);
+                    logs = JsonSerializer.Deserialize<List<MikuBeamLogEntry>>(json) ?? new List<MikuBeamLogEntry>();
+                }
+            }
+            catch { }
+
+            logs.Add(logEntry);
+            // Keep only last 1000 entries per guild to prevent file bloat
+            var trimmed = logs.Where(l => l.GuildId == guildId).TakeLast(100).ToList();
+            trimmed.AddRange(logs.Where(l => l.GuildId != guildId));
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            await File.WriteAllTextAsync(MikuBeamLogPath, JsonSerializer.Serialize(trimmed, options));
+        }
+
+        private static async Task<List<MikuBeamLogEntry>> GetMikuBeamLogsAsync(ulong guildId, ulong? targetId = null)
+        {
+            try
+            {
+                if (!File.Exists(MikuBeamLogPath))
+                    return new List<MikuBeamLogEntry>();
+
+                var json = await File.ReadAllTextAsync(MikuBeamLogPath);
+                var logs = JsonSerializer.Deserialize<List<MikuBeamLogEntry>>(json) ?? new List<MikuBeamLogEntry>();
+                var filtered = logs.Where(l => l.GuildId == guildId).OrderByDescending(l => l.Timestamp).ToList();
+                if (targetId.HasValue)
+                    filtered = filtered.Where(l => l.TargetId == targetId.Value).ToList();
+                return filtered;
+            }
+            catch
+            {
+                return new List<MikuBeamLogEntry>();
+            }
+        }
+
+        public class MikuBeamLogEntry
+        {
+            public ulong GuildId { get; set; }
+            public ulong TargetId { get; set; }
+            public ulong ModeratorId { get; set; }
+            public string TargetName { get; set; }
+            public string ModeratorName { get; set; }
+            public DateTime Timestamp { get; set; }
         }
 
         public class WarnExpireOptions : INadekoCommandOptions

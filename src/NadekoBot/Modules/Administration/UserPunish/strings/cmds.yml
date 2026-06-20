@@ -293,3 +293,22 @@ warnpunishlist:
     - ''
   params:
     - {}
+mikumikubeam:
+  desc: |-
+    Hits a user with the Miku Miku Beam! Times them out for 1 minute and logs it.
+    Requires Moderate Members permission. Fun command inspired by Hatsune Miku.
+  ex:
+    - '@Someone'
+  params:
+    - user:
+        desc: The user to beam with Miku Miku power.
+mikumikulog:
+  desc: |-
+    Shows the Miku Miku Beam log for a user or the entire server.
+    Requires Moderate Members permission.
+  ex:
+    - ''
+    - '@Someone'
+  params:
+    - user:
+        desc: Optional user to filter the log by. Shows all beams if omitted.

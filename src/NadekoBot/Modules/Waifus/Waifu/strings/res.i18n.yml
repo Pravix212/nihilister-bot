@@ -12,6 +12,7 @@ ar:
   waifu_hugged: 'لقد منحت {0} عناقًا دافئًا!'
   waifu_kissed: 'لقد قبّلت {0}!'
   waifu_patted: 'لقد ربّتّ على {0} بلطف.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'لقد اطعمت {0}!'
   waifu_pending_payout: 'لديك {0} من المدفوعات غير المحصّلة.'
   waifu_no_pending_payout: ليس لديك مدفوعات معلّقة.
@@ -111,6 +112,7 @@ de-DE:
   waifu_hugged: 'Du hast {0} umarmt!'
   waifu_kissed: 'Du hast {0} geküsst!'
   waifu_patted: 'Du hast {0} gestreichelt.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Du hast {0} gefuttert!'
   waifu_pending_payout: 'Du hast {0} an nicht abgeholten Auszahlungen.'
   waifu_no_pending_payout: Du hast keine ausstehenden Auszahlungen.
@@ -210,6 +212,7 @@ es-ES:
   waifu_hugged: '¡Le diste un abrazo cálido a {0}!'
   waifu_kissed: '¡Besaste a {0}!'
   waifu_patted: 'Le hiciste cariño a {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Le diste de comer a {0}!'
   waifu_pending_payout: 'Tienes {0} en pagos no cobrados.'
   waifu_no_pending_payout: No tienes pagos pendientes.
@@ -309,6 +312,7 @@ fr-FR:
   waifu_hugged: 'Vous avez fait un câlin chaleureux à {0} !'
   waifu_kissed: 'Vous avez embrassé {0} !'
   waifu_patted: 'Vous avez caressé {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Tu as nourri {0} !'
   waifu_pending_payout: 'Vous avez {0} en paiements non collectés.'
   waifu_no_pending_payout: Vous n'avez pas de paiements en attente.
@@ -408,6 +412,7 @@ id-ID:
   waifu_hugged: 'Kamu memberi {0} pelukan hangat!'
   waifu_kissed: 'Kamu mencium {0}!'
   waifu_patted: 'Kamu mengelus {0} dengan lembut.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Kamu memberi makan {0}!'
   waifu_pending_payout: 'Kamu punya {0} pembayaran yang belum diambil.'
   waifu_no_pending_payout: Kamu tidak punya pembayaran yang tertunda.
@@ -507,6 +512,7 @@ ja-JP:
   waifu_hugged: '{0}に温かいハグをしました！'
   waifu_kissed: '{0}にキスしました！'
   waifu_patted: '{0}を優しくなでました。'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: '{0}にご飯をあげた!'
   waifu_pending_payout: '未回収のペイアウトが{0}あります。'
   waifu_no_pending_payout: 保留中のペイアウトはありません。
@@ -606,6 +612,7 @@ ko-KR:
   waifu_hugged: '{0}에게 따뜻한 포옹을 해줬어요!'
   waifu_kissed: '{0}에게 키스했어요!'
   waifu_patted: '{0}을(를) 부드럽게 쓰다듬었어요.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: '{0}에게 밥을 줬어요!'
   waifu_pending_payout: '미수령 보수가 {0} 있어요.'
   waifu_no_pending_payout: 미수령 보수가 없어요.
@@ -705,6 +712,7 @@ pl-PL:
   waifu_hugged: 'Przytuliłeś {0}!'
   waifu_kissed: 'Pocałowałeś {0}!'
   waifu_patted: 'Pogłaskałeś {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Nakarmiles {0}!'
   waifu_pending_payout: 'Masz {0} w nieodebranych wypłatach.'
   waifu_no_pending_payout: Nie masz żadnych oczekujących wypłat.
@@ -804,6 +812,7 @@ pt-BR:
   waifu_hugged: 'Você deu um abraço caloroso em {0}!'
   waifu_kissed: 'Você beijou {0}!'
   waifu_patted: 'Você fez carinho em {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Voce alimentou {0}!'
   waifu_pending_payout: 'Você tem {0} em pagamentos não coletados.'
   waifu_no_pending_payout: Você não tem pagamentos pendentes.
@@ -903,6 +912,7 @@ ru-RU:
   waifu_hugged: 'Вы обняли {0}!'
   waifu_kissed: 'Вы поцеловали {0}!'
   waifu_patted: 'Вы погладили {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Вы накормили {0}!'
   waifu_pending_payout: 'У вас {0} несобранных выплат.'
   waifu_no_pending_payout: У вас нет ожидающих выплат.
@@ -1002,6 +1012,7 @@ sr-Cyrl-RS:
   waifu_hugged: 'Загрлили сте {0}!'
   waifu_kissed: 'Пољубили сте {0}!'
   waifu_patted: 'Нежно сте потапшали {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Нахранили сте {0}!'
   waifu_pending_payout: 'Имате {0} у неприкупљеним исплатама.'
   waifu_no_pending_payout: Немате исплате на чекању.
@@ -1101,6 +1112,7 @@ tr-TR:
   waifu_hugged: '{0} kullanıcısına sıcak bir sarılma verdin!'
   waifu_kissed: '{0} kullanıcısını öptün!'
   waifu_patted: '{0} kullanıcısını nazikçe okşadın.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: '{0} kullanicisini besledin!'
   waifu_pending_payout: 'Toplanmamış {0} ödemen var.'
   waifu_no_pending_payout: Bekleyen ödemen yok.
@@ -1200,6 +1212,7 @@ ts-TS:
   waifu_hugged: 'You gave {0} a warm hug!'
   waifu_kissed: 'You kissed {0}! W-whatever!'
   waifu_patted: 'You gently patted {0}. H-how sweet... I mean, whatever.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'You fed {0}! I-it''s not like I''m jealous or anything!'
   waifu_pending_payout: 'You have {0} in uncollected payouts.'
   waifu_no_pending_payout: You have no pending payouts.
@@ -1299,6 +1312,7 @@ uk-UA:
   waifu_hugged: 'Ти тепло обійняв(-ла) {0}!'
   waifu_kissed: 'Ти поцілував(-ла) {0}!'
   waifu_patted: 'Ти ніжно погладив(-ла) {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Ти нагодував(-ла) {0}!'
   waifu_pending_payout: 'У тебе {0} незібраних виплат.'
   waifu_no_pending_payout: У тебе немає незібраних виплат.
@@ -1398,6 +1412,7 @@ vi-VN:
   waifu_hugged: 'Bạn đã ôm {0} thật ấm áp!'
   waifu_kissed: 'Bạn đã hôn {0}!'
   waifu_patted: 'Bạn đã nhẹ nhàng vỗ về {0}.'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: 'Ban da cho {0} an!'
   waifu_pending_payout: 'Bạn có {0} chưa nhận.'
   waifu_no_pending_payout: Bạn không có khoản thanh toán nào đang chờ.
@@ -1497,6 +1512,7 @@ zh-CN:
   waifu_hugged: '你給了 {0} 一個溫暖的擁抱！'
   waifu_kissed: '你親了 {0}！'
   waifu_patted: '你輕輕摸了摸 {0}。'
+  waifu_spat: "You spat on {0}!"
   waifu_nommed: '你喂了 {0}!'
   waifu_pending_payout: '你有 {0} 未領取的收益。'
   waifu_no_pending_payout: 你沒有待領取的收益。

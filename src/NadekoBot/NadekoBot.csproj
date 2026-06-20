@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -101,7 +101,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\NadekoBot.StringsMerger\NadekoBot.StringsMerger.csproj" GlobalPropertiesToRemove="OutputPath" />
-        <ProjectReference Include="..\Nadeko.Medusa\Nadeko.Medusa.csproj" />
+        <ProjectReference Include="..\Nadeko.Medusa\NadekoBot.Medusa.csproj" />
         <ProjectReference Include="..\NadekoBot.Voice\NadekoBot.Voice.csproj" />
         <ProjectReference Include="..\NadekoBot.Generators\NadekoBot.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>

@@ -23,8 +23,8 @@ namespace NadekoBot.Services
             _timer = new Timer(
                 _ => UpdateStatus(),
                 null,
-                TimeSpan.FromMinutes(1),
-                TimeSpan.FromMinutes(1));
+                TimeSpan.FromSeconds(1),
+                TimeSpan.FromSeconds(1));
             return Task.CompletedTask;
         }
 
@@ -33,7 +33,8 @@ namespace NadekoBot.Services
             try
             {
                 var uptime = DateTime.UtcNow - _startTime;
-                var status = $"Watching over Heathen's Garden - Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+                var status = $"Watc" +
+                    $"Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
                 _ = _client.SetGameAsync(status);
             }
             catch { /* ignore */ }

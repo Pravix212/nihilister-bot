@@ -50,4 +50,4 @@ customHeaders:
 # Lower values save output tokens on simple tool-calling tasks. Default "low"
 reasoningEffort: low
 # Whether AI agent text responses are sent as embeds. If false, sent as plain text. Default true
-useEmbed: true
+useEmbed: false

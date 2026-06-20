@@ -8,7 +8,10 @@ $remotePath = "/root/bot-publish"
 # NOTE: We build ON the droplet because the Windows .NET 10 SDK has a NuGet bug.
 # This script pushes your code to GitHub, then triggers a rebuild on the server.
 
-# 1. Stage and push local changes
+# 1. Set default merge strategy so git doesn't complain about divergent branches
+git config pull.rebase false
+
+# 2. Stage and push local changes
 Write-Host "Committing and pushing changes..."
 Set-Location "C:\Users\Prav2\AppData\Roaming\NadekoHub\Bots\Nihilister Clone"
 $msg = Read-Host "Enter commit message (or press Enter for 'Update bot')"
@@ -16,12 +19,19 @@ if ([string]::IsNullOrWhiteSpace($msg)) { $msg = "Update bot" }
 
 git add .
 git commit -m "$msg" 2>$null
-git push origin v6
 
-# 2. Trigger remote build + restart
+# If push fails due to divergent branches, pull merge then push again
+git push origin v6
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Push failed due to divergent branches. Pulling and retrying..."
+    git pull origin v6 --no-rebase
+    git push origin v6
+}
+
+# 3. Trigger remote build + restart
 Write-Host "Pulling latest code and rebuilding on droplet..."
 $sshCommand = @"
-cd /root/nihilister-bot && git pull origin v6 && dotnet publish src/NadekoBot/NadekoBot.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-publish -p:UseSharedCompilation=false && systemctl restart nihilister-bot && systemctl status nihilister-bot --no-pager
+cd /root/nihilister-bot && git config pull.rebase false && git pull origin v6 --no-rebase && dotnet publish src/NadekoBot/NadekoBot.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-publish -p:UseSharedCompilation=false && systemctl restart nihilister-bot && systemctl status nihilister-bot --no-pager
 "@
 
 ssh "${botUser}@${dropletIp}" "$sshCommand"

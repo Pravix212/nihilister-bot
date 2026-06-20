@@ -1,4 +1,4 @@
-﻿# DO NOT CHANGE THE VERSION MANUALLY
+# DO NOT CHANGE THE VERSION MANUALLY
 version: 11
 coins:
   heads:
@@ -6,7 +6,7 @@ coins:
   tails:
     - https://cdn.nadeko.bot/coins/tails3.png
 currency:
-  - https://i.imgur.com/JYJBhlr.png
+  - https://i.imgur.com/tC2Mm7C.png
 dice:
   - https://cdn.nadeko.bot/other/dice/0.png
   - https://cdn.nadeko.bot/other/dice/1.png

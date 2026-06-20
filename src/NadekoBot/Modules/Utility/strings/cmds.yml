@@ -97,7 +97,7 @@ eval:
     `channel` - Channel in which the command is executed
     `user` - User executing the command
     `ctx` - Discord.Net command context
-    `services` - Nadeko's IServiceProvider
+    `services` - Nihilister's IServiceProvider
   ex:
     - 123 / 4.5f
     - await ctx.OkAsync();
@@ -168,7 +168,7 @@ say:
     Make the bot say something, or in other words, make the bot send the message.
     You can optionally specify the channel where the bot will send the message.
     If you omit the channel name, it will send the message in the current channel.
-    Supports [embeds](https://eb.nadeko.bot/)
+    Supports [embeds](https://eb.Nihilister.bot/)
   ex:
     - hi
     - '#chat hi'
@@ -250,7 +250,7 @@ snipe:
   params:
     - {}
 stats:
-  desc: Shows some basic stats for Nadeko.
+  desc: Shows some basic stats for Nihilister.
   ex:
     - ''
   params:
@@ -296,3 +296,16 @@ whosplaying:
   params:
     - game:
         desc: The name of the game being played by the users.
+ship:
+  desc: |-
+    Calculates a love compatibility percentage between two users.
+    Mention one user to ship yourself with them, or mention two users to ship them together.
+    The percentage is deterministic — the same pair always gets the same result!
+  ex:
+    - '@Someone'
+    - '@User1 @User2'
+  params:
+    - user1:
+        desc: First user to ship. Defaults to yourself if only one user is provided.
+    - user2:
+        desc: Second user to ship (optional).

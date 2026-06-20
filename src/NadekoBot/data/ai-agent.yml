@@ -4,38 +4,50 @@ version: 8
 enabled: true
 # Base URL for the OpenAI-compatible API.
 # DO NOT add /v1/chat/completions suffix.
-apiUrl: https://openrouter.ai/api
+apiUrl: https://api.x.ai
+apiKey: xai-dEvaa7FE6g6ded9mbWtpNIF6L1ZjQpRY25cLAxQ6cogEfexJSseU6RilQI4tKWIdWR4wj6IKTtaQGS9T
 # Which model to use for the agent. Must support tool/function calling.
-modelName: inception/mercury-2
+modelName: grok-build-0.1
 # Optional list of model IDs for providers that support fallback routing (e.g. OpenRouter).
 # If set, this is sent as "models" instead of "model" in the request body.
 # Example: ["openai/gpt-5.4", "anthropic/claude-opus-4", "google/gemini-3.1-pro"]
 models: []
 # Maximum number of tool calls the agent can make per invocation. Default 10
-maxToolCalls: 10
+# Reduced to 2 to prevent loops. Most chat queries should need 0 tools.
+maxToolCalls: 2
 # Maximum tokens for LLM responses. Default 2048
 maxTokens: 2048
 # Temperature for LLM responses. Lower = more deterministic. Default 0.3
 temperature: 0.3
 # List of allowed tool names. If empty, all tools are available.
-# Example: ["send_message", "get_message"]
-allowedTools: []
+# Removed send_message because the AI was sending messages via tools AND the final
+# response was also being sent, causing duplicate/triple messages.
+# Only read-only tools remain for safety.
+allowedTools:
+  - get_message
+  - list_channels
+  - get_channel_info
+  - get_user_info
+  - list_user_roles
+  - compute_timestamp
+  - ask_user
+  - close_session
 # Number of recent messages per channel the agent remembers. 0 to disable. Default 20
 channelMessageMemory: 20
 # Minutes of inactivity before channel memory expires and stops observing. Default 30
 memoryIdleExpiryMinutes: 30
-# Enable triggering the agent by saying the bot's name (with intent classification). Default true
-nameTriggerEnabled: true
-# Seconds after an agent response during which the user's messages go directly to the agent. Default 120
-followUpWindowSeconds: 120
+# DISABLED: Bot will NOT respond when you say her name
+nameTriggerEnabled: false
+# DISABLED: Bot will NOT keep responding after .ai — only responds to explicit .ai commands
+followUpWindowSeconds: 0
 # Custom HTTP headers sent with every LLM request.
 # Useful for provider-specific headers like X-OpenRouter-Title.
 # Example: { "X-OpenRouter-Title": "Nadeko" }
 customHeaders:
-  X-OpenRouter-Title: Nadeko
+  X-OpenRouter-Title: Nihilister
 # Reasoning effort level for models that support it (e.g. GPT-5.x, Claude, o-series).
 # Values: "none", "low", "medium", "high", "xhigh". Empty string to disable.
 # Lower values save output tokens on simple tool-calling tasks. Default "low"
 reasoningEffort: low
 # Whether AI agent text responses are sent as embeds. If false, sent as plain text. Default true
-useEmbed: true
+useEmbed: false

@@ -902,7 +902,8 @@ public sealed class AiAgentService(
 
     /// <summary>
     /// Checks if a user is allowed to use the AI agent.
-    /// Owner is always allowed. When patronage is enabled, active patrons are also allowed.
+    /// Owner is always allowed. If patronage is enabled, only active patrons are allowed.
+    /// If patronage is disabled (default), everyone is allowed to use the AI agent.
     /// Results are cached for 1 minute to avoid DB queries on every message.
     /// </summary>
     public async Task<bool> IsAllowedAsync(IUser user)
@@ -910,8 +911,9 @@ public sealed class AiAgentService(
         if (credsProvider.GetCreds().IsOwner(user))
             return true;
 
+        // If patronage is not enabled, allow everyone to use the AI agent (free access)
         if (!patronageConfig.Data.IsEnabled)
-            return false;
+            return true;
 
         var now = DateTime.UtcNow;
         if (_allowedCache.TryGetValue(user.Id, out var cached) && cached.ExpiresUtc > now)

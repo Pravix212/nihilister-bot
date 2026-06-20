@@ -12,7 +12,7 @@ namespace NadekoBot.Modules.SampleFinder;
 [Group]
 public class SampleFinderModule : NadekoModule
 {
-    private const string ApiKey = "y0uFbwOTsawnF4K0RND6uGi1F1cDSPdBfvo6AbnE";
+    private const string ApiKey = "YOUR_KEY_HERE";
 
     [Cmd]
     [Aliases("sf")]

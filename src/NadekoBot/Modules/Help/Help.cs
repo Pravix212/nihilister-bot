@@ -1,4 +1,5 @@
 #nullable disable
+using Discord;
 using NadekoBot.Modules.Help.Common;
 using NadekoBot.Modules.Help.Services;
 using Nadeko.Common.Medusa;
@@ -484,40 +485,43 @@ public sealed partial class Help : NadekoModule<HelpService>
         await Response().Error(strs.command_not_found).SendAsync();
     }
 
-    [Cmd]
-    [Priority(1)]
-    public async Task H([Leftover] CommandInfo com = null)
+[Cmd]
+[Priority(1)]
+public async Task H([Leftover] CommandInfo com = null)
+{
+    var channel = ctx.Channel;
+    if (com is null)
     {
-        var channel = ctx.Channel;
-        if (com is null)
-        {
-            try
-            {
-                var ch = channel is ITextChannel ? await ctx.User.CreateDMChannelAsync() : channel;
-                var data = await GetHelpString();
-                if (data == default)
-                    return;
+        var clientId = await _lazyClientId.Value;
+        var inviteLink = $"https://discordapp.com/oauth2/authorize?client_id={clientId}&scope=bot&permissions=66186303";
+        var supportLink = "https://discord.com/invite/2DPjFc7XVT";
+        var commandsLink = "https://prav.lol/nihilister/commands";
 
-                await Response().Channel(ch).Text(data).SendAsync();
-                try
-                {
-                    await ctx.OkAsync();
-                }
-                catch
-                {
-                } // ignore if bot can't react
-            }
-            catch (Exception)
-            {
-                await Response().Error(strs.cant_dm).SendAsync();
-            }
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("Nihilister Help")
+            .WithDescription($"To invite me to your server, use this [link]({inviteLink})")
+            .WithThumbnailUrl(_client.CurrentUser.GetAvatarUrl() ?? _client.CurrentUser.GetDefaultAvatarUrl())
+            .AddField("Useful help commands",
+                $"{Format.Code(".modules")} Lists all bot modules.\n"
+                + $"{Format.Code(".h CommandName")} Shows some help about a specific command.\n"
+                + $"{Format.Code(".commands ModuleName")} Lists all commands in a module.",
+                false)
+            .AddField("List of all Commands",
+                $"[View all commands]({commandsLink})",
+                false)
+            .AddField("Nihilister Support",
+                $"[Join the support server]({supportLink})",
+                false)
+            .WithFooter($"Prefix: {prefix} | Use .h <command> for command help");
 
-            return;
-        }
-
-        var embed = _cus.GetCommandHelp(com, ctx.Guild);
-        await _sender.Response(channel).Embed(embed).SendAsync();
+        await ctx.Channel.SendMessageAsync(embed: eb.Build());
+        return;
     }
+
+    var embed = _cus.GetCommandHelp(com, ctx.Guild);
+    await _sender.Response(channel).Embed(embed).SendAsync();
+}
 
     [Cmd]
     [OwnerOnly]
@@ -537,52 +541,33 @@ public sealed partial class Help : NadekoModule<HelpService>
             .SendAsync();
 
     [Cmd]
-    [OnlyPublicBot]
     public async Task Donate()
     {
         var eb = CreateEmbed()
             .WithOkColor()
-            .WithTitle("Thank you for considering to donate to the NadekoBot project!");
-
-        eb
+            .WithTitle("Support Nihilister")
             .WithDescription("""
-                             NadekoBot relies on donations to keep the servers, services and APIs running.
-                             Donating will give you access to some exclusive features. You can read about them on the [patreon page](https://patreon.com/join/nadekobot)
+                             Keeping the heretic alive costs real money every month.
+                             
+                             **Monthly Costs:**
+                             • DigitalOcean VPS — $6-12/month
+                             • Grok AI API — $15-30/month
+                             • Domain & SSL — $10/year
+                             
+                             Every donation helps keep the bot running 24/7.
                              """)
-            .AddField("Donation Instructions",
-                $"""
-                 🗒️ Before pledging it is recommended to open your DMs as Nadeko will send you a welcome message with instructions after you pledge has been processed and confirmed.
+            .WithFooter("Thank you for supporting the Heathen's Garden ❤️");
 
-                 **Step 1:** ❤️ Pledge on Patreon ❤️
+        var button = new ButtonBuilder(
+            label: "💰 Donate",
+            url: "https://prav.lol/nihilister/donate.html",
+            style: ButtonStyle.Link
+        );
 
-                 `1.` Go to <https://patreon.com/join/nadekobot> and choose a tier.
-                 `2.` Make sure your payment is processed and accepted.
+        var components = new ComponentBuilder()
+            .WithButton(button)
+            .Build();
 
-                 **Step 2** 🤝 Connect your Discord account 🤝
-
-                 `1.` Go to your profile settings on Patreon and connect your Discord account to it.
-                 *please make sure you're logged into the correct Discord account*
-
-                 If you do not know how to do it, you may [follow instructions here](https://support.patreon.com/hc/en-us/articles/212052266-How-do-I-connect-Discord-to-Patreon-Patron-)
-
-                 **Step 3** ⏰ Wait a short while (usually 1-3 minutes) ⏰
-                   
-                 Nadeko will DM you the welcome instructions, and you will receive your rewards!
-                 🎉 **Enjoy!** 🎉
-                 """);
-
-        try
-        {
-            await Response()
-                .Channel(await ctx.User.CreateDMChannelAsync())
-                .Embed(eb)
-                .SendAsync();
-
-            _ = ctx.OkAsync();
-        }
-        catch
-        {
-            await Response().Error(strs.cant_dm).SendAsync();
-        }
+        await ctx.Channel.SendMessageAsync(embed: eb.Build(), components: components);
     }
 }

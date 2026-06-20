@@ -1,4 +1,4 @@
-# DO NOT CHANGE
+﻿# DO NOT CHANGE THE VERSION MANUALLY
 version: 11
 coins:
   heads:
@@ -6,9 +6,7 @@ coins:
   tails:
     - https://cdn.nadeko.bot/coins/tails3.png
 currency:
-  - https://cdn.nadeko.bot/other/currency/0.jpg
-  - https://cdn.nadeko.bot/other/currency/1.jpg
-  - https://cdn.nadeko.bot/other/currency/2.jpg
+  - https://i.imgur.com/JYJBhlr.png
 dice:
   - https://cdn.nadeko.bot/other/dice/0.png
   - https://cdn.nadeko.bot/other/dice/1.png
@@ -21,7 +19,7 @@ dice:
   - https://cdn.nadeko.bot/other/dice/8.png
   - https://cdn.nadeko.bot/other/dice/9.png
 xp:
-  bg: https://cdn.nadeko.bot/other/xp/bg6_mini.png
+  bg: https://cdn.nadeko.bot/xp/bgs/v6.png
 slots:
   emojis:
     - https://cdn.nadeko.bot/slots/10.png

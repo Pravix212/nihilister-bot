@@ -1,11 +1,9 @@
-﻿#nullable disable
+#nullable disable
 using DryIoc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using NadekoBot.Common.Configs;
 using NadekoBot.Common.ModuleBehaviors;
-using NadekoBot.Extensions;
-using NadekoBot.Services;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
@@ -136,7 +134,6 @@ public sealed class Bot : IBot
         }
 
         svcs.AddSingleton<IServiceProvider>(svcs);
-        svcs.AddSingleton<UptimeService>();
 
         //initialize Services
         Services = svcs;
@@ -278,7 +275,6 @@ public sealed class Bot : IBot
         await commandHandler.InitializeAsync();
 
         _ = Task.Run(ExecuteReadySubscriptions);
-        await Services.GetRequiredService<UptimeService>().StartAsync();
 
         await commandHandler.StartHandling();
 

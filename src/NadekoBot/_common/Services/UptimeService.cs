@@ -1,31 +1,42 @@
-﻿using Discord;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Discord.WebSocket;
-using NadekoBot.Common;
+using NadekoBot.Common.ModuleBehaviors;
 
-namespace NadekoBot.Services;
-
-public class UptimeService : INService
+namespace NadekoBot.Services
 {
-    private readonly DiscordSocketClient _client;
-    private readonly DateTime _startTime = DateTime.UtcNow;
-    private Timer? _timer;
-
-    public UptimeService(DiscordSocketClient client)
+    public class UptimeService : INService, IReadyExecutor
     {
-        _client = client;
-    }
+        private readonly DiscordSocketClient _client;
+        private Timer? _timer;
+        private readonly DateTime _startTime;
 
-    public Task StartAsync()
-    {
-        _timer = new Timer(UpdateStatus, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-        return Task.CompletedTask;
-    }
+        public UptimeService(DiscordSocketClient client)
+        {
+            _client = client;
+            _startTime = DateTime.UtcNow;
+        }
 
-    private void UpdateStatus(object? state)
-    {
-        var uptime = DateTime.UtcNow - _startTime;
-        var uptimeStr = $"{(int)uptime.TotalDays}d {uptime.Hours}h {uptime.Minutes}m";
-        var status = $"over Heathen's Garden | Uptime: {uptimeStr}";
-        _client.SetGameAsync(status, type: ActivityType.Watching);
+        public Task OnReadyAsync()
+        {
+            _timer = new Timer(
+                _ => UpdateStatus(),
+                null,
+                TimeSpan.FromMinutes(1),
+                TimeSpan.FromMinutes(1));
+            return Task.CompletedTask;
+        }
+
+        private void UpdateStatus()
+        {
+            try
+            {
+                var uptime = DateTime.UtcNow - _startTime;
+                var status = $"Uptime: {uptime.Days}d {uptime.Hours}h {uptime.Minutes}m";
+                _ = _client.SetGameAsync(status, type: ActivityType.Watching);
+            }
+            catch { /* ignore */ }
+        }
     }
 }

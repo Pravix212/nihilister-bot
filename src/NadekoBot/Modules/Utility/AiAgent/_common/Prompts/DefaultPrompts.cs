@@ -1,4 +1,4 @@
-namespace NadekoBot.Modules.Utility.AiAgent.Prompts;
+﻿namespace NadekoBot.Modules.Utility.AiAgent.Prompts;
 
 public static class DefaultPrompts
 {

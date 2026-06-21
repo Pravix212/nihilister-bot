@@ -33,7 +33,7 @@ allowedTools:
   - ask_user
   - close_session
 # Number of recent messages per channel the agent remembers. 0 to disable. Default 20
-channelMessageMemory: 20
+channelMessageMemory: 5
 # Minutes of inactivity before channel memory expires and stops observing. Default 30
 memoryIdleExpiryMinutes: 30
 # DISABLED: Bot will NOT respond when you say her name

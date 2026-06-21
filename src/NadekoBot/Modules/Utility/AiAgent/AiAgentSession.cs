@@ -202,6 +202,7 @@ public sealed class AiAgentSession(
         CancellationToken ct)
     {
         using var http = httpFactory.CreateClient();
+        http.Timeout = TimeSpan.FromSeconds(30);
         http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", provider.AuthValue);
 
         if (config.CustomHeaders is { Count: > 0 } headers)

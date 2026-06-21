@@ -31,6 +31,9 @@ public sealed class AiAgentService(
     private readonly ConcurrentDictionary<ulong, ChannelMessageBuffer> _channelBuffers = new();
     private readonly ConcurrentDictionary<ulong, (bool Allowed, DateTime ExpiresUtc)> _allowedCache = new();
     private readonly ConcurrentDictionary<ulong, ImmutableArray<AiAgentGuildSkill>> _skillCache = new();
+    private readonly ConcurrentDictionary<ulong, DateTime> _lastSessionTime = new();
+
+    private static readonly TimeSpan _userCooldown = TimeSpan.FromSeconds(30);
 
     private sealed record QueuedMessage(IGuild Guild, ITextChannel Channel, IUserMessage Message, string Text);
 
@@ -368,12 +371,20 @@ public sealed class AiAgentService(
 
         var userId = message.Author.Id;
 
+        if (_lastSessionTime.TryGetValue(userId, out var lastTime)
+            && DateTime.UtcNow - lastTime < _userCooldown)
+        {
+            return false;
+        }
+
         if (_activeSessions.ContainsKey(userId))
         {
             var queue = _pendingMessages.GetOrAdd(userId, _ => new());
             queue.Enqueue(new(guild, channel, message, prompt));
             return true;
         }
+
+        _lastSessionTime[userId] = DateTime.UtcNow;
 
         var cts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
         if (!_activeSessions.TryAdd(userId, cts))

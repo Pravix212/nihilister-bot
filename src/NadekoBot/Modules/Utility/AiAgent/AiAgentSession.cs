@@ -190,9 +190,18 @@ public sealed class AiAgentSession(
     private AiProviderInfo ResolveProviderInternal(AiAgentConfig config)
     {
         var creds = credsProvider.GetCreds();
+        var apiKey = GetAiApiKey(creds);
         return new(
             config.ApiUrl.TrimEnd('/') + "/v1/chat/completions",
-            $"Bearer {creds.AiApiKey}");
+            $"Bearer {apiKey}");
+    }
+
+    private static string GetAiApiKey(IBotCreds creds)
+    {
+        // Prefer environment variable over file-based creds to avoid leaking keys in git
+        var envKey = Environment.GetEnvironmentVariable("NIHILISTER_AI_API_KEY")
+                     ?? Environment.GetEnvironmentVariable("bot_AiApiKey");
+        return !string.IsNullOrWhiteSpace(envKey) ? envKey : creds.AiApiKey;
     }
 
     private async Task<AgentChatResponse?> CallLlmInternalAsync(

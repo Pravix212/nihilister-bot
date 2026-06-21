@@ -665,12 +665,16 @@ public sealed class AiAgentService(
     private bool HasValidAiCreds()
     {
         var creds = credsProvider.GetCreds();
-        var ok = !string.IsNullOrWhiteSpace(creds.AiApiKey);
+        var apiKey = Environment.GetEnvironmentVariable("NIHILISTER_AI_API_KEY")
+                     ?? Environment.GetEnvironmentVariable("bot_AiApiKey")
+                     ?? creds.AiApiKey;
+        var ok = !string.IsNullOrWhiteSpace(apiKey);
 
         if (!ok && !_credsWarningLogged)
         {
             _credsWarningLogged = true;
-            Log.Warning("AI agent is enabled but AiApiKey is empty in creds.yml. "
+            Log.Warning("AI agent is enabled but AiApiKey is empty. "
+                        + "Set NIHILISTER_AI_API_KEY env var or add it to creds.yml. "
                         + "Agent will not run until credentials are set");
         }
 

@@ -1,7 +1,10 @@
 #Manually added files
 
-src/NadekoBot/data/last_known_version.txt
+# AI agent config — contains sensitive API keys. Use environment variables instead.
 src/NadekoBot/data/ai-agent.yml
+src/NadekoBot/data/ai-agent.yml.bak
+
+src/NadekoBot/data/last_known_version.txt
 scripts/
 **/DESIGN.md
 src/NadekoBot/data/music_cache/

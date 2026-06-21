@@ -1,11 +1,13 @@
 # DO NOT CHANGE THE VERSION MANUALLY
 version: 8
 # Whether the AI agent feature is enabled. Default false
-enabled: true
+enabled: false
 # Base URL for the OpenAI-compatible API.
 # DO NOT add /v1/chat/completions suffix.
 apiUrl: https://api.x.ai
-apiKey: xai-dEvaa7FE6g6ded9mbWtpNIF6L1ZjQpRY25cLAxQ6cogEfexJSseU6RilQI4tKWIdWR4wj6IKTtaQGS9T
+# API Key is read from environment variable NIHILISTER_AI_API_KEY or bot_AiApiKey
+# DO NOT put a real key here — it will be leaked on GitHub. Set it via environment variable.
+# Example: export NIHILISTER_AI_API_KEY=xai-...
 # Which model to use for the agent. Must support tool/function calling.
 modelName: grok-build-0.1
 # Optional list of model IDs for providers that support fallback routing (e.g. OpenRouter).
@@ -20,9 +22,6 @@ maxTokens: 2048
 # Temperature for LLM responses. Lower = more deterministic. Default 0.3
 temperature: 0.3
 # List of allowed tool names. If empty, all tools are available.
-# Removed send_message because the AI was sending messages via tools AND the final
-# response was also being sent, causing duplicate/triple messages.
-# Only read-only tools remain for safety.
 allowedTools:
   - get_message
   - list_channels
@@ -41,13 +40,9 @@ nameTriggerEnabled: false
 # DISABLED: Bot will NOT keep responding after .ai — only responds to explicit .ai commands
 followUpWindowSeconds: 0
 # Custom HTTP headers sent with every LLM request.
-# Useful for provider-specific headers like X-OpenRouter-Title.
-# Example: { "X-OpenRouter-Title": "Nadeko" }
 customHeaders:
   X-OpenRouter-Title: Nihilister
-# Reasoning effort level for models that support it (e.g. GPT-5.x, Claude, o-series).
-# Values: "none", "low", "medium", "high", "xhigh". Empty string to disable.
-# Lower values save output tokens on simple tool-calling tasks. Default "low"
+# Reasoning effort level for models that support it. Default "low"
 reasoningEffort: low
 # Whether AI agent text responses are sent as embeds. If false, sent as plain text. Default true
 useEmbed: false

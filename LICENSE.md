@@ -1,4 +1,4 @@
-Copyright (C) 2025 NadekoBot
+Copyright (C) 2025 Prav
 
 - This program is dual licensed under AGPLv3 and Commercial license.
 - You may purchase a commercial license to exempt yourself from some of the AGPLv3 obligations

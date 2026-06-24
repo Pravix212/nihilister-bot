@@ -28,7 +28,7 @@ docker run -d --name nihilister ghcr.io/Pravix212/nihilister-bot:v6   -e bot_tok
 
 ## Support
 
-For issues, feature requests, or donations, visit [prav.lol](http://www.prav.lol/).
+For issues, feature requests, or donations, visit [prav.lol](http://www.prav.lol/nihilister).
 
 ---
 

@@ -10,14 +10,6 @@ public partial class Utility
 {
     public partial class VideoDownloadCommands : NadekoModule
     {
-        private static long GetMaxFileSize(PremiumTier tier) => tier switch
-        {
-            PremiumTier.Tier3 => 500L * 1024 * 1024,  // 14+ boosts: 500MB
-            PremiumTier.Tier2 => 100L * 1024 * 1024,  // 7+ boosts: 100MB
-            PremiumTier.Tier1 => 50L * 1024 * 1024,   // 2+ boosts: 50MB
-            _ => 25L * 1024 * 1024,                   // No boosts: 25MB
-        };
-
         private const string DOWNLOAD_DIR = "/tmp/nihilister-videos";
         private const string COOKIES_PATH = "/root/bot-dev/output/data/youtube-cookies.txt";
 
@@ -42,9 +34,6 @@ public partial class Utility
                 await Response().Error("That doesn't look like a valid URL.").SendAsync();
                 return;
             }
-
-            var maxSize = GetMaxFileSize(ctx.Guild.PremiumTier);
-            var maxSizeMb = maxSize / 1024 / 1024;
 
             var statusMsg = await Response().Pending("Downloading video... This may take a moment.").SendAsync();
 
@@ -78,20 +67,16 @@ public partial class Utility
                     return;
                 }
 
-                if (fileInfo.Length > maxSize)
-                {
-                    await SafeDeleteAsync(statusMsg);
-                    await Response().Error($"The video is too large ({fileInfo.Length / 1024 / 1024}MB). This server's upload limit is {maxSizeMb}MB. Try a shorter video.").SendAsync();
-                    try { File.Delete(outputPath); } catch { }
-                    return;
-                }
-
                 await SafeDeleteAsync(statusMsg);
                 
                 try
                 {
                     using var fileStream = File.OpenRead(outputPath);
                     await ctx.Channel.SendFileAsync(fileStream, $"{fileId}.mp4");
+                }
+                catch (Exception uploadEx) when (uploadEx.Message.Contains("too large") || uploadEx.Message.Contains("Request entity too large") || uploadEx.Message.Contains("413") || uploadEx.Message.Contains("size"))
+                {
+                    await Response().Error($"The video is too large ({fileInfo.Length / 1024 / 1024}MB). Discord rejected the upload. Check your server boost settings for the current upload limit.").SendAsync();
                 }
                 catch (Exception uploadEx)
                 {

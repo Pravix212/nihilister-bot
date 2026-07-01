@@ -30,6 +30,8 @@ eval:
   - eval
 inrole:
   - inrole
+mp4:
+  - mp4
 ping:
   - ping
 roleid:

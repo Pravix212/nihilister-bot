@@ -1,4 +1,4 @@
-﻿using NadekoBot.Common.ModuleBehaviors;
+using NadekoBot.Common.ModuleBehaviors;
 
 namespace NadekoBot.Modules.Utility;
 
@@ -50,9 +50,15 @@ public sealed class AfkService : INService, IReadyExecutor
 
         _ = Task.Run(async () =>
         {
-            if (sm.Author is IGuildUser gUser)
+            // FIX: Get guild user from guild directly instead of relying on sm.Author type cast
+            // Discord.Net may not cache the author as SocketGuildUser in all channels
+            if (tc is IGuildChannel guildChannel)
             {
-                await TryClearSelfAfkInternalAsync(gUser, tc);
+                var guildUser = await guildChannel.Guild.GetUserAsync(sm.Author.Id);
+                if (guildUser != null)
+                {
+                    await TryClearSelfAfkInternalAsync(guildUser, tc);
+                }
             }
             await TryReplyAfkOnMentionInternalAsync(sm, uMsg, tc);
         });
@@ -84,11 +90,16 @@ public sealed class AfkService : INService, IReadyExecutor
     }
 
     // Safely changes or updates nicknames with Discord boundary conditions handled
+    // FIXED: Re-fetches user from guild cache to ensure fresh nickname data
     private async Task TryChangeNicknameAsync(IGuildUser user, bool isGoingAfk)
     {
         try
         {
-            var currentNickname = user.Nickname ?? user.GlobalName ?? user.Username;
+            // Re-fetch from guild cache to get the latest nickname
+            // This fixes the bug where stale cached user data caused [AFK] removal to fail
+            var gUser = await user.Guild.GetUserAsync(user.Id) as IGuildUser;
+            var targetUser = gUser ?? user;
+            var currentNickname = gUser?.Nickname ?? user.Nickname ?? user.GlobalName ?? user.Username;
 
             if (isGoingAfk)
             {
@@ -99,7 +110,7 @@ public sealed class AfkService : INService, IReadyExecutor
                 if (newNick.Length > 32)
                     newNick = newNick[..32];
 
-                await user.ModifyAsync(properties => properties.Nickname = newNick);
+                await targetUser.ModifyAsync(properties => properties.Nickname = newNick);
             }
             else
             {
@@ -108,9 +119,9 @@ public sealed class AfkService : INService, IReadyExecutor
                     string originalNick = currentNickname["[AFK] ".Length..];
 
                     if (originalNick == (user.GlobalName ?? user.Username))
-                        await user.ModifyAsync(properties => properties.Nickname = null);
+                        await targetUser.ModifyAsync(properties => properties.Nickname = null);
                     else
-                        await user.ModifyAsync(properties => properties.Nickname = originalNick);
+                        await targetUser.ModifyAsync(properties => properties.Nickname = originalNick);
                 }
             }
         }

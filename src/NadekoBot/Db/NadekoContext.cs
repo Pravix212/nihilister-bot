@@ -73,6 +73,11 @@ public sealed class NadekoContext : DbContext
 
     public DbSet<PatronUser> Patrons { get; set; }
 
+    public DbSet<MarriageInfo> Marriages { get; set; }
+    public DbSet<AdoptionInfo> Adoptions { get; set; }
+    public DbSet<MarriagePending> MarriageProposals { get; set; }
+    public DbSet<AdoptionPending> AdoptionProposals { get; set; }
+
     public DbSet<StreamOnlineMessage> StreamOnlineMessages { get; set; }
 
     public DbSet<StickyRole> StickyRoles { get; set; }
@@ -592,6 +597,26 @@ public sealed class NadekoContext : DbContext
                 .Property(x => x.AutoDeleteTimer)
                 .HasDefaultValue(0);
         });
+
+        #region Marriage
+
+        modelBuilder.Entity<MarriageInfo>()
+            .HasKey(m => m.Id);
+
+        modelBuilder.Entity<MarriageInfo>()
+            .HasIndex(m => m.User1);
+
+        modelBuilder.Entity<MarriagePending>()
+            .HasKey(p => p.Id);
+
+        modelBuilder.Entity<AdoptionInfo>()
+            .HasKey(a => a.Id);
+
+        modelBuilder.Entity<AdoptionInfo>()
+            .HasIndex(a => a.UserId);
+
+        modelBuilder.Entity<AdoptionPending>()
+            .HasKey(p => p.Id);
 
         #endregion
     }

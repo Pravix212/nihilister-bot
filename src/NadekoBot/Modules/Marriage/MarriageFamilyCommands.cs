@@ -52,6 +52,9 @@ public partial class Marriage
         }
 
         await _svc.AdoptAsync(ctx.User.Id, target.Id);
+        MarriageService.ProposalChannels.Set(ctx.User.Id, target.Id, "adoption", ctx.Channel.Id, ctx.Guild.Id);
+        ScheduleExpirationTimer(ctx.User.Id, target.Id, "adoption");
+
         await Response().Confirm($"{ctx.User.Mention} wants to adopt {target.Mention}!\n\n{target.Mention}, type `.accept` to accept! (Expires in 1 minute)").SendAsync();
     }
 

@@ -19,17 +19,46 @@ public partial class Marriage : NadekoModule
         var expired = await _svc.CleanupExpiredProposals();
         foreach (var proposal in expired)
         {
+            if (proposal.ChannelId == 0) continue;
             try
             {
+                var guild = await ctx.Client.GetGuildAsync(proposal.GuildId);
+                var channel = await guild.GetTextChannelAsync(proposal.ChannelId);
                 var proposer = await ctx.Client.GetUserAsync(proposal.ProposerId);
-                var target = await ctx.Client.GetUserAsync(proposal.TargetId);
+                var targetUser = await ctx.Client.GetUserAsync(proposal.TargetId);
                 if (proposal.Type == "marriage")
-                    await ctx.Channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                    await channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
                 else
-                    await ctx.Channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
+                    await channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
             }
-            catch { /* channel access issue */ }
+            catch { /* channel/guild access issue */ }
         }
+    }
+
+    private void ScheduleExpirationTimer(ulong proposerId, ulong targetId, string type)
+    {
+        var client = ctx.Client;
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(MarriageService.PROPOSAL_TIMEOUT);
+            var expired = await _svc.CleanupExpiredProposals();
+            var ours = expired.FirstOrDefault(e => e.ProposerId == proposerId && e.TargetId == targetId && e.Type == type);
+            if (ours != null && ours.ChannelId != 0)
+            {
+                try
+                {
+                    var guild = await client.GetGuildAsync(ours.GuildId);
+                    var channel = await guild.GetTextChannelAsync(ours.ChannelId);
+                    var proposer = await client.GetUserAsync(ours.ProposerId);
+                    var targetUser = await client.GetUserAsync(ours.TargetId);
+                    if (type == "marriage")
+                        await channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                    else
+                        await channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
+                }
+                catch { }
+            }
+        });
     }
 
     [Cmd]
@@ -77,6 +106,9 @@ public partial class Marriage : NadekoModule
         }
 
         await _svc.ProposeAsync(ctx.User.Id, target.Id);
+        MarriageService.ProposalChannels.Set(ctx.User.Id, target.Id, "marriage", ctx.Channel.Id, ctx.Guild.Id);
+        ScheduleExpirationTimer(ctx.User.Id, target.Id, "marriage");
+
         await Response().Confirm($"💍 {ctx.User.Mention} has proposed to {target.Mention}!\n\n{target.Mention}, type `.accept` to accept! (Expires in 1 minute)").SendAsync();
     }
 

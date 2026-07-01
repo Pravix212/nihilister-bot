@@ -8,12 +8,49 @@ using NadekoBot.Db.Models;
 
 namespace NadekoBot.Modules.Marriage;
 
-public record ExpiredProposal(ulong ProposerId, ulong TargetId, string Type);
+public record ExpiredProposal(ulong ProposerId, ulong TargetId, string Type, ulong ChannelId, ulong GuildId);
 
 public class MarriageService
 {
     private readonly DbService _db;
-    private static readonly TimeSpan PROPOSAL_TIMEOUT = TimeSpan.FromMinutes(1);
+    public static readonly TimeSpan PROPOSAL_TIMEOUT = TimeSpan.FromMinutes(1);
+
+    public static class ProposalChannels
+    {
+        private static readonly Dictionary<(ulong Proposer, ulong Target, string Type), (ulong ChannelId, ulong GuildId)> _channels = new();
+
+        public static void Set(ulong proposer, ulong target, string type, ulong channelId, ulong guildId)
+        {
+            lock (_channels)
+            {
+                _channels[(proposer, target, type)] = (channelId, guildId);
+            }
+        }
+
+        public static bool TryGet(ulong proposer, ulong target, string type, out ulong channelId, out ulong guildId)
+        {
+            lock (_channels)
+            {
+                if (_channels.TryGetValue((proposer, target, type), out var value))
+                {
+                    channelId = value.ChannelId;
+                    guildId = value.GuildId;
+                    return true;
+                }
+            }
+            channelId = 0;
+            guildId = 0;
+            return false;
+        }
+
+        public static void Remove(ulong proposer, ulong target, string type)
+        {
+            lock (_channels)
+            {
+                _channels.Remove((proposer, target, type));
+            }
+        }
+    }
 
     public MarriageService(DbService db)
     {
@@ -23,27 +60,40 @@ public class MarriageService
     public async Task<List<ExpiredProposal>> CleanupExpiredProposals()
     {
         var result = new List<ExpiredProposal>();
-        
+
         await using var ctx = _db.GetDbContext();
         var cutoff = DateTime.UtcNow - PROPOSAL_TIMEOUT;
         var cutoffStr = cutoff.ToString("yyyy-MM-dd HH:mm:ss");
-        
+
         // Use raw SQL for SQLite datetime comparison
         var expiredMarriage = await ctx.MarriageProposals
             .FromSqlRaw("SELECT * FROM \"MarriageProposals\" WHERE datetime(\"CreatedAt\") < datetime({0})", cutoffStr)
             .ToListAsync();
         foreach (var p in expiredMarriage)
-            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "marriage"));
+        {
+            ProposalChannels.TryGet(p.ProposerId, p.TargetId, "marriage", out var channelId, out var guildId);
+            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "marriage", channelId, guildId));
+        }
         ctx.MarriageProposals.RemoveRange(expiredMarriage);
-        
+
         var expiredAdoption = await ctx.AdoptionProposals
             .FromSqlRaw("SELECT * FROM \"AdoptionProposals\" WHERE datetime(\"CreatedAt\") < datetime({0})", cutoffStr)
             .ToListAsync();
         foreach (var p in expiredAdoption)
-            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "adoption"));
+        {
+            ProposalChannels.TryGet(p.ProposerId, p.TargetId, "adoption", out var channelId, out var guildId);
+            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "adoption", channelId, guildId));
+        }
         ctx.AdoptionProposals.RemoveRange(expiredAdoption);
-        
+
         await ctx.SaveChangesAsync();
+
+        // Remove from dictionary after cleanup
+        foreach (var r in result)
+        {
+            ProposalChannels.Remove(r.ProposerId, r.TargetId, r.Type);
+        }
+
         return result;
     }
 

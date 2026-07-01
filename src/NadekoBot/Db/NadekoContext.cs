@@ -598,6 +598,8 @@ public sealed class NadekoContext : DbContext
                 .HasDefaultValue(0);
         });
 
+        #endregion
+
         #region Marriage
 
         modelBuilder.Entity<MarriageInfo>()

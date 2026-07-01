@@ -97,6 +97,31 @@ public class MarriageService
         return result;
     }
 
+    public async Task<bool> TryExpireSpecificProposalAsync(ulong proposerId, ulong targetId, string type)
+    {
+        await using var ctx = _db.GetDbContext();
+        if (type == "marriage")
+        {
+            var proposal = await ctx.MarriageProposals.FirstOrDefaultAsync(p => p.ProposerId == proposerId && p.TargetId == targetId);
+            if (proposal == null) return false;
+            if (DateTime.UtcNow - proposal.CreatedAt < PROPOSAL_TIMEOUT) return false;
+            ctx.MarriageProposals.Remove(proposal);
+            await ctx.SaveChangesAsync();
+            ProposalChannels.Remove(proposerId, targetId, type);
+            return true;
+        }
+        else
+        {
+            var proposal = await ctx.AdoptionProposals.FirstOrDefaultAsync(p => p.ProposerId == proposerId && p.TargetId == targetId);
+            if (proposal == null) return false;
+            if (DateTime.UtcNow - proposal.CreatedAt < PROPOSAL_TIMEOUT) return false;
+            ctx.AdoptionProposals.Remove(proposal);
+            await ctx.SaveChangesAsync();
+            ProposalChannels.Remove(proposerId, targetId, type);
+            return true;
+        }
+    }
+
     public async Task<bool> IsMarriedAsync(ulong userId)
     {
         await using var ctx = _db.GetDbContext();

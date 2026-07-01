@@ -38,19 +38,20 @@ public partial class Marriage : NadekoModule
     private void ScheduleExpirationTimer(ulong proposerId, ulong targetId, string type)
     {
         var client = ctx.Client;
+        var guildId = ctx.Guild.Id;
+        var channelId = ctx.Channel.Id;
         _ = Task.Run(async () =>
         {
             await Task.Delay(MarriageService.PROPOSAL_TIMEOUT);
-            var expired = await _svc.CleanupExpiredProposals();
-            var ours = expired.FirstOrDefault(e => e.ProposerId == proposerId && e.TargetId == targetId && e.Type == type);
-            if (ours != null && ours.ChannelId != 0)
+            var expired = await _svc.TryExpireSpecificProposalAsync(proposerId, targetId, type);
+            if (expired)
             {
                 try
                 {
-                    var guild = await client.GetGuildAsync(ours.GuildId);
-                    var channel = await guild.GetTextChannelAsync(ours.ChannelId);
-                    var proposer = await client.GetUserAsync(ours.ProposerId);
-                    var targetUser = await client.GetUserAsync(ours.TargetId);
+                    var guild = await client.GetGuildAsync(guildId);
+                    var channel = await guild.GetTextChannelAsync(channelId);
+                    var proposer = await client.GetUserAsync(proposerId);
+                    var targetUser = await client.GetUserAsync(targetId);
                     if (type == "marriage")
                         await channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
                     else

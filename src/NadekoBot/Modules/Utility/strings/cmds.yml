@@ -128,6 +128,14 @@ inrole:
         desc: "One or more roles to filter by (use mentions). Users must have ALL specified roles."
     - roles:
         desc: "One or more roles to filter by (use mentions). Users must have ALL specified roles."
+mp4:
+  desc: Downloads a video from the provided URL (TikTok, X/Twitter, Reddit, Instagram, YouTube) and sends it in the chat.
+  ex:
+    - https://www.tiktok.com/@user/video/123456789
+    - https://x.com/user/status/123456789
+  params:
+    - url:
+        desc: The URL of the video to download.
 ping:
   desc: Ping the bot to see if there are latency issues.
   ex:

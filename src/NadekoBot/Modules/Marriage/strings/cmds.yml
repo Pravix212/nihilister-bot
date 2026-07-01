@@ -1,0 +1,65 @@
+marry:
+  desc: Propose to another user for marriage. They can accept with .accept.
+  ex:
+    - '@user'
+  params:
+    - target:
+        desc: The user you want to marry.
+
+accept:
+  desc: Accept a pending marriage or adoption proposal.
+  ex:
+    - ''
+  params: []
+
+wife:
+  desc: Shows your spouse (gender-neutral alias for spouse command).
+  ex:
+    - ''
+  params: []
+
+husband:
+  desc: Shows your spouse (gender-neutral alias for spouse command).
+  ex:
+    - ''
+  params: []
+
+divorce:
+  desc: Divorce your current spouse. Must be married for at least 1 hour.
+  ex:
+    - ''
+  params: []
+
+lovequiz:
+  desc: Takes a love compatibility quiz with your spouse.
+  ex:
+    - ''
+  params: []
+
+adopt:
+  desc: Propose to adopt a user. They can accept with .accept.
+  ex:
+    - '@user'
+  params:
+    - target:
+        desc: The user you want to adopt.
+
+disown:
+  desc: Remove a user from your family (undoes an adoption).
+  ex:
+    - '@user'
+  params:
+    - target:
+        desc: The adopted user you want to disown.
+
+family:
+  desc: Shows your family members (spouse and children).
+  ex:
+    - ''
+  params: []
+
+familytree:
+  desc: Generates an image of your family tree showing marriage and adoption relationships.
+  ex:
+    - ''
+  params: []

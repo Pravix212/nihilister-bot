@@ -12,9 +12,10 @@ public partial class Utility
     {
         private static long GetMaxFileSize(PremiumTier tier) => tier switch
         {
-            PremiumTier.Tier3 => 500L * 1024 * 1024,  // Level 3: 500MB
-            PremiumTier.Tier2 => 100L * 1024 * 1024,  // Level 2: 100MB
-            _ => 25L * 1024 * 1024,                     // Level 0/1: 25MB
+            PremiumTier.Tier3 => 500L * 1024 * 1024,  // 14+ boosts: 500MB
+            PremiumTier.Tier2 => 100L * 1024 * 1024,  // 7+ boosts: 100MB
+            PremiumTier.Tier1 => 50L * 1024 * 1024,   // 2+ boosts: 50MB
+            _ => 25L * 1024 * 1024,                   // No boosts: 25MB
         };
 
         private const string DOWNLOAD_DIR = "/tmp/nihilister-videos";

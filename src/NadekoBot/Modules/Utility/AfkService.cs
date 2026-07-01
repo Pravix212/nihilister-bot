@@ -50,8 +50,10 @@ public sealed class AfkService : INService, IReadyExecutor
 
         _ = Task.Run(async () =>
         {
-            // FIX: Get guild user from guild directly instead of relying on sm.Author type cast
-            // Discord.Net may not cache the author as SocketGuildUser in all channels
+            // FIX: Get guild user from guild directly instead of relying on sm.Author type cast.
+            // Discord.Net may not cache the author as SocketGuildUser in all channels,
+            // causing the 'is IGuildUser' check to fail silently when the user types
+            // in a different channel than where they went AFK.
             if (tc is IGuildChannel guildChannel)
             {
                 var guildUser = await guildChannel.Guild.GetUserAsync(sm.Author.Id);
@@ -60,6 +62,7 @@ public sealed class AfkService : INService, IReadyExecutor
                     await TryClearSelfAfkInternalAsync(guildUser, tc);
                 }
             }
+
             await TryReplyAfkOnMentionInternalAsync(sm, uMsg, tc);
         });
 

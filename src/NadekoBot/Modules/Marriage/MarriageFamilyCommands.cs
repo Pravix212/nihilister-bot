@@ -17,6 +17,8 @@ public partial class Marriage
     [RequireContext(ContextType.Guild)]
     public async Task Adopt([Leftover] IUser? target = null)
     {
+        await CheckAndNotifyExpiredAsync();
+
         if (target == null || target.Id == ctx.User.Id)
         {
             await Response().Error("Mention someone to adopt! Example: .adopt @user").SendAsync();
@@ -57,6 +59,8 @@ public partial class Marriage
     [RequireContext(ContextType.Guild)]
     public async Task Disown([Leftover] IUser? target = null)
     {
+        await CheckAndNotifyExpiredAsync();
+
         if (target == null)
         {
             await Response().Error("Mention someone to disown! Example: .disown @user").SendAsync();
@@ -81,6 +85,8 @@ public partial class Marriage
     [RequireContext(ContextType.Guild)]
     public async Task Family([Leftover] IUser? target = null)
     {
+        await CheckAndNotifyExpiredAsync();
+
         var user = target ?? ctx.User;
         var spouseId = await _svc.GetSpouseAsync(user.Id);
         var adoption = await _svc.GetAdoptionAsync(user.Id);
@@ -141,6 +147,8 @@ public partial class Marriage
     [RequireContext(ContextType.Guild)]
     public async Task Familytree([Leftover] IUser? target = null)
     {
+        await CheckAndNotifyExpiredAsync();
+
         var user = target ?? ctx.User;
 
         var spouseId = await _svc.GetSpouseAsync(user.Id);

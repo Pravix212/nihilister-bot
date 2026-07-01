@@ -8,6 +8,8 @@ using NadekoBot.Db.Models;
 
 namespace NadekoBot.Modules.Marriage;
 
+public record ExpiredProposal(ulong ProposerId, ulong TargetId, string Type);
+
 public class MarriageService
 {
     private readonly DbService _db;
@@ -18,8 +20,10 @@ public class MarriageService
         _db = db;
     }
 
-    private async Task CleanupExpiredProposals()
+    public async Task<List<ExpiredProposal>> CleanupExpiredProposals()
     {
+        var result = new List<ExpiredProposal>();
+        
         await using var ctx = _db.GetDbContext();
         var cutoff = DateTime.UtcNow - PROPOSAL_TIMEOUT;
         var cutoffStr = cutoff.ToString("yyyy-MM-dd HH:mm:ss");
@@ -28,14 +32,19 @@ public class MarriageService
         var expiredMarriage = await ctx.MarriageProposals
             .FromSqlRaw("SELECT * FROM \"MarriageProposals\" WHERE datetime(\"CreatedAt\") < datetime({0})", cutoffStr)
             .ToListAsync();
+        foreach (var p in expiredMarriage)
+            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "marriage"));
         ctx.MarriageProposals.RemoveRange(expiredMarriage);
         
         var expiredAdoption = await ctx.AdoptionProposals
             .FromSqlRaw("SELECT * FROM \"AdoptionProposals\" WHERE datetime(\"CreatedAt\") < datetime({0})", cutoffStr)
             .ToListAsync();
+        foreach (var p in expiredAdoption)
+            result.Add(new ExpiredProposal(p.ProposerId, p.TargetId, "adoption"));
         ctx.AdoptionProposals.RemoveRange(expiredAdoption);
         
         await ctx.SaveChangesAsync();
+        return result;
     }
 
     public async Task<bool> IsMarriedAsync(ulong userId)

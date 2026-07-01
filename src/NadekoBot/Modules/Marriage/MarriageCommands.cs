@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 
@@ -13,10 +14,34 @@ public partial class Marriage : NadekoModule
         _svc = new MarriageService(db);
     }
 
+    private async Task CheckAndNotifyExpiredAsync()
+    {
+        var expired = await _svc.CleanupExpiredProposals();
+        foreach (var proposal in expired)
+        {
+            try
+            {
+                var proposer = await ctx.Client.GetUserAsync(proposal.ProposerId);
+                var target = await ctx.Client.GetUserAsync(proposal.TargetId);
+                if (proposer != null)
+                {
+                    var dm = await proposer.CreateDMChannelAsync();
+                    if (proposal.Type == "marriage")
+                        await dm.SendMessageAsync($"💔 Your marriage proposal to {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                    else
+                        await dm.SendMessageAsync($"👨‍👩‍👧 Your adoption proposal for {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
+                }
+            }
+            catch { /* DMs disabled or user not found */ }
+        }
+    }
+
     [Cmd]
     [RequireContext(ContextType.Guild)]
     public async Task Marry([Leftover] IUser? target = null)
     {
+        await CheckAndNotifyExpiredAsync();
+
         if (target == null || target.Id == ctx.User.Id)
         {
             await Response().Error("Mention someone to marry! Example: .marry @user").SendAsync();
@@ -63,6 +88,8 @@ public partial class Marriage : NadekoModule
     [RequireContext(ContextType.Guild)]
     public async Task Accept()
     {
+        await CheckAndNotifyExpiredAsync();
+
         // Check for marriage proposal first
         var marriageProposer = await _svc.GetPendingProposalAsync(ctx.User.Id);
         if (marriageProposer.HasValue)
@@ -103,6 +130,8 @@ public partial class Marriage : NadekoModule
 
     private async Task SpouseAsync()
     {
+        await CheckAndNotifyExpiredAsync();
+
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {
@@ -129,6 +158,8 @@ public partial class Marriage : NadekoModule
     [RequireContext(ContextType.Guild)]
     public async Task Divorce()
     {
+        await CheckAndNotifyExpiredAsync();
+
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {
@@ -157,6 +188,8 @@ public partial class Marriage : NadekoModule
     [RequireContext(ContextType.Guild)]
     public async Task Lovequiz()
     {
+        await CheckAndNotifyExpiredAsync();
+
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {

@@ -23,16 +23,12 @@ public partial class Marriage : NadekoModule
             {
                 var proposer = await ctx.Client.GetUserAsync(proposal.ProposerId);
                 var target = await ctx.Client.GetUserAsync(proposal.TargetId);
-                if (proposer != null)
-                {
-                    var dm = await proposer.CreateDMChannelAsync();
-                    if (proposal.Type == "marriage")
-                        await dm.SendMessageAsync($"💔 Your marriage proposal to {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
-                    else
-                        await dm.SendMessageAsync($"👨‍👩‍👧 Your adoption proposal for {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
-                }
+                if (proposal.Type == "marriage")
+                    await ctx.Channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                else
+                    await ctx.Channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {target?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
             }
-            catch { /* DMs disabled or user not found */ }
+            catch { /* channel access issue */ }
         }
     }
 

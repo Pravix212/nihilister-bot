@@ -1,0 +1,12 @@
+donationreminder:
+  desc: "Toggle the periodic donation reminder on/off in the current channel."
+  ex: ".donationreminder"
+  params: []
+donationremindermessage:
+  desc: "Set the custom message for the donation reminder."
+  ex: ".donationremindermessage If you enjoy the bot, consider donating!"
+  params: ["message"]
+donationreminderinterval:
+  desc: "Set how often (in hours) the donation reminder is sent."
+  ex: ".donationreminderinterval 6"
+  params: ["hours"]

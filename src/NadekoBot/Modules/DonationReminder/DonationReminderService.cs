@@ -60,7 +60,7 @@ public class DonationReminderService : INService
 
             try
             {
-                await channel.SendMessageAsync(config.Message);
+                await SendReminderEmbedAsync(channel, config.Message);
                 config.LastSentAt = now;
             }
             catch
@@ -70,6 +70,28 @@ public class DonationReminderService : INService
         }
 
         await uow.SaveChangesAsync();
+    }
+
+    private async Task SendReminderEmbedAsync(IMessageChannel channel, string message)
+    {
+        var embed = new EmbedBuilder()
+            .WithColor(new Color(0x5865F2))
+            .WithTitle("Support Nihilister")
+            .WithDescription(message)
+            .WithFooter("Thank you for supporting the Heathen's Garden ❤️")
+            .Build();
+
+        var button = new ButtonBuilder(
+            label: "💰 Donate",
+            url: "https://prav.lol/nihilister/donate.html",
+            style: ButtonStyle.Link
+        );
+
+        var components = new ComponentBuilder()
+            .WithButton(button)
+            .Build();
+
+        await channel.SendMessageAsync(embed: embed, components: components);
     }
 
     public async Task<DonationReminderSettings> GetOrCreateConfigAsync(ulong guildId)
@@ -119,7 +141,7 @@ public class DonationReminderService : INService
 
         if (isEnabling)
         {
-            // Send a test message immediately so the user can verify it works
+            // Send a test reminder immediately so the user can verify it works
             _ = Task.Run(async () =>
             {
                 try
@@ -137,7 +159,7 @@ public class DonationReminderService : INService
                                 var perms = botMember.GetPermissions(channel as IGuildChannel);
                                 if (perms.SendMessages)
                                 {
-                                    await channel.SendMessageAsync($"📢 **Test reminder:** {config.Message}");
+                                    await SendReminderEmbedAsync(channel, config.Message);
                                     using var uow2 = _db.GetDbContext();
                                     var c2 = await uow2.Set<DonationReminderSettings>()
                                         .FirstOrDefaultAsync(x => x.GuildId == guildId);

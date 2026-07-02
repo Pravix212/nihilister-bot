@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using NadekoBot.Data;
 using NadekoBot.Db.Models;
 
 namespace NadekoBot.Services;

@@ -35,14 +35,14 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
                 .Build();
 
             await ctx.Channel.SendMessageAsync(
-                content: $"✅ Donation reminder **enabled** in {ctx.Channel.Mention}.",
+                content: $"✅ Donation reminder **enabled** in <#{ctx.Channel.Id}>.",
                 embed: previewEmbed,
                 components: components);
         }
         else
         {
             await Response()
-                .Confirm($"Donation reminder **disabled** in {ctx.Channel.Mention}.")
+                .Confirm($"Donation reminder **disabled** in <#{ctx.Channel.Id}>.")
                 .SendAsync();
         }
     }

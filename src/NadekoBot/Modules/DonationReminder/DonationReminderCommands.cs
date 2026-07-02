@@ -12,11 +12,9 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task DonationReminder()
     {
-        var config = await _service.GetOrCreateConfigAsync(ctx.Guild.Id);
-        var newState = !config.IsEnabled;
-        await _service.ToggleAsync(ctx.Guild.Id, ctx.Channel.Id);
+        var newState = await _service.ToggleAsync(ctx.Guild.Id, ctx.Channel.Id);
         await Response()
-            .Confirm($"Donation reminder **{(newState ? "enabled" : "disabled")}** in <#{ctx.Channel.Id}>.")
+            .Confirm($"Donation reminder **{(newState ? "enabled" : "disabled")}** in <#{ctx.Channel.Id}>. A test message will be sent shortly if enabled.")
             .SendAsync();
     }
 

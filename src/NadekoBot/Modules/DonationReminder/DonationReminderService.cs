@@ -19,7 +19,8 @@ public class DonationReminderService : INService
     {
         _client = client;
         _db = db;
-        _timer = new Timer(OnTimerTick, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(30));
+        // First check after 30 seconds, then every 30 minutes
+        _timer = new Timer(OnTimerTick, null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(30));
     }
 
     private async void OnTimerTick(object? state)
@@ -87,30 +88,77 @@ public class DonationReminderService : INService
         return config;
     }
 
-    public async Task ToggleAsync(ulong guildId, ulong channelId)
+    public async Task<bool> ToggleAsync(ulong guildId, ulong channelId)
     {
         using var uow = _db.GetDbContext();
         var config = await uow.Set<DonationReminderSettings>()
             .FirstOrDefaultAsync(x => x.GuildId == guildId);
 
+        bool isEnabling;
         if (config == null)
         {
+            isEnabling = true;
             config = new DonationReminderSettings
             {
                 GuildId = guildId,
                 ChannelId = channelId,
-                IsEnabled = true
+                IsEnabled = true,
+                LastSentAt = DateTime.MinValue
             };
             uow.Set<DonationReminderSettings>().Add(config);
         }
         else
         {
-            config.IsEnabled = !config.IsEnabled;
-            if (config.IsEnabled && channelId != 0)
+            isEnabling = !config.IsEnabled;
+            config.IsEnabled = isEnabling;
+            if (isEnabling && channelId != 0)
                 config.ChannelId = channelId;
         }
 
         await uow.SaveChangesAsync();
+
+        if (isEnabling)
+        {
+            // Send a test message immediately so the user can verify it works
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(500); // small delay so the response comes first
+                    var channel = _client.GetChannel(channelId) as IMessageChannel;
+                    if (channel != null)
+                    {
+                        var guild = _client.GetGuild(guildId);
+                        if (guild != null)
+                        {
+                            var botMember = guild.CurrentUser;
+                            if (botMember != null)
+                            {
+                                var perms = botMember.GetPermissions(channel as IGuildChannel);
+                                if (perms.SendMessages)
+                                {
+                                    await channel.SendMessageAsync($"📢 **Test reminder:** {config.Message}");
+                                    using var uow2 = _db.GetDbContext();
+                                    var c2 = await uow2.Set<DonationReminderSettings>()
+                                        .FirstOrDefaultAsync(x => x.GuildId == guildId);
+                                    if (c2 != null)
+                                    {
+                                        c2.LastSentAt = DateTime.UtcNow;
+                                        await uow2.SaveChangesAsync();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch
+                {
+                    // Test message failed, but the toggle still succeeded
+                }
+            });
+        }
+
+        return isEnabling;
     }
 
     public async Task SetMessageAsync(ulong guildId, string message)

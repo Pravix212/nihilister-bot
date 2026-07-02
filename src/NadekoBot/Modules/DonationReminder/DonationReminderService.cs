@@ -139,47 +139,6 @@ public class DonationReminderService : INService
 
         await uow.SaveChangesAsync();
 
-        if (isEnabling)
-        {
-            // Send a test reminder immediately so the user can verify it works
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(500); // small delay so the response comes first
-                    var channel = _client.GetChannel(channelId) as IMessageChannel;
-                    if (channel != null)
-                    {
-                        var guild = _client.GetGuild(guildId);
-                        if (guild != null)
-                        {
-                            var botMember = guild.CurrentUser;
-                            if (botMember != null)
-                            {
-                                var perms = botMember.GetPermissions(channel as IGuildChannel);
-                                if (perms.SendMessages)
-                                {
-                                    await SendReminderEmbedAsync(channel, config.Message);
-                                    using var uow2 = _db.GetDbContext();
-                                    var c2 = await uow2.Set<DonationReminderSettings>()
-                                        .FirstOrDefaultAsync(x => x.GuildId == guildId);
-                                    if (c2 != null)
-                                    {
-                                        c2.LastSentAt = DateTime.UtcNow;
-                                        await uow2.SaveChangesAsync();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // Test message failed, but the toggle still succeeded
-                }
-            });
-        }
-
         return isEnabling;
     }
 

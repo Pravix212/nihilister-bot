@@ -12,11 +12,11 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task DonationReminder()
     {
-        var config = await _svc.GetOrCreateConfigAsync(ctx.Guild.Id);
+        var config = await _service.GetOrCreateConfigAsync(ctx.Guild.Id);
         var newState = !config.IsEnabled;
-        await _svc.ToggleAsync(ctx.Guild.Id, ctx.Channel.Id);
+        await _service.ToggleAsync(ctx.Guild.Id, ctx.Channel.Id);
         await Response()
-            .Confirm($"Donation reminder **{(newState ? "enabled" : "disabled")}** in {ctx.Channel.Mention}.")
+            .Confirm($"Donation reminder **{(newState ? "enabled" : "disabled")}** in <#{ctx.Channel.Id}>.")
             .SendAsync();
     }
 
@@ -25,7 +25,7 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
     [RequireUserPermission(GuildPermission.Administrator)]
     public async Task DonationReminderMessage([Leftover] string message)
     {
-        await _svc.SetMessageAsync(ctx.Guild.Id, message);
+        await _service.SetMessageAsync(ctx.Guild.Id, message);
         await Response()
             .Confirm($"Donation reminder message set to:\n{message}")
             .SendAsync();
@@ -42,7 +42,7 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
             return;
         }
 
-        await _svc.SetIntervalAsync(ctx.Guild.Id, hours);
+        await _service.SetIntervalAsync(ctx.Guild.Id, hours);
         await Response()
             .Confirm($"Donation reminder interval set to **{hours} hour(s)**.")
             .SendAsync();

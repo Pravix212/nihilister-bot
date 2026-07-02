@@ -13,9 +13,38 @@ public class DonationReminderCommands : NadekoModule<DonationReminderService>
     public async Task DonationReminder()
     {
         var newState = await _service.ToggleAsync(ctx.Guild.Id, ctx.Channel.Id);
-        await Response()
-            .Confirm($"Donation reminder **{(newState ? "enabled" : "disabled")}** in <#{ctx.Channel.Id}>. A test message will be sent shortly if enabled.")
-            .SendAsync();
+        if (newState)
+        {
+            var config = await _service.GetOrCreateConfigAsync(ctx.Guild.Id);
+            
+            var previewEmbed = new EmbedBuilder()
+                .WithColor(new Color(0x5865F2))
+                .WithTitle("Support Nihilister")
+                .WithDescription(config.Message)
+                .WithFooter("Thank you for supporting the Heathen's Garden ❤️")
+                .Build();
+
+            var button = new ButtonBuilder(
+                label: "💰 Donate",
+                url: "https://prav.lol/nihilister/donate.html",
+                style: ButtonStyle.Link
+            );
+
+            var components = new ComponentBuilder()
+                .WithButton(button)
+                .Build();
+
+            await ctx.Channel.SendMessageAsync(
+                content: $"✅ Donation reminder **enabled** in {ctx.Channel.Mention}.",
+                embed: previewEmbed,
+                components: components);
+        }
+        else
+        {
+            await Response()
+                .Confirm($"Donation reminder **disabled** in {ctx.Channel.Mention}.")
+                .SendAsync();
+        }
     }
 
     [Cmd]

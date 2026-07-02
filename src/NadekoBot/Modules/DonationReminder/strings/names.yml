@@ -1,1 +1,3 @@
 donationreminder: ["donatereminder", "donremind"]
+donationremindermessage: ["donateremindermessage"]
+donationreminderinterval: ["donatereminderinterval"]

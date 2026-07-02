@@ -103,14 +103,14 @@ public partial class Marriage
         var childrenUsers = new List<IGuildUser>();
         foreach (var childId in children)
         {
-            try { childrenUsers.Add(await ctx.Guild.GetUserAsync(childId)); }
+            try { var c = await ctx.Guild.GetUserAsync(childId); if (c != null) childrenUsers.Add(c); }
             catch { }
         }
 
         var siblingUsers = new List<IGuildUser>();
         foreach (var sibId in siblings)
         {
-            try { siblingUsers.Add(await ctx.Guild.GetUserAsync(sibId)); }
+            try { var s = await ctx.Guild.GetUserAsync(sibId); if (s != null) siblingUsers.Add(s); }
             catch { }
         }
 

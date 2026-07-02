@@ -86,6 +86,7 @@ public sealed class NadekoContext : DbContext
     public DbSet<ArchivedTodoListModel> TodosArchive { get; set; }
     public DbSet<HoneypotChannel> HoneyPotChannels { get; set; }
 
+    public DbSet<DonationReminderSettings> DonationReminderSettings { get; set; }
 
     // public DbSet<GuildColors> GuildColors { get; set; }
 
@@ -619,6 +620,17 @@ public sealed class NadekoContext : DbContext
 
         modelBuilder.Entity<AdoptionPending>()
             .HasKey(p => p.Id);
+
+        #endregion
+
+        #region DonationReminder
+
+        modelBuilder.Entity<DonationReminderSettings>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<DonationReminderSettings>()
+            .HasIndex(x => x.GuildId)
+            .IsUnique();
 
         #endregion
     }

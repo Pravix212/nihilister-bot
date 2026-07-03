@@ -1,4 +1,4 @@
-﻿waifu:
+waifu:
   - waifu
   - w
 waifuhelp:
@@ -40,6 +40,8 @@ nom:
   - nom
 spit:
   - spit
+explode:
+  - explode
 waifugiftshop:
   - waifugiftshop
   - wgiftshop

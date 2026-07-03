@@ -1,4 +1,4 @@
-﻿login:
+login:
   - login
   - lfm
 fm:
@@ -17,3 +17,6 @@ topalbums:
 toptracks:
   - toptracks
   - tt
+fmlyrics:
+  - fmlyrics
+  - fml

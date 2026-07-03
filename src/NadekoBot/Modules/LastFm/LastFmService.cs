@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using NadekoBot.Db;
 using NadekoBot.Db.Models;
 using Nadeko.Common;
@@ -91,16 +91,15 @@ public class LastFmService : INService
             return null;
         }
     }
-
+    
     public async Task<List<LastFmTrack>> GetRecentTracksAsync(string username, int limit = 2)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
             return null;
-
-        // No cache — always fetch fresh data
+        
         return await GetRecentTracksFactoryAsync(username, limit);
     }
-
+    
     private async Task<List<LastFmTrack>> GetRecentTracksFactoryAsync(string username, int limit)
     {
         using var http = _httpFactory.CreateClient();
@@ -157,18 +156,18 @@ public class LastFmService : INService
             return new List<LastFmArtist>();
         }
     }
-
+    
     public async Task<List<LastFmAlbum>> GetTopAlbumsAsync(string username, string period = "overall", int limit = 10)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
             return null;
-
+        
         return await _cache.GetOrAddAsync(
             new TypedKey<List<LastFmAlbum>>($"lastfm_topalbums_{username}_{period}_{limit}"),
             async () => await GetTopAlbumsFactoryAsync(username, period, limit),
             TimeSpan.FromMinutes(5));
     }
-
+    
     private async Task<List<LastFmAlbum>> GetTopAlbumsFactoryAsync(string username, string period, int limit)
     {
         using var http = _httpFactory.CreateClient();
@@ -178,11 +177,11 @@ public class LastFmService : INService
             var response = await http.GetStringAsync(url);
             if (string.IsNullOrWhiteSpace(response))
                 return new List<LastFmAlbum>();
-
+            
             var jObject = JObject.Parse(response);
             if (jObject["error"] != null)
                 return new List<LastFmAlbum>();
-
+            
             var albums = jObject["topalbums"]?["album"]?.ToObject<List<LastFmAlbum>>();
             return albums ?? new List<LastFmAlbum>();
         }
@@ -190,18 +189,19 @@ public class LastFmService : INService
         {
             return new List<LastFmAlbum>();
         }
-    }   
+    }
+    
     public async Task<List<LastFmTopTrack>> GetTopTracksAsync(string username, string period = "overall", int limit = 10)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
             return null;
-
+        
         return await _cache.GetOrAddAsync(
             new TypedKey<List<LastFmTopTrack>>($"lastfm_toptracks_{username}_{period}_{limit}"),
             async () => await GetTopTracksFactoryAsync(username, period, limit),
             TimeSpan.FromSeconds(30));
     }
-
+    
     private async Task<List<LastFmTopTrack>> GetTopTracksFactoryAsync(string username, string period, int limit)
     {
         using var http = _httpFactory.CreateClient();
@@ -211,11 +211,11 @@ public class LastFmService : INService
             var response = await http.GetStringAsync(url);
             if (string.IsNullOrWhiteSpace(response))
                 return new List<LastFmTopTrack>();
-
+            
             var jObject = JObject.Parse(response);
             if (jObject["error"] != null)
                 return new List<LastFmTopTrack>();
-
+            
             var tracks = jObject["toptracks"]?["track"]?.ToObject<List<LastFmTopTrack>>();
             return tracks ?? new List<LastFmTopTrack>();
         }
@@ -224,18 +224,18 @@ public class LastFmService : INService
             return new List<LastFmTopTrack>();
         }
     }
-
+    
     public async Task<LastFmTrackInfo> GetTrackInfoAsync(string artist, string track, string username)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
             return null;
-
+        
         return await _cache.GetOrAddAsync(
             new TypedKey<LastFmTrackInfo>($"lastfm_trackinfo_{artist}_{track}_{username}"),
             async () => await GetTrackInfoFactoryAsync(artist, track, username),
             TimeSpan.FromSeconds(10));
     }
-
+    
     private async Task<LastFmTrackInfo> GetTrackInfoFactoryAsync(string artist, string track, string username)
     {
         using var http = _httpFactory.CreateClient();
@@ -245,11 +245,11 @@ public class LastFmService : INService
             var response = await http.GetStringAsync(url);
             if (string.IsNullOrWhiteSpace(response))
                 return null;
-
+            
             var jObject = JObject.Parse(response);
             if (jObject["error"] != null)
                 return null;
-
+            
             return jObject["track"]?.ToObject<LastFmTrackInfo>();
         }
         catch
@@ -257,147 +257,175 @@ public class LastFmService : INService
             return null;
         }
     }
-
-
-
+    
+    public async Task<string> GetLyricsAsync(string artist, string track)
+    {
+        if (string.IsNullOrWhiteSpace(artist) || string.IsNullOrWhiteSpace(track))
+            return null;
+        
+        return await _cache.GetOrAddAsync(
+            new TypedKey<string>($"lyrics_{artist}_{track}"),
+            async () => await GetLyricsFactoryAsync(artist, track),
+            TimeSpan.FromHours(6));
+    }
+    
+    private async Task<string> GetLyricsFactoryAsync(string artist, string track)
+    {
+        using var http = _httpFactory.CreateClient();
+        var url = $"https://api.lyrics.ovh/v1/{Uri.EscapeDataString(artist)}/{Uri.EscapeDataString(track)}";
+        try
+        {
+            var response = await http.GetStringAsync(url);
+            if (string.IsNullOrWhiteSpace(response))
+                return null;
+            
+            var jObject = JObject.Parse(response);
+            return jObject["lyrics"]?.Value<string>();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    
+    #endregion
 }
 
-    #endregion
+#region DTOs
 
-    #region DTOs
-
-    public class LastFmUserInfo
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        
-        [JsonProperty("playcount")]
-        public string Playcount { get; set; }
-        
-        [JsonProperty("artist_count")]
-        public string ArtistCount { get; set; }
-        
-        [JsonProperty("track_count")]
-        public string TrackCount { get; set; }
-        
-        [JsonProperty("album_count")]
-        public string AlbumCount { get; set; }
-        
-        [JsonProperty("image")]
-        public List<LastFmImage> Images { get; set; }
-    }
-    
-    public class LastFmImage
-    {
-        [JsonProperty("#text")]
-        public string Url { get; set; }
-        
-        [JsonProperty("size")]
-        public string Size { get; set; }
-    }
-    
-    public class LastFmTrack
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        
-        [JsonProperty("artist")]
-        public LastFmTextField Artist { get; set; }
-        
-        [JsonProperty("album")]
-        public LastFmTextField Album { get; set; }
-        
-        [JsonProperty("image")]
-        public List<LastFmImage> Images { get; set; }
-        
-        [JsonProperty("date")]
-        public LastFmDate Date { get; set; }
-        
-        [JsonProperty("@attr")]
-        public LastFmTrackAttr Attr { get; set; }
-    }
-    
-    public class LastFmTextField
-    {
-        [JsonProperty("#text")]
-        public string Text { get; set; }
-    }
-    
-    public class LastFmDate
-    {
-        [JsonProperty("#text")]
-        public string Text { get; set; }
-    }
-    
-    public class LastFmTrackAttr
-    {
-        [JsonProperty("nowplaying")]
-        public string NowPlaying { get; set; }
-    }
-    
-    public class LastFmArtist
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        
-        [JsonProperty("playcount")]
-        public string Playcount { get; set; }
-        
-        [JsonProperty("listeners")]
-        public string Listeners { get; set; }
-        
-        [JsonProperty("image")]
-        public List<LastFmImage> Images { get; set; }
-    }
-    
-    public class LastFmAlbum
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("artist")]
-        public LastFmTextField Artist { get; set; }
-
-        [JsonProperty("playcount")]
-        public string Playcount { get; set; }
-
-        [JsonProperty("image")]
-        public List<LastFmImage> Images { get; set; }
-    }
-    public class LastFmTopTrack
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("playcount")]
-        public string Playcount { get; set; }
-
-        [JsonProperty("artist")]
-        public LastFmTextField Artist { get; set; }
-
-        [JsonProperty("image")]
-        public List<LastFmImage> Images { get; set; }
-    }
-
-    public class LastFmTrackInfo
-    {
+public class LastFmUserInfo
+{
     [JsonProperty("name")]
     public string Name { get; set; }
-
-    [JsonProperty("artist")]
-    public LastFmTextField Artist { get; set; }
-
+    
     [JsonProperty("playcount")]
     public string Playcount { get; set; }
-
-    [JsonProperty("userplaycount")]
-    public string UserPlaycount { get; set; }
-
-    [JsonProperty("listeners")]
-    public string Listeners { get; set; }
-
+    
+    [JsonProperty("artist_count")]
+    public string ArtistCount { get; set; }
+    
+    [JsonProperty("track_count")]
+    public string TrackCount { get; set; }
+    
+    [JsonProperty("album_count")]
+    public string AlbumCount { get; set; }
+    
     [JsonProperty("image")]
     public List<LastFmImage> Images { get; set; }
-    }
+}
+
+public class LastFmImage
+{
+    [JsonProperty("#text")]
+    public string Url { get; set; }
+    
+    [JsonProperty("size")]
+    public string Size { get; set; }
+}
+
+public class LastFmTrack
+{
+    [JsonProperty("name")]
+    public string Name { get; set; }
+    
+    [JsonProperty("artist")]
+    public LastFmTextField Artist { get; set; }
+    
+    [JsonProperty("album")]
+    public LastFmTextField Album { get; set; }
+    
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+    
+    [JsonProperty("date")]
+    public LastFmDate Date { get; set; }
+    
+    [JsonProperty("@attr")]
+    public LastFmTrackAttr Attr { get; set; }
+}
+
+public class LastFmTextField
+{
+    [JsonProperty("#text")]
+    public string Text { get; set; }
+}
+
+public class LastFmDate
+{
+    [JsonProperty("#text")]
+    public string Text { get; set; }
+}
+
+public class LastFmTrackAttr
+{
+    [JsonProperty("nowplaying")]
+    public string NowPlaying { get; set; }
+}
+
+public class LastFmArtist
+{
+    [JsonProperty("name")]
+    public string Name { get; set; }
+    
+    [JsonProperty("playcount")]
+    public string Playcount { get; set; }
+    
+    [JsonProperty("listeners")]
+    public string Listeners { get; set; }
+    
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+}
+
+public class LastFmAlbum
+{
+    [JsonProperty("name")]
+    public string Name { get; set; }
+    
+    [JsonProperty("artist")]
+    public LastFmTextField Artist { get; set; }
+    
+    [JsonProperty("playcount")]
+    public string Playcount { get; set; }
+    
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+}
+
+public class LastFmTopTrack
+{
+    [JsonProperty("name")]
+    public string Name { get; set; }
+    
+    [JsonProperty("playcount")]
+    public string Playcount { get; set; }
+    
+    [JsonProperty("artist")]
+    public LastFmTextField Artist { get; set; }
+    
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+}
+
+public class LastFmTrackInfo
+{
+    [JsonProperty("name")]
+    public string Name { get; set; }
+    
+    [JsonProperty("artist")]
+    public LastFmTextField Artist { get; set; }
+    
+    [JsonProperty("playcount")]
+    public string Playcount { get; set; }
+    
+    [JsonProperty("userplaycount")]
+    public string UserPlaycount { get; set; }
+    
+    [JsonProperty("listeners")]
+    public string Listeners { get; set; }
+    
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+}
 
 #endregion

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using Discord;
 using NadekoBot.Modules.LastFm.Services;
 
@@ -68,7 +68,7 @@ public partial class LastFm : NadekoModule
         var embed = new EmbedBuilder()
             .WithAuthor(user.ToString(), user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl())
             .WithTitle(currentTrack.Name)
-            .WithDescription($"by **{artistName}**\\n on **{currentTrack.Album?.Text}**")
+            .WithDescription($"by **{artistName}**\n on **{currentTrack.Album?.Text}**")
             .WithColor(new Color(185, 35, 35));
 
         // Build footer with playcount
@@ -236,12 +236,67 @@ public partial class LastFm : NadekoModule
         await ctx.Channel.SendMessageAsync(embed: embed.Build());
     }
 
+    [Cmd]
+    public async Task FmLyrics(IUser user = null)
+    {
+        user ??= ctx.User;
+
+        var username = await _svc.GetUsernameAsync(user.Id);
+        if (string.IsNullOrEmpty(username))
+        {
+            if (user.Id == ctx.User.Id)
+                await Response().Error("You haven't linked your Last.fm account yet. Use `.login <username>` to link it.").SendAsync();
+            else
+                await Response().Error($"{user.Mention} hasn't linked their Last.fm account yet.").SendAsync();
+            return;
+        }
+
+        // Get the most recent track
+        var tracks = await _svc.GetRecentTracksAsync(username, 1);
+        if (tracks == null || tracks.Count == 0)
+        {
+            await Response().Error("No recent tracks found.").SendAsync();
+            return;
+        }
+
+        var currentTrack = tracks.First();
+        var artist = currentTrack.Artist?.Text;
+        var track = currentTrack.Name;
+
+        if (string.IsNullOrWhiteSpace(artist) || string.IsNullOrWhiteSpace(track))
+        {
+            await Response().Error("Could not determine the track name.").SendAsync();
+            return;
+        }
+
+        await Response().Pending($"Searching lyrics for **{track}** by **{artist}**...").SendAsync();
+
+        var lyrics = await _svc.GetLyricsAsync(artist, track);
+        if (string.IsNullOrWhiteSpace(lyrics))
+        {
+            await Response().Error($"Could not find lyrics for **{track}** by **{artist}**.").SendAsync();
+            return;
+        }
+
+        // Discord embed description limit is 4096 chars
+        if (lyrics.Length > 4000)
+            lyrics = lyrics[..4000] + "\n\n... (truncated)";
+
+        var embed = new EmbedBuilder()
+            .WithTitle($"🎵 {track}")
+            .WithDescription($"by **{artist}**\n\n{lyrics}")
+            .WithColor(new Color(185, 35, 35))
+            .WithFooter($"Requested by {ctx.User.Username} • Powered by lyrics.ovh");
+
+        await ctx.Channel.SendMessageAsync(embed: embed.Build());
+    }
+
     private static string GetPeriodDisplay(string period)
     {
         return period switch
         {
             "7day" => "Last 7 Days",
-            "1month" => "Last Mon th",
+            "1month" => "Last Month",
             "3month" => "Last 3 Months",
             "6month" => "Last 6 Months",
             "12month" => "Last Year",

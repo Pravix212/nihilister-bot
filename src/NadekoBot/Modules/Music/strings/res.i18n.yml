@@ -13,7 +13,6 @@ ar:
   music_fairplay: تم إعادة ترتيب قائمة الانتظار بشكل عادل.
   music_quality_set: 'تم تعيين جودة الموسيقى إلى {0}. ستحتاج إلى إيقاف وإعادة تشغيل مشغّل الموسيقى ليتم تطبيق التغيير.'
   no_last_queued_found: لم يتم العثور على آخر مقطع تم إضافته.
-  no_lyrics_found: لم يتم العثور على كلمات الأغنية.
   no_player: لا يوجد مشغّل موسيقى نشط.
   not_with_bot_in_voice: أنت لست في نفس القناة الصوتية مع البوت.
   now_playing: قيد التشغيل الآن
@@ -64,7 +63,6 @@ de-DE:
   music_fairplay: Die Musikwarteschlange wurde fair neu geordnet.
   music_quality_set: 'Musikqualität wurde auf {0} gestellt. Du musst den Musikplayer zerstören und neu starten damit die Änderungen übernommen werden.'
   no_last_queued_found: Kein zuletzt hinzugefügter Track gefunden.
-  no_lyrics_found: Keine Songtexte gefunden.
   no_player: Keine aktiven Musik Spieler.
   not_with_bot_in_voice: Du bist nicht im selben Voice Channel wie der Bot.
   now_playing: Spielt jetzt
@@ -115,7 +113,6 @@ es-ES:
   music_fairplay: La cola de música ha sido reorganizada de forma justa.
   music_quality_set: 'La calidad de la música se ha establecido en {0}. Tendrás que eliminar y reiniciar el reproductor de música para que el cambio surta efecto.'
   no_last_queued_found: No se encontró ninguna pista añadida recientemente.
-  no_lyrics_found: No se encontraron letras.
   no_player: No hay reproducción activa.
   not_with_bot_in_voice: No estás en el mismo canal de voz que el bot.
   now_playing: Reproduciendo
@@ -166,7 +163,6 @@ fr-FR:
   music_fairplay: La file de musique a été réorganisée équitablement.
   music_quality_set: 'La qualité de la musique a été définie sur {0}. Vous devrez arrêter et redémarrer le lecteur de musique pour que le changement prenne effet.'
   no_last_queued_found: Aucune piste récemment ajoutée trouvée.
-  no_lyrics_found: Aucune parole trouvée.
   no_player: Aucun lecteur de musique actif.
   not_with_bot_in_voice: Vous n'êtes pas dans le même salon vocal que le bot.
   now_playing: Lecture en cours
@@ -217,7 +213,6 @@ id-ID:
   music_fairplay: Antrean musik sudah diurutkan ulang secara adil.
   music_quality_set: 'Kualitas musik sudah diatur ke {0}. Kamu harus menghentikan dan memulai ulang pemutar musik agar perubahan berlaku.'
   no_last_queued_found: Lagu terakhir yang diantrikan tidak ditemukan.
-  no_lyrics_found: Lirik tidak ditemukan.
   no_player: Tidak ada pemutar musik yang aktif.
   not_with_bot_in_voice: Kamu tidak berada di voice channel yang sama dengan bot.
   now_playing: Sedang diputar
@@ -268,7 +263,6 @@ ja-JP:
   music_fairplay: 音楽キューが公平に並べ替えられました。
   music_quality_set: '音楽品質が{0}に設定されました。変更を反映するにはミュージックプレイヤーを破棄して再起動する必要があります。'
   no_last_queued_found: 最後にキューに追加されたトラックが見つかりません。
-  no_lyrics_found: 歌詞が見つかりません。
   no_player: 有効な音楽プレーヤーがありません。
   not_with_bot_in_voice: Botと同じボイスチャンネルにいません。
   now_playing: 再生中の曲
@@ -319,7 +313,6 @@ ko-KR:
   music_fairplay: 음악 대기열이 공정하게 재정렬되었어요.
   music_quality_set: '음악 품질이 {0}(으)로 설정되었어요. 변경 사항을 적용하려면 음악 플레이어를 종료하고 다시 시작해야 해요.'
   no_last_queued_found: 마지막으로 대기열에 추가된 트랙을 찾을 수 없어요.
-  no_lyrics_found: 가사를 찾을 수 없어요.
   no_player: 활성화된 음악 플레이어가 없어요.
   not_with_bot_in_voice: 봇과 같은 음성 채널에 있지 않아요.
   now_playing: 지금 재생 중
@@ -370,7 +363,6 @@ pl-PL:
   music_fairplay: Kolejka muzyki została sprawiedliwie uporządkowana.
   music_quality_set: 'Jakość muzyki ustawiona na {0}. Musisz zniszczyć i ponownie uruchomić odtwarzacz, aby zmiana zaczęła obowiązywać.'
   no_last_queued_found: Nie znaleziono ostatnio dodanego utworu.
-  no_lyrics_found: Nie znaleziono tekstu piosenki.
   no_player: Brak aktywnego odtwarzacza muzyki.
   not_with_bot_in_voice: Nie jesteś na tym samym kanale głosowym co bot.
   now_playing: Teraz odtwarzane
@@ -421,7 +413,6 @@ pt-BR:
   music_fairplay: A fila de música foi reorganizada de forma justa.
   music_quality_set: 'A qualidade da música foi definida par {0}. Você terá que destruir e reiniciar o reprodutor para que as alterações tenham efeito.'
   no_last_queued_found: Nenhuma faixa adicionada recentemente encontrada.
-  no_lyrics_found: Nenhuma letra encontrada.
   no_player: Não há música em reprodução.
   not_with_bot_in_voice: Você não está no mesmo canal de voz que o bot.
   now_playing: Reproduzindo agora
@@ -472,7 +463,6 @@ ru-RU:
   music_fairplay: Очередь музыки была справедливо переупорядочена.
   music_quality_set: 'Качество музыки установлено на {0}. Вам нужно будет уничтожить и перезапустить музыкальный проигрыватель, чтобы изменения вступили в силу.'
   no_last_queued_found: Последний добавленный трек не найден.
-  no_lyrics_found: Текст песни не найден.
   no_player: Отсутствует активный музыкальный проигрыватель.
   not_with_bot_in_voice: Вы не находитесь в том же голосовом канале, что и бот.
   now_playing: Сейчас играет
@@ -523,7 +513,6 @@ sr-Cyrl-RS:
   music_fairplay: Ред музике је фер преуређен.
   music_quality_set: 'Квалитет музике је подешен на {0}. Мораш уништити и поново покренути музички плејер да би промена ступила на снагу.'
   no_last_queued_found: Није пронађена последња додата нумера.
-  no_lyrics_found: Текст песме није пронађен.
   no_player: Нема активног музичког плејера.
   not_with_bot_in_voice: Ниси у истом гласовном каналу као бот.
   now_playing: Тренутно свира
@@ -574,7 +563,6 @@ tr-TR:
   music_fairplay: Müzik sırası adil olarak yeniden sıralandı.
   music_quality_set: 'Müzik kalitesi {0} olarak ayarlandı. Değişikliğin geçerli olması için müzik oynatıcıyı kapatıp yeniden başlatman gerekiyor.'
   no_last_queued_found: Son sıraya eklenen parça bulunamadı.
-  no_lyrics_found: Şarkı sözü bulunamadı.
   no_player: Aktif müzik oynatıcı yok.
   not_with_bot_in_voice: Botla aynı ses kanalında değilsin.
   now_playing: Şu an çalıyor
@@ -625,7 +613,6 @@ ts-TS:
   music_fairplay: Music queue has been fairly reordered. I-I'm always fair.
   music_quality_set: 'Music quality set to {0}. You''ll need to restart the music player for it to take effect.'
   no_last_queued_found: No last queued track found. Did you even queue anything?
-  no_lyrics_found: Couldn't find any lyrics.
   no_player: No active music player. Start one first.
   not_with_bot_in_voice: You're not in the same voice channel as me. H-hurry up and join!
   now_playing: Now playing
@@ -676,7 +663,6 @@ uk-UA:
   music_fairplay: Чергу музики було справедливо перевпорядковано.
   music_quality_set: 'Якість музики встановлено на {0}. Потрібно зупинити та перезапустити плеєр, щоб зміни набули чинності.'
   no_last_queued_found: Не знайдено останній доданий трек.
-  no_lyrics_found: Текст пісні не знайдено.
   no_player: Немає активного музичного плеєра.
   not_with_bot_in_voice: Ти не в тому ж голосовому каналі, що й бот.
   now_playing: Зараз грає
@@ -727,7 +713,6 @@ vi-VN:
   music_fairplay: Hàng đợi nhạc đã được sắp xếp lại công bằng.
   music_quality_set: 'Chất lượng nhạc đã được đặt thành {0}. Bạn cần tắt và khởi động lại trình phát nhạc để thay đổi có hiệu lực.'
   no_last_queued_found: Không tìm thấy bài hát cuối cùng trong hàng đợi.
-  no_lyrics_found: Không tìm thấy lời bài hát.
   no_player: Không có trình phát nhạc nào đang hoạt động.
   not_with_bot_in_voice: Bạn không ở cùng kênh thoại với bot.
   now_playing: Đang phát
@@ -778,7 +763,6 @@ zh-CN:
   music_fairplay: 音樂佇列已公平重新排序。
   music_quality_set: '音樂播放品質已被設定為 {0}，設定將在完全停止(destroy)並重新啟動音樂播放器後生效'
   no_last_queued_found: 找不到最近加入佇列的曲目。
-  no_lyrics_found: 找不到歌詞。
   no_player: 沒有運作中的音樂撥放器。
   not_with_bot_in_voice: 你和機器人並未處在相同的語音頻道中
   now_playing: 現在播放

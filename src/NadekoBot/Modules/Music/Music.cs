@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 using NadekoBot.Modules.Music.Services;
 using NadekoBot.Db.Models;
 using NadekoBot.Modules.Patronage;
@@ -34,12 +34,10 @@ public sealed partial class Music : NadekoModule<IMusicService>
 
     private static readonly SemaphoreSlim _voiceChannelLock = new(1, 1);
     private readonly ILogCommandService _logService;
-    private readonly ILyricsService _lyricsService;
 
-    public Music(ILogCommandService logService, ILyricsService lyricsService)
+    public Music(ILogCommandService logService)
     {
         _logService = logService;
-        _lyricsService = lyricsService;
     }
 
     private async Task<bool> ValidateAsync()
@@ -808,72 +806,5 @@ public sealed partial class Music : NadekoModule<IMusicService>
         {
             await Response().Confirm(strs.wrongsong_success(removed.Title.TrimTo(30))).SendAsync();
         }
-    }
-
-    [Cmd]
-    [RequireContext(ContextType.Guild)]
-    public async Task Lyrics([Leftover] string name = null)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            if (_service.TryGetMusicPlayer(ctx.Guild.Id, out var mp)
-                && mp.GetCurrentTrack(out _) is { } currentTrack)
-            {
-                name = currentTrack.Title;
-            }
-            else
-            {
-                return;
-            }
-        }
-
-        var tracks = await _lyricsService.SearchTracksAsync(name);
-
-        if (tracks.Count == 0)
-        {
-            await Response().Error(strs.no_lyrics_found).SendAsync();
-            return;
-        }
-
-        var embed = CreateEmbed()
-            .WithFooter("type 1-5 to select");
-
-        for (var i = 0; i <= 5 && i < tracks.Count; i++)
-        {
-            var item = tracks[i];
-            embed.AddField($"`{(i + 1)}`. {item.Author}", item.Title, false);
-        }
-
-        await Response()
-            .Embed(embed)
-            .SendAsync();
-
-        var input = await GetUserInputAsync(ctx.User.Id, ctx.Channel.Id, str => int.TryParse(str, out _));
-
-        if (input is null)
-            return;
-
-        var index = int.Parse(input) - 1;
-        if (index < 0 || index > 4)
-        {
-            return;
-        }
-
-        var track = tracks[index];
-        var lyrics = await _lyricsService.GetLyricsAsync(track.Id);
-
-        if (string.IsNullOrWhiteSpace(lyrics))
-        {
-            await Response().Error(strs.no_lyrics_found).SendAsync();
-            return;
-        }
-
-        await Response()
-            .Embed(CreateEmbed()
-                .WithOkColor()
-                .WithAuthor(track.Author)
-                .WithTitle(track.Title)
-                .WithDescription(lyrics))
-            .SendAsync();
     }
 }

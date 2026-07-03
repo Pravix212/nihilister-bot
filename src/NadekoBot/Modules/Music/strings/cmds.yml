@@ -54,13 +54,6 @@ localplaylist:
   params:
     - dirPath:
         desc: The path to the directory containing the songs to be queued.
-lyrics:
-  desc: Looks up lyrics for a song. Very hit or miss.
-  ex:
-    - biri biri
-  params:
-    - name:
-        desc: The song to look up lyrics for.
 musicquality:
   desc: |-
     Gets or sets the default music player quality. Available settings: Highest, High, Medium, Low. Default is **Highest**. Provide no argument to see current setting.

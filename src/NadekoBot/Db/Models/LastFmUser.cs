@@ -10,7 +10,7 @@ public class LastFmUser
     
     public ulong DiscordUserId { get; set; }
     
-    public string LastFmUsername { get; set; }
+    public required string LastFmUsername { get; set; }
     
     public string? SessionKey { get; set; }
     

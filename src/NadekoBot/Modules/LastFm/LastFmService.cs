@@ -91,18 +91,16 @@ public class LastFmService : INService
             return null;
         }
     }
-    
+
     public async Task<List<LastFmTrack>> GetRecentTracksAsync(string username, int limit = 2)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
             return null;
-        
-        return await _cache.GetOrAddAsync(
-            new TypedKey<List<LastFmTrack>>($"lastfm_recent_{username}_{limit}"),
-            async () => await GetRecentTracksFactoryAsync(username, limit),
-            TimeSpan.FromMinutes(2));
+
+        // No cache — always fetch fresh data
+        return await GetRecentTracksFactoryAsync(username, limit);
     }
-    
+
     private async Task<List<LastFmTrack>> GetRecentTracksFactoryAsync(string username, int limit)
     {
         using var http = _httpFactory.CreateClient();
@@ -201,7 +199,7 @@ public class LastFmService : INService
         return await _cache.GetOrAddAsync(
             new TypedKey<List<LastFmTopTrack>>($"lastfm_toptracks_{username}_{period}_{limit}"),
             async () => await GetTopTracksFactoryAsync(username, period, limit),
-            TimeSpan.FromMinutes(5));
+            TimeSpan.FromSeconds(30));
     }
 
     private async Task<List<LastFmTopTrack>> GetTopTracksFactoryAsync(string username, string period, int limit)
@@ -235,7 +233,7 @@ public class LastFmService : INService
         return await _cache.GetOrAddAsync(
             new TypedKey<LastFmTrackInfo>($"lastfm_trackinfo_{artist}_{track}_{username}"),
             async () => await GetTrackInfoFactoryAsync(artist, track, username),
-            TimeSpan.FromMinutes(5));
+            TimeSpan.FromSeconds(10));
     }
 
     private async Task<LastFmTrackInfo> GetTrackInfoFactoryAsync(string artist, string track, string username)

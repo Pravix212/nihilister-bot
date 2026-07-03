@@ -77,6 +77,7 @@ public sealed class NadekoContext : DbContext
     public DbSet<AdoptionInfo> Adoptions { get; set; }
     public DbSet<MarriagePending> MarriageProposals { get; set; }
     public DbSet<AdoptionPending> AdoptionProposals { get; set; }
+    public DbSet<LastFmUser> LastFmUsers { get; set; }
 
     public DbSet<StreamOnlineMessage> StreamOnlineMessages { get; set; }
 
@@ -630,6 +631,17 @@ public sealed class NadekoContext : DbContext
 
         modelBuilder.Entity<DonationReminderSettings>()
             .HasIndex(x => x.GuildId)
+            .IsUnique();
+
+        #endregion
+
+        #region LastFm
+
+        modelBuilder.Entity<LastFmUser>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<LastFmUser>()
+            .HasIndex(x => x.DiscordUserId)
             .IsUnique();
 
         #endregion

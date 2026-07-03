@@ -156,6 +156,12 @@ public sealed class Creds : IBotCreds
     public string SteamApiKey { get; set; }
 
     [Comment("""
+             Last.fm API key. Obtain at https://www.last.fm/api/account/create
+             Used for .fm, .topartists, and other Last.fm commands.
+             """)]
+    public string LastFmApiKey { get; set; }
+
+    [Comment("""
              Brave Search API key. Register at https://api-dashboard.search.brave.com and create an API key.
              Used for .search and .image commands when search engine is set to 'Brave' in searches.yml
              """)]
@@ -188,6 +194,7 @@ public sealed class Creds : IBotCreds
 
         Seq = new();
         SteamApiKey = string.Empty;
+        LastFmApiKey = string.Empty;
         BraveSearchApiKey = string.Empty;
     }
 

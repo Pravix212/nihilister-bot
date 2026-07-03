@@ -1,0 +1,10 @@
+login:
+  - login
+  - lfm
+fm:
+  - fm
+  - nowplaying
+  - np
+topartists:
+  - topartists
+  - ta

@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 namespace NadekoBot;
 
 public interface IBotCreds
@@ -30,6 +30,7 @@ public interface IBotCreds
     SeqConfig Seq { get; set; }
     string SteamApiKey { get; }
     string BraveSearchApiKey { get; }
+    string LastFmApiKey { get; }
 }
 
 public interface IVotesSettings

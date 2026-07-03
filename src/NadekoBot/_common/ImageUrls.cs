@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using NadekoBot.Common.Yml;
 
 namespace NadekoBot.Common;
@@ -40,5 +40,6 @@ public sealed class ImageUrls
         public Uri[] Pat { get; set; }
         public Uri[] Nom { get; set; }
         public Uri[] Spit { get; set; }
+        public Uri[] Explode { get; set; }
     }
 }

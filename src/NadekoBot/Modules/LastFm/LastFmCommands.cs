@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 using Discord;
 using NadekoBot.Modules.LastFm.Services;
 
@@ -279,6 +279,47 @@ public partial class LastFm : NadekoModule
         }
 
         // Discord embed description limit is 4096 chars
+        if (lyrics.Length > 4000)
+            lyrics = lyrics[..4000] + "\n\n... (truncated)";
+
+        var embed = new EmbedBuilder()
+            .WithTitle($"🎵 {track}")
+            .WithDescription($"by **{artist}**\n\n{lyrics}")
+            .WithColor(new Color(185, 35, 35))
+            .WithFooter($"Requested by {ctx.User.Username} • Powered by lyrics.ovh");
+
+        await ctx.Channel.SendMessageAsync(embed: embed.Build());
+    }
+
+    [Cmd]
+    public async Task Lyrics([Leftover] string search)
+    {
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            await Response().Error("Please search with `.lyrics Artist Name - Song Name`, or use `.fmlyrics` for your current track.").SendAsync();
+            return;
+        }
+
+        // Parse "artist - song" format
+        var parts = search.Split(new[] { " - " }, 2, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 2)
+        {
+            await Response().Error("Please use the format: `.lyrics Artist Name - Song Name`").SendAsync();
+            return;
+        }
+
+        var artist = parts[0].Trim();
+        var track = parts[1].Trim();
+
+        await Response().Pending($"Searching lyrics for **{track}** by **{artist}**...").SendAsync();
+
+        var lyrics = await _svc.GetLyricsAsync(artist, track);
+        if (string.IsNullOrWhiteSpace(lyrics))
+        {
+            await Response().Error($"Could not find lyrics for **{track}** by **{artist}**.").SendAsync();
+            return;
+        }
+
         if (lyrics.Length > 4000)
             lyrics = lyrics[..4000] + "\n\n... (truncated)";
 

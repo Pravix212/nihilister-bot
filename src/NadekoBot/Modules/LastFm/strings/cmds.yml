@@ -1,4 +1,4 @@
-login:
+﻿login:
   desc: Link your Last.fm account to your Discord profile.
   ex:
     - 'your_lastfm_username'
@@ -75,3 +75,13 @@ whoknows:
     - {}
     - artist:
         desc: Artist name to search. If omitted, uses your currently playing artist.
+
+lyrics:
+  desc: Get lyrics for your current/last track or search by artist and song.
+  ex:
+    - ''
+    - 'The Weeknd - Blinding Lights'
+  params:
+    - {}
+    - search:
+        desc: 'Artist - Song to search for. Leave empty for current track.'

@@ -1,4 +1,4 @@
-login:
+﻿login:
   - login
   - lfm
 fm:
@@ -23,3 +23,6 @@ fmlyrics:
 whoknows:
   - whoknows
   - wk
+lyrics:
+  - lyrics
+  - ly

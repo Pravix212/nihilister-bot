@@ -362,7 +362,8 @@ public class LastFmService : INService
             return null;
         }
     }
-    
+
+
     public async Task<int?> GetArtistUserPlaycountAsync(string artistName, string username)
     {
         if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))

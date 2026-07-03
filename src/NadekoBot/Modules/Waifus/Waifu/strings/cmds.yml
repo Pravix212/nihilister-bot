@@ -144,6 +144,9 @@ spit:
   params:
     - users:
         desc: "The users to spit on."
+explode:
+  desc: |-
+    Explodes one or more users. If no valid user is found, just shows an explode GIF.
 waifugiftshop:
   desc: |-
     Shows today's available gift items. Items rotate daily at 00:00 UTC.

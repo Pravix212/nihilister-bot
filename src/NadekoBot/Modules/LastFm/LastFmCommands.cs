@@ -33,12 +33,12 @@ public partial class LastFm : NadekoModule
         await _svc.SetUsernameAsync(ctx.User.Id, username);
         await Response().Confirm($"✅ Linked your Discord account to Last.fm user **{userInfo.Name}**.\nTotal scrobbles: **{userInfo.Playcount}**").SendAsync();
     }
-    
+
     [Cmd]
     public async Task Fm(IUser user = null)
     {
         user ??= ctx.User;
-        
+
         var username = await _svc.GetUsernameAsync(user.Id);
         if (string.IsNullOrEmpty(username))
         {
@@ -48,37 +48,54 @@ public partial class LastFm : NadekoModule
                 await Response().Error($"{user.Mention} hasn't linked their Last.fm account yet.").SendAsync();
             return;
         }
-        
+
         var tracks = await _svc.GetRecentTracksAsync(username, 2);
         if (tracks == null || tracks.Count == 0)
         {
             await Response().Error("No recent tracks found.").SendAsync();
             return;
         }
-        
+
         var currentTrack = tracks.FirstOrDefault(t => t.Attr?.NowPlaying == "true") ?? tracks.First();
-        
+        var artistName = currentTrack.Artist?.Text;
+        var trackName = currentTrack.Name;
+
+        // Get the user's playcount for this specific track
+        var trackInfo = !string.IsNullOrEmpty(artistName) && !string.IsNullOrEmpty(trackName)
+            ? await _svc.GetTrackInfoAsync(artistName, trackName, username)
+            : null;
+
         var embed = new EmbedBuilder()
             .WithAuthor(user.ToString(), user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl())
             .WithTitle(currentTrack.Name)
-            .WithDescription($"by **{currentTrack.Artist?.Text}**\n on **{currentTrack.Album?.Text}**")
+            .WithDescription($"by **{artistName}**\\n on **{currentTrack.Album?.Text}**")
             .WithColor(new Color(185, 35, 35));
-        
+
+        // Build footer with playcount
+        var footerParts = new List<string>();
         if (currentTrack.Attr?.NowPlaying == "true")
-            embed.WithFooter("🎵 Now Playing • Last.fm");
+            footerParts.Add("🎵 Now Playing");
         else if (currentTrack.Date != null)
-            embed.WithFooter($"Last played {currentTrack.Date.Text} • Last.fm");
-        else
-            embed.WithFooter("Last.fm");
-        
+            footerParts.Add($"Last played {currentTrack.Date.Text}");
+
+        if (trackInfo?.UserPlaycount != null)
+            footerParts.Add($"▶ {trackInfo.UserPlaycount} scrobbles");
+
+        footerParts.Add("Last.fm");
+        embed.WithFooter(string.Join(" • ", footerParts));
+
         var imageUrl = currentTrack.Images?.FirstOrDefault(i => i.Size == "large")?.Url
             ?? currentTrack.Images?.LastOrDefault()?.Url;
         if (!string.IsNullOrEmpty(imageUrl))
             embed.WithThumbnailUrl(imageUrl);
-        
-        await ctx.Channel.SendMessageAsync(embed: embed.Build());
+
+        var sentMessage = await ctx.Channel.SendMessageAsync(embed: embed.Build());
+
+        // Add reactions so others can vote
+        await sentMessage.AddReactionAsync(new Emoji("👍"));
+        await sentMessage.AddReactionAsync(new Emoji("👎"));
     }
-    
+
     [Cmd]
     public async Task TopArtists([Leftover] string period = "overall")
     {

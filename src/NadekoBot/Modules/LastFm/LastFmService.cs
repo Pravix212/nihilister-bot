@@ -227,6 +227,41 @@ public class LastFmService : INService
         }
     }
 
+    public async Task<LastFmTrackInfo> GetTrackInfoAsync(string artist, string track, string username)
+    {
+        if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
+            return null;
+
+        return await _cache.GetOrAddAsync(
+            new TypedKey<LastFmTrackInfo>($"lastfm_trackinfo_{artist}_{track}_{username}"),
+            async () => await GetTrackInfoFactoryAsync(artist, track, username),
+            TimeSpan.FromMinutes(5));
+    }
+
+    private async Task<LastFmTrackInfo> GetTrackInfoFactoryAsync(string artist, string track, string username)
+    {
+        using var http = _httpFactory.CreateClient();
+        var url = $"{BASE_URL}?method=track.getInfo&artist={Uri.EscapeDataString(artist)}&track={Uri.EscapeDataString(track)}&username={Uri.EscapeDataString(username)}&api_key={_creds.GetCreds().LastFmApiKey}&format=json";
+        try
+        {
+            var response = await http.GetStringAsync(url);
+            if (string.IsNullOrWhiteSpace(response))
+                return null;
+
+            var jObject = JObject.Parse(response);
+            if (jObject["error"] != null)
+                return null;
+
+            return jObject["track"]?.ToObject<LastFmTrackInfo>();
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+
+
 }
 
     #endregion
@@ -346,4 +381,25 @@ public class LastFmService : INService
         public List<LastFmImage> Images { get; set; }
     }
 
-    #endregion
+    public class LastFmTrackInfo
+    {
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonProperty("artist")]
+    public LastFmTextField Artist { get; set; }
+
+    [JsonProperty("playcount")]
+    public string Playcount { get; set; }
+
+    [JsonProperty("userplaycount")]
+    public string UserPlaycount { get; set; }
+
+    [JsonProperty("listeners")]
+    public string Listeners { get; set; }
+
+    [JsonProperty("image")]
+    public List<LastFmImage> Images { get; set; }
+    }
+
+#endregion

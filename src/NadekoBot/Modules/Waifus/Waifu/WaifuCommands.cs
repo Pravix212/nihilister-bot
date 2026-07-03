@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using NadekoBot.Common.TypeReaders;
 using NadekoBot.Modules.Gambling.Bank;
 using NadekoBot.Modules.Waifus.Waifu;
@@ -565,6 +565,7 @@ public partial class Waifus
             WaifuAction.Pat => strs.waifu_patted(name),
             WaifuAction.Nom => strs.waifu_nommed(name),
             WaifuAction.Spit => strs.waifu_spat(name),
+            WaifuAction.Explode => strs.waifu_exploded(name),
             _ => strs.waifu_hugged(name)
         });
 
@@ -577,6 +578,7 @@ public partial class Waifus
             WaifuAction.Pat => ic.Data.Waifu?.Pat,
             WaifuAction.Nom => ic.Data.Waifu?.Nom,
             WaifuAction.Spit => ic.Data.Waifu?.Spit,
+            WaifuAction.Explode => ic.Data.Waifu?.Explode,
             _ => null
         };
 
@@ -679,6 +681,11 @@ public partial class Waifus
         => ActionWithUsersAsync(WaifuAction.Spit, users);
 
     [Cmd]
+    [Priority(1)]
+    public Task Explode(params IUser[] users)
+        => ActionWithUsersAsync(WaifuAction.Explode, users);
+
+    [Cmd]
     [Priority(0)] 
     public Task Hug([Leftover] string input)
         => ActionGifOnlyAsync(WaifuAction.Hug);
@@ -697,6 +704,11 @@ public partial class Waifus
     [Priority(0)]
     public Task Nom([Leftover] string input)
         => ActionGifOnlyAsync(WaifuAction.Nom);
+
+    [Cmd]
+    [Priority(0)]
+    public Task Explode([Leftover] string input)
+        => ActionGifOnlyAsync(WaifuAction.Explode);
 
     [Cmd]
     public async Task WaifuGiftShop()

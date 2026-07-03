@@ -21,8 +21,6 @@ music_quality_set: >-
   player for the change to take effect.
 no_last_queued_found: No last queued track found.
 no_player: No active music player.
-no_lyrics_found: No lyrics found.
-no_player: No active music player.
 not_with_bot_in_voice: You are not in the same voice channel as the bot.
 now_playing: Now playing
 player_queue: Player queue - Page {0}/{1}

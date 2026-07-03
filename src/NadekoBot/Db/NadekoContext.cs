@@ -78,6 +78,7 @@ public sealed class NadekoContext : DbContext
     public DbSet<MarriagePending> MarriageProposals { get; set; }
     public DbSet<AdoptionPending> AdoptionProposals { get; set; }
     public DbSet<LastFmUser> LastFmUsers { get; set; }
+    public DbSet<LastFmArtistCrown> LastFmArtistCrowns { get; set; }
 
     public DbSet<StreamOnlineMessage> StreamOnlineMessages { get; set; }
 
@@ -644,7 +645,15 @@ public sealed class NadekoContext : DbContext
             .HasIndex(x => x.DiscordUserId)
             .IsUnique();
 
+        modelBuilder.Entity<LastFmArtistCrown>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<LastFmArtistCrown>()
+            .HasIndex(x => new { x.GuildId, x.ArtistName })
+            .IsUnique();
+
         #endregion
+
     }
 
 #if DEBUG

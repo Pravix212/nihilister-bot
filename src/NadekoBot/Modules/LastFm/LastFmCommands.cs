@@ -291,6 +291,100 @@ public partial class LastFm : NadekoModule
         await ctx.Channel.SendMessageAsync(embed: embed.Build());
     }
 
+    [Cmd]
+    public async Task WhoKnows([Leftover] string artist = null)
+    {
+        // If no artist provided, try to get it from the user's current track
+        if (string.IsNullOrWhiteSpace(artist))
+        {
+            var username = await _svc.GetUsernameAsync(ctx.User.Id);
+            if (string.IsNullOrEmpty(username))
+            {
+                await Response().Error("You haven't linked your Last.fm account yet. Use `.login <username>` to link it.\nOr provide an artist name: `.whoknows <artist>`").SendAsync();
+                return;
+            }
+
+            var tracks = await _svc.GetRecentTracksAsync(username, 1);
+            if (tracks == null || tracks.Count == 0)
+            {
+                await Response().Error("No recent tracks found. Please provide an artist name: `.whoknows <artist>`").SendAsync();
+                return;
+            }
+
+            artist = tracks.First().Artist?.Text;
+            if (string.IsNullOrWhiteSpace(artist))
+            {
+                await Response().Error("Could not determine artist from your recent tracks. Please provide one: `.whoknows <artist>`").SendAsync();
+                return;
+            }
+        }
+
+        await Response().Pending($"Searching who knows **{artist}** in **{ctx.Guild.Name}**...").SendAsync();
+
+        // Get all guild members who have linked Last.fm
+        var guildUsers = await ctx.Guild.GetUsersAsync();
+        var result = await _svc.GetWhoKnowsAsync(ctx.Guild.Id, artist, guildUsers);
+
+        if (result == null || result.Entries.Count == 0)
+        {
+            await Response().Error($"No one in this server has scrobbled **{artist}**.").SendAsync();
+            return;
+        }
+
+        // Get artist info for image and tags
+        var artistInfo = await _svc.GetArtistInfoAsync(artist);
+
+        var embed = new EmbedBuilder()
+            .WithTitle($"{result.ArtistName} in {ctx.Guild.Name}")
+            .WithColor(new Color(185, 35, 35));
+
+        // Build the leaderboard description
+        var lines = new List<string>();
+        
+        // Crown holder gets special treatment
+        var crownEntry = result.Entries.First();
+        lines.Add($"👑 **{crownEntry.DiscordUser.DisplayName ?? crownEntry.DiscordUser.Username}** — **{crownEntry.Playcount}** plays");
+        
+        // Rest of the leaderboard
+        foreach (var entry in result.Entries.Skip(1).Take(14)) // Show top 15 total
+        {
+            lines.Add($"**{entry.DiscordUser.DisplayName ?? entry.DiscordUser.Username}** — {entry.Playcount} plays");
+        }
+
+        embed.WithDescription(string.Join("\n", lines));
+
+        // Crown claimed message
+        var crownMessage = $"Crown claimed by **{crownEntry.DiscordUser.DisplayName ?? crownEntry.DiscordUser.Username}**!";
+        if (result.CrownClaimedAt.HasValue)
+        {
+            var daysAgo = (DateTime.UtcNow - result.CrownClaimedAt.Value).TotalDays;
+            if (daysAgo < 1)
+                crownMessage += " *(just now)*";
+            else if (daysAgo < 2)
+                crownMessage += " *(yesterday)*";
+            else
+                crownMessage += $" *({(int)daysAgo} days ago)*";
+        }
+        embed.AddField("\u200B", crownMessage);
+
+        // Add genre tags if available
+        var tags = artistInfo?.Tags?.TagList?.Take(3).Select(t => t.Name).ToList();
+        if (tags != null && tags.Count > 0)
+        {
+            embed.AddField("Tags", string.Join(" • ", tags), inline: true);
+        }
+
+        // Artist image
+        var imageUrl = artistInfo?.Images?.FirstOrDefault(i => i.Size == "large")?.Url
+            ?? artistInfo?.Images?.LastOrDefault()?.Url;
+        if (!string.IsNullOrEmpty(imageUrl))
+            embed.WithThumbnailUrl(imageUrl);
+
+        embed.WithFooter($"{result.Entries.Count} listener{(result.Entries.Count != 1 ? "s" : "")} • Last.fm");
+
+        await ctx.Channel.SendMessageAsync(embed: embed.Build());
+    }
+
     private static string GetPeriodDisplay(string period)
     {
         return period switch

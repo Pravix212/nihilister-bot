@@ -65,3 +65,13 @@ fmlyrics:
     - {}
     - user:
         desc: The user to check lyrics for.
+
+whoknows:
+  desc: Show who in this server listens to an artist the most. Crown goes to #1.
+  ex:
+    - ''
+    - 'The Beatles'
+  params:
+    - {}
+    - artist:
+        desc: Artist name to search. If omitted, uses your currently playing artist.

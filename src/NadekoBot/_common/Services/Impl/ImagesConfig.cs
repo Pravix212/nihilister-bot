@@ -49,6 +49,21 @@ public sealed class ImagesConfig : ConfigServiceBase<ImageUrls>
             });
         }
 
+        if (Data.Version < 13)
+        {
+            ModifyConfig(c =>
+            {
+                c.Waifu ??= new ImageUrls.WaifuActionData();
+                c.Waifu.Explode =
+                [
+                    new Uri("https://media.discordapp.net/attachments/1516821409941426289/1522613583668707561/house-explosion.gif?ex=6a491be7&is=6a47ca67&hm=d085388ee88d7eb616e5ccc964e722dcccce74cf5e727931032b971c8c774f23&="),
+                    new Uri("https://media.discordapp.net/attachments/1516821409941426289/1522613584167833752/explosion-explode.gif?ex=6a491be7&is=6a47ca67&hm=687bb726b7609467d149ba841adea34fecb94582dc2e7f6abb3a227804048254&="),
+                    new Uri("https://i.imgur.com/eVfpSFf.gif")
+                    ];
+                c.Version = 13;
+            });
+        }
+
     }
 
     private static ImageUrls.WaifuActionData CreateDefaultWaifuActions()
@@ -59,5 +74,6 @@ public sealed class ImagesConfig : ConfigServiceBase<ImageUrls>
             Pat = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/pat/pat_{i}.gif")).ToArray(),
             Nom = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/nom/nom_{i}.gif")).ToArray(),
             Spit = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/spit/spit_{i}.gif")).ToArray(),
+            Explode = Enumerable.Range(0, 20).Select(i => new Uri($"https://cdn.nadeko.bot/w/explode/explode_{i}.gif")).ToArray()
         };
 }

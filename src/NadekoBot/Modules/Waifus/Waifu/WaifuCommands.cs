@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using NadekoBot.Common.TypeReaders;
 using NadekoBot.Modules.Gambling.Bank;
 using NadekoBot.Modules.Waifus.Waifu;
@@ -676,16 +676,16 @@ public partial class Waifus
         => ActionWithUsersAsync(WaifuAction.Nom, users);
 
     [Cmd]
-    [Priority(0)]
-    public Task Spit(params IUser[] users)
-        => ActionWithUsersAsync(WaifuAction.Spit, users);
-
-    [Cmd]
     [Priority(1)]
     public Task Explode(params IUser[] users)
         => ActionWithUsersAsync(WaifuAction.Explode, users);
 
-    [Cmd]
+        [Cmd]
+    [Priority(0)]
+    public Task Spit(params IUser[] users)
+        => ActionWithUsersAsync(WaifuAction.Spit, users);
+
+        [Cmd]
     [Priority(0)] 
     public Task Hug([Leftover] string input)
         => ActionGifOnlyAsync(WaifuAction.Hug);

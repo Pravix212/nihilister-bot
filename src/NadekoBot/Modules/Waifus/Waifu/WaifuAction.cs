@@ -1,4 +1,4 @@
-﻿namespace NadekoBot.Modules.Waifus.Waifu;
+namespace NadekoBot.Modules.Waifus.Waifu;
 
 public enum WaifuAction
 {
@@ -6,5 +6,6 @@ public enum WaifuAction
     Kiss,
     Pat,
     Nom,
-    Spit
+    Spit,
+    Explode
 }

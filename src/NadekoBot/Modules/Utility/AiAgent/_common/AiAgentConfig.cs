@@ -50,6 +50,9 @@ public sealed class AiAgentConfig
     [Comment("Enable triggering the agent by saying the bot's name (with intent classification). Default true")]
     public bool NameTriggerEnabled { get; set; } = true;
 
+    [Comment("Enable triggering the agent by replying to its message) Default true")]
+    public bool ReplyTriggerEnabled { get; set; } = true;
+
     [Comment("Seconds after an agent response during which the user's messages go directly to the agent. Default 120")]
     public int FollowUpWindowSeconds { get; set; } = 120;
 

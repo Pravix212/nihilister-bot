@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using LinqToDB;
 using LinqToDB.EntityFrameworkCore;
 using NadekoBot.Common.ModuleBehaviors;
@@ -245,7 +245,8 @@ public sealed class AiAgentService(
             }
         }
 
-        if (msg.ReferencedMessage?.Author?.Id == nadekoId
+        if (config.ReplyTriggerEnabled
+            && msg.ReferencedMessage?.Author?.Id == nadekoId
             && searchService.IsReady
             && !string.IsNullOrWhiteSpace(msg.Content))
         {

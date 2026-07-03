@@ -1,4 +1,4 @@
-# DO NOT CHANGE THE VERSION MANUALLY
+﻿# DO NOT CHANGE THE VERSION MANUALLY
 version: 8
 # Whether the AI agent feature is enabled. Default false
 enabled: true
@@ -53,3 +53,5 @@ customHeaders:
 reasoningEffort: low
 # Whether AI agent text responses are sent as embeds. If false, sent as plain text. Default true
 useEmbed: false
+# Disables or enables the AI Agent to respond to someone who replied to it's message. Default true
+ReplyTriggerEnabled: false

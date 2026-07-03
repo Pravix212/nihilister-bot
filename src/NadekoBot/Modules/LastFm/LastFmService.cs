@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 using NadekoBot.Db;
 using NadekoBot.Db.Models;
 using Nadeko.Common;
@@ -159,11 +159,80 @@ public class LastFmService : INService
             return new List<LastFmArtist>();
         }
     }
-    
+
+    public async Task<List<LastFmAlbum>> GetTopAlbumsAsync(string username, string period = "overall", int limit = 10)
+    {
+        if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
+            return null;
+
+        return await _cache.GetOrAddAsync(
+            new TypedKey<List<LastFmAlbum>>($"lastfm_topalbums_{username}_{period}_{limit}"),
+            async () => await GetTopAlbumsFactoryAsync(username, period, limit),
+            TimeSpan.FromMinutes(5));
+    }
+
+    private async Task<List<LastFmAlbum>> GetTopAlbumsFactoryAsync(string username, string period, int limit)
+    {
+        using var http = _httpFactory.CreateClient();
+        var url = $"{BASE_URL}?method=user.getTopAlbums&user={Uri.EscapeDataString(username)}&period={period}&limit={limit}&api_key={_creds.GetCreds().LastFmApiKey}&format=json";
+        try
+        {
+            var response = await http.GetStringAsync(url);
+            if (string.IsNullOrWhiteSpace(response))
+                return new List<LastFmAlbum>();
+
+            var jObject = JObject.Parse(response);
+            if (jObject["error"] != null)
+                return new List<LastFmAlbum>();
+
+            var albums = jObject["topalbums"]?["album"]?.ToObject<List<LastFmAlbum>>();
+            return albums ?? new List<LastFmAlbum>();
+        }
+        catch
+        {
+            return new List<LastFmAlbum>();
+        }
+    }   
+    public async Task<List<LastFmTopTrack>> GetTopTracksAsync(string username, string period = "overall", int limit = 10)
+    {
+        if (string.IsNullOrWhiteSpace(_creds.GetCreds().LastFmApiKey))
+            return null;
+
+        return await _cache.GetOrAddAsync(
+            new TypedKey<List<LastFmTopTrack>>($"lastfm_toptracks_{username}_{period}_{limit}"),
+            async () => await GetTopTracksFactoryAsync(username, period, limit),
+            TimeSpan.FromMinutes(5));
+    }
+
+    private async Task<List<LastFmTopTrack>> GetTopTracksFactoryAsync(string username, string period, int limit)
+    {
+        using var http = _httpFactory.CreateClient();
+        var url = $"{BASE_URL}?method=user.getTopTracks&user={Uri.EscapeDataString(username)}&period={period}&limit={limit}&api_key={_creds.GetCreds().LastFmApiKey}&format=json";
+        try
+        {
+            var response = await http.GetStringAsync(url);
+            if (string.IsNullOrWhiteSpace(response))
+                return new List<LastFmTopTrack>();
+
+            var jObject = JObject.Parse(response);
+            if (jObject["error"] != null)
+                return new List<LastFmTopTrack>();
+
+            var tracks = jObject["toptracks"]?["track"]?.ToObject<List<LastFmTopTrack>>();
+            return tracks ?? new List<LastFmTopTrack>();
+        }
+        catch
+        {
+            return new List<LastFmTopTrack>();
+        }
+    }
+
+}
+
     #endregion
-    
+
     #region DTOs
-    
+
     public class LastFmUserInfo
     {
         [JsonProperty("name")]
@@ -248,5 +317,33 @@ public class LastFmService : INService
         public List<LastFmImage> Images { get; set; }
     }
     
+    public class LastFmAlbum
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("artist")]
+        public LastFmTextField Artist { get; set; }
+
+        [JsonProperty("playcount")]
+        public string Playcount { get; set; }
+
+        [JsonProperty("image")]
+        public List<LastFmImage> Images { get; set; }
+    }
+    public class LastFmTopTrack
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("playcount")]
+        public string Playcount { get; set; }
+
+        [JsonProperty("artist")]
+        public LastFmTextField Artist { get; set; }
+
+        [JsonProperty("image")]
+        public List<LastFmImage> Images { get; set; }
+    }
+
     #endregion
-}

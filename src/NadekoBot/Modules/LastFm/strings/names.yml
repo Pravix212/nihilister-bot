@@ -1,4 +1,4 @@
-login:
+﻿login:
   - login
   - lfm
 fm:
@@ -8,3 +8,12 @@ fm:
 topartists:
   - topartists
   - ta
+recent:
+  - recent
+  - r
+topalbums:
+  - topalbums
+  - tab
+toptracks:
+  - toptracks
+  - tt

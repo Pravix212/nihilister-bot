@@ -31,106 +31,7 @@ public partial class NikkeCommands : NadekoModule
             return;
         }
 
-        var embed = new EmbedBuilder()
-            .WithTitle(character.Name)
-            .WithColor(GetElementColor(character.Element))
-            .WithThumbnailUrl(character.Images?.Icon ?? "");
-
-        // Class, rarity, element, manufacturer, burst
-        var details = new List<string>();
-        if (!string.IsNullOrEmpty(character.Rarity))
-            details.Add($"**Rarity:** {character.Rarity}");
-        if (!string.IsNullOrEmpty(character.Class))
-            details.Add($"**Class:** {character.Class}");
-        if (!string.IsNullOrEmpty(character.Element))
-            details.Add($"**Element:** {character.Element}");
-        if (!string.IsNullOrEmpty(character.BurstType))
-            details.Add($"**Burst:** {character.BurstType}");
-        if (!string.IsNullOrEmpty(character.Manufacturer))
-            details.Add($"**Manufacturer:** {character.Manufacturer}");
-        if (!string.IsNullOrEmpty(character.Squad))
-            details.Add($"**Squad:** {character.Squad}");
-        if (!string.IsNullOrEmpty(character.Weapon))
-            details.Add($"**Weapon:** {character.Weapon}{(string.IsNullOrEmpty(character.WeaponName) ? "" : $" ({character.WeaponName})")}");
-
-        if (details.Count > 0)
-            embed.AddField("Details", string.Join("\n", details), inline: true);
-
-        // Stats
-        if (character.Stats != null && (character.Stats.Hp.HasValue || character.Stats.Atk.HasValue || character.Stats.Def.HasValue))
-        {
-            var statsLines = new List<string>();
-            if (character.Stats.Hp.HasValue)
-                statsLines.Add($"**HP:** {character.Stats.Hp.Value:N0}");
-            if (character.Stats.Atk.HasValue)
-                statsLines.Add($"**ATK:** {character.Stats.Atk.Value:N0}");
-            if (character.Stats.Def.HasValue)
-                statsLines.Add($"**DEF:** {character.Stats.Def.Value:N0}");
-            embed.AddField("Stats", string.Join("\n", statsLines), inline: true);
-        }
-
-        // Voice actors
-        var vaLines = new List<string>();
-        if (!string.IsNullOrEmpty(character.VoiceActors?.En))
-            vaLines.Add($"🇺🇸 {character.VoiceActors.En}");
-        if (!string.IsNullOrEmpty(character.VoiceActors?.Jp))
-            vaLines.Add($"🇯🇵 {character.VoiceActors.Jp}");
-        if (!string.IsNullOrEmpty(character.VoiceActors?.Kr))
-            vaLines.Add($"🇰🇷 {character.VoiceActors.Kr}");
-        if (vaLines.Count > 0)
-            embed.AddField("Voice Actors", string.Join("\n", vaLines), inline: true);
-
-        // Skills
-        if (character.Skills != null)
-        {
-            var skillLines = new List<string>();
-            
-            if (character.Skills.Normal != null)
-            {
-                var desc = FormatSkillDescription(character.Skills.Normal.BaseDescription ?? character.Skills.Normal.Description);
-                skillLines.Add($"**{character.Skills.Normal.Name}** — {desc}");
-            }
-            if (character.Skills.Skill1 != null)
-            {
-                var desc = FormatSkillDescription(character.Skills.Skill1.BaseDescription);
-                var cd = string.IsNullOrEmpty(character.Skills.Skill1.Cooldown) ? "" : $" ({character.Skills.Skill1.Cooldown})";
-                skillLines.Add($"**{character.Skills.Skill1.Name}**{cd} — {desc}");
-            }
-            if (character.Skills.Skill2 != null)
-            {
-                var desc = FormatSkillDescription(character.Skills.Skill2.BaseDescription);
-                var cd = string.IsNullOrEmpty(character.Skills.Skill2.Cooldown) ? "" : $" ({character.Skills.Skill2.Cooldown})";
-                skillLines.Add($"**{character.Skills.Skill2.Name}**{cd} — {desc}");
-            }
-            if (character.Skills.Burst != null)
-            {
-                var desc = FormatSkillDescription(character.Skills.Burst.BaseDescription);
-                var cd = string.IsNullOrEmpty(character.Skills.Burst.Cooldown) ? "" : $" ({character.Skills.Burst.Cooldown})";
-                skillLines.Add($"**{character.Skills.Burst.Name}**{cd} — {desc}");
-            }
-
-            if (skillLines.Count > 0)
-            {
-                var skillsText = string.Join("\n\n", skillLines);
-                if (skillsText.Length > 1000)
-                    skillsText = skillsText[..1000] + "\n\n... (truncated)";
-                embed.AddField("Skills", skillsText);
-            }
-        }
-
-        // Backstory (truncated if too long)
-        if (!string.IsNullOrEmpty(character.Backstory))
-        {
-            var backstory = character.Backstory.Length > 500 ? character.Backstory[..500] + "..." : character.Backstory;
-            embed.AddField("Backstory", backstory);
-        }
-
-        // Card image
-        if (!string.IsNullOrEmpty(character.Images?.Card))
-            embed.WithImageUrl(character.Images.Card);
-
-        embed.WithFooter("Data from NikkeAPI / prydwen.gg");
-
+        var embed = BuildCharacterEmbed(character);
         await ctx.Channel.SendMessageAsync(embed: embed.Build());
     }
 
@@ -154,29 +55,198 @@ public partial class NikkeCommands : NadekoModule
 
         var embed = new EmbedBuilder()
             .WithTitle($"{character.Name} — Full Artwork")
-            .WithColor(GetElementColor(character.Element))
+            .WithColor(GetRarityColor(character.Rarity))
             .WithImageUrl(character.Images?.Full ?? character.Images?.Card ?? "")
-            .WithFooter("Data from NikkeAPI / prydwen.gg");
+            .WithFooter("Data from NIKKE.gg");
 
         await ctx.Channel.SendMessageAsync(embed: embed.Build());
     }
 
-    private static string FormatSkillDescription(List<string> description)
+    private EmbedBuilder BuildCharacterEmbed(NikkeCharacter c)
     {
-        if (description == null || description.Count == 0)
-            return "No description available.";
-        return string.Join(" ", description);
+        var embed = new EmbedBuilder()
+            .WithTitle($"{c.Rarity} {c.Name}")
+            .WithColor(GetRarityColor(c.Rarity))
+            .WithThumbnailUrl(c.Images?.Icon ?? "");
+
+        // Backstory
+        if (!string.IsNullOrEmpty(c.Backstory))
+        {
+            var desc = c.Backstory.Length > 500 ? c.Backstory[..500] + "..." : c.Backstory;
+            embed.WithDescription(desc);
+        }
+
+        // Details field
+        var details = new List<string>();
+        if (!string.IsNullOrEmpty(c.Class))
+            details.Add($"**Class:** {c.Class}");
+        if (!string.IsNullOrEmpty(c.Weapon))
+            details.Add($"**Weapon:** {c.Weapon}");
+        if (!string.IsNullOrEmpty(c.Manufacturer))
+            details.Add($"**Manufacturer:** {c.Manufacturer}");
+        if (!string.IsNullOrEmpty(c.Element))
+            details.Add($"**Element:** {c.Element}");
+        if (!string.IsNullOrEmpty(c.BurstType))
+            details.Add($"**Burst:** Type {c.BurstType}");
+        if (!string.IsNullOrEmpty(c.Squad))
+            details.Add($"**Squad:** {c.Squad}");
+        if (!string.IsNullOrEmpty(c.BurstGeneration))
+            details.Add($"**Burst Gen:** {c.BurstGeneration}");
+
+        if (details.Count > 0)
+            embed.AddField("Details", string.Join("\n", details), inline: true);
+
+        // Tierlist field
+        if (c.Tierlist != null && (c.Tierlist.Combined != null || c.Tierlist.Story != null || c.Tierlist.Boss != null || c.Tierlist.PvP != null))
+        {
+            var tierLines = new List<string>();
+            if (!string.IsNullOrEmpty(c.Tierlist.Combined))
+                tierLines.Add($"**Combined:** {c.Tierlist.Combined}");
+            if (!string.IsNullOrEmpty(c.Tierlist.Story))
+                tierLines.Add($"**Story:** {c.Tierlist.Story}");
+            if (!string.IsNullOrEmpty(c.Tierlist.Boss))
+                tierLines.Add($"**Boss:** {c.Tierlist.Boss}");
+            if (!string.IsNullOrEmpty(c.Tierlist.PvP))
+                tierLines.Add($"**PvP:** {c.Tierlist.PvP}");
+
+            if (tierLines.Count > 0)
+                embed.AddField("Tierlist (NIKKE.gg)", string.Join("\n", tierLines), inline: true);
+        }
+
+        // Normal Attack
+        if (c.Skills?.Normal != null)
+        {
+            var normalLines = new List<string>();
+            if (!string.IsNullOrEmpty(c.Skills.Normal.Mode))
+                normalLines.Add($"**Mode:** {c.Skills.Normal.Mode}");
+            if (c.Skills.Normal.Ammo.HasValue)
+                normalLines.Add($"**Ammo:** {c.Skills.Normal.Ammo.Value}");
+            if (!string.IsNullOrEmpty(c.Skills.Normal.ReloadTime))
+                normalLines.Add($"**Reload:** {c.Skills.Normal.ReloadTime}");
+            if (!string.IsNullOrEmpty(c.DamagePercent))
+                normalLines.Add($"**Damage:** {c.DamagePercent} ATK");
+            if (!string.IsNullOrEmpty(c.ChargeTime) && c.ChargeTime != "0s")
+                normalLines.Add($"**Charge:** {c.ChargeTime} / {c.ChargeDamage}");
+            if (!string.IsNullOrEmpty(c.Skills.Normal.Description?.FirstOrDefault()))
+                normalLines.Add($"\n{FormatSkillLines(c.Skills.Normal.Description)}");
+
+            if (normalLines.Count > 0)
+            {
+                var text = string.Join("\n", normalLines);
+                if (text.Length > 1024) text = text[..1021] + "...";
+                embed.AddField($"🎯 Normal Attack", text);
+            }
+        }
+
+        // Skill 1
+        if (c.Skills?.Skill1 != null)
+        {
+            var skillText = FormatSkill(c.Skills.Skill1);
+            if (!string.IsNullOrEmpty(skillText))
+            {
+                if (skillText.Length > 1024) skillText = skillText[..1021] + "...";
+                embed.AddField($"🗡️ {c.Skills.Skill1.Name} [{c.Skills.Skill1.Type}]", skillText);
+            }
+        }
+
+        // Skill 2
+        if (c.Skills?.Skill2 != null)
+        {
+            var skillText = FormatSkill(c.Skills.Skill2);
+            if (!string.IsNullOrEmpty(skillText))
+            {
+                if (skillText.Length > 1024) skillText = skillText[..1021] + "...";
+                embed.AddField($"🛡️ {c.Skills.Skill2.Name} [{c.Skills.Skill2.Type}]", skillText);
+            }
+        }
+
+        // Burst
+        if (c.Skills?.Burst != null)
+        {
+            var skillText = FormatSkill(c.Skills.Burst);
+            if (!string.IsNullOrEmpty(skillText))
+            {
+                if (skillText.Length > 1024) skillText = skillText[..1021] + "...";
+                var cd = string.IsNullOrEmpty(c.Skills.Burst.Cooldown) ? "" : $" [{c.Skills.Burst.Cooldown}]";
+                embed.AddField($"💥 {c.Skills.Burst.Name} [{c.Skills.Burst.Type}]{cd}", skillText);
+            }
+        }
+
+        // Skill Priority
+        if (c.SkillPriority != null && (c.SkillPriority.Budget != null || c.SkillPriority.Recommended != null))
+        {
+            var prioLines = new List<string>();
+            if (!string.IsNullOrEmpty(c.SkillPriority.Budget))
+                prioLines.Add($"**Budget:** {c.SkillPriority.Budget}");
+            if (!string.IsNullOrEmpty(c.SkillPriority.Recommended))
+                prioLines.Add($"**Recommended:** {c.SkillPriority.Recommended}");
+            if (!string.IsNullOrEmpty(c.SkillPriority.Order))
+                prioLines.Add($"**Order:** {c.SkillPriority.Order}");
+
+            if (prioLines.Count > 0)
+                embed.AddField("Skill Priority", string.Join("\n", prioLines), inline: true);
+        }
+
+        // Cubes
+        if (c.Cubes != null && (c.Cubes.Main != null || c.Cubes.Alternative != null))
+        {
+            var cubeLines = new List<string>();
+            if (!string.IsNullOrEmpty(c.Cubes.Main))
+                cubeLines.Add($"**Main:** {c.Cubes.Main}");
+            if (!string.IsNullOrEmpty(c.Cubes.Alternative))
+                cubeLines.Add($"**Alt:** {c.Cubes.Alternative}");
+
+            if (cubeLines.Count > 0)
+                embed.AddField("Cube Recommendations", string.Join("\n", cubeLines), inline: true);
+        }
+
+        // Voice Actors
+        var vaLines = new List<string>();
+        if (!string.IsNullOrEmpty(c.VoiceActors?.En))
+            vaLines.Add($"🇺🇸 {c.VoiceActors.En}");
+        if (!string.IsNullOrEmpty(c.VoiceActors?.Jp))
+            vaLines.Add($"🇯🇵 {c.VoiceActors.Jp}");
+        if (!string.IsNullOrEmpty(c.VoiceActors?.Kr))
+            vaLines.Add($"🇰🇷 {c.VoiceActors.Kr}");
+        if (vaLines.Count > 0)
+            embed.AddField("Voice Actors", string.Join("\n", vaLines), inline: true);
+
+        // Full body image at bottom
+        if (!string.IsNullOrEmpty(c.Images?.Full))
+            embed.WithImageUrl(c.Images.Full);
+
+        embed.WithFooter("Data from NIKKE.gg • Skills shown at Level 10");
+
+        return embed;
     }
 
-    private static Color GetElementColor(string element)
+    private static string FormatSkill(NikkeSkill skill)
     {
-        return element?.ToLowerInvariant() switch
+        if (skill == null) return null;
+
+        var desc = skill.BaseDescription ?? skill.MaxDescription ?? skill.Description;
+        if (desc == null || desc.Count == 0)
+            return null;
+
+        return FormatSkillLines(desc);
+    }
+
+    private static string FormatSkillLines(List<string> lines)
+    {
+        if (lines == null || lines.Count == 0)
+            return "No description available.";
+
+        var formatted = lines.Select(l => l.StartsWith("■") ? $"▸ {l[1..].Trim()}" : l).ToList();
+        return string.Join("\n", formatted);
+    }
+
+    private static Color GetRarityColor(string rarity)
+    {
+        return rarity?.ToUpperInvariant() switch
         {
-            "fire" => new Color(220, 60, 40),
-            "water" => new Color(40, 120, 220),
-            "wind" => new Color(40, 180, 80),
-            "electric" => new Color(220, 200, 40),
-            "iron" => new Color(120, 120, 120),
+            "R" => new Color(0, 144, 255),       // Blue
+            "SR" => new Color(191, 0, 254),      // Purple
+            "SSR" => new Color(255, 192, 0),    // Gold
             _ => new Color(185, 35, 35)
         };
     }

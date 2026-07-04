@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using NadekoBot.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,12 +9,43 @@ public class NikkeService : INService
 {
     private readonly IHttpClientFactory _httpFactory;
     private readonly IBotCache _cache;
+    private readonly List<NikkeCharacter> _localCharacters;
     private const string BASE_URL = "https://nikke-api.vercel.app/characters/";
+    private const string JSON_PATH = "Modules/Nikke/nikke_characters.json";
 
     public NikkeService(IHttpClientFactory httpFactory, IBotCache cache)
     {
         _httpFactory = httpFactory;
         _cache = cache;
+        _localCharacters = LoadLocalCharacters();
+    }
+
+    private List<NikkeCharacter> LoadLocalCharacters()
+    {
+        try
+        {
+            // Try multiple paths: project dir (dev), output dir (published), base dir
+            var paths = new[]
+            {
+                Path.Combine(Environment.CurrentDirectory, JSON_PATH),
+                Path.Combine(AppContext.BaseDirectory, JSON_PATH),
+                Path.Combine(Directory.GetCurrentDirectory(), JSON_PATH)
+            };
+
+            foreach (var path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    var json = File.ReadAllText(path);
+                    return JsonConvert.DeserializeObject<List<NikkeCharacter>>(json) ?? new List<NikkeCharacter>();
+                }
+            }
+            return new List<NikkeCharacter>();
+        }
+        catch
+        {
+            return new List<NikkeCharacter>();
+        }
     }
 
     public async Task<NikkeCharacter> GetCharacterAsync(string name)
@@ -31,6 +62,13 @@ public class NikkeService : INService
 
     private async Task<NikkeCharacter> GetCharacterFactoryAsync(string name)
     {
+        // 1. Try local JSON first (case-insensitive)
+        var local = _localCharacters.FirstOrDefault(c =>
+            string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (local != null)
+            return local;
+
+        // 2. Fall back to API
         using var http = _httpFactory.CreateClient();
         try
         {
@@ -39,7 +77,7 @@ public class NikkeService : INService
                 return null;
 
             var jObject = JObject.Parse(response);
-            if (jObject["error"] != null)
+            if (jObject["error"] != null || jObject["data"]?.Value<string>() == "No NIKKE Found!")
                 return null;
 
             return jObject.ToObject<NikkeCharacter>();

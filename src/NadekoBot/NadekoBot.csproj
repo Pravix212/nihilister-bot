@@ -132,6 +132,12 @@
         </Protobuf>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Modules/Nikke/nikke_characters.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
     <PropertyGroup Condition=" '$(Configuration)' == 'GlobalNadeko' ">
         <!-- Define trace doesn't seem to affect the build at all so I had to remove $(DefineConstants)-->
         <DefineTrace>false</DefineTrace>

@@ -1,0 +1,19 @@
+nikke:
+  desc: Look up a NIKKE character's stats, skills, and info.
+  ex:
+    - 'nihilister'
+    - 'scarlet'
+  params:
+    - {}
+    - name:
+        desc: Character name to search for.
+
+nikkeart:
+  desc: Show full artwork for a NIKKE character.
+  ex:
+    - 'nihilister'
+    - 'rapi'
+  params:
+    - {}
+    - name:
+        desc: Character name to search for.

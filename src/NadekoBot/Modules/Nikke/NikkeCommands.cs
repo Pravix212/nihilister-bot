@@ -4,17 +4,17 @@ using NadekoBot.Modules.Nikke.Services;
 
 namespace NadekoBot.Modules.Nikke;
 
-public partial class Nikke : NadekoModule
+public partial class NikkeCommands : NadekoModule
 {
     private readonly NikkeService _svc;
 
-    public Nikke(NikkeService svc)
+    public NikkeCommands(NikkeService svc)
     {
         _svc = svc;
     }
 
     [Cmd]
-    public async Task NikkeCharacter([Leftover] string name)
+    public async Task Nikke([Leftover] string name)
     {
         if (string.IsNullOrWhiteSpace(name))
         {

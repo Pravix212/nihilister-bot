@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 using NadekoBot.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

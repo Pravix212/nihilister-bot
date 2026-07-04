@@ -1,0 +1,10 @@
+```powershell
+Remove-Item -Recurse -Force "src\NadekoBot.StringsMerger\bin"
+Remove-Item -Recurse -Force "src\NadekoBot.StringsMerger\obj"
+Remove-Item -Recurse -Force "src\NadekoBot\bin"
+Remove-Item -Recurse -Force "src\NadekoBot\obj"
+Remove-Item -Recurse -Force "src\NadekoBot.Tests\bin"
+Remove-Item -Recurse -Force "src\NadekoBot.Tests\obj"
+```
+
+Run those one at a time in PowerShell. Then reopen VS and **Rebuild Solution**.

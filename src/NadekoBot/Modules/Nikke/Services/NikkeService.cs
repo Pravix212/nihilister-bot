@@ -9,6 +9,8 @@ public class NikkeService : INService
     private readonly IHttpClientFactory _httpFactory;
     private readonly IBotCache _cache;
     private readonly List<NikkeCharacter> _localCharacters;
+    private List<DotggCharacterListItem> _cachedApiList;
+    private DateTime _cachedApiListTime = DateTime.MinValue;
     private const string CHARACTERS_API = "https://api.dotgg.gg/nikke/characters";
     private const string CHARACTER_API = "https://api.dotgg.gg/nikke/character/";
     private const string STATIC_IMG_BASE = "https://static.dotgg.gg/nikke/characters/";
@@ -53,7 +55,8 @@ public class NikkeService : INService
         if (string.IsNullOrWhiteSpace(name))
             return null;
 
-        var cacheKey = $"nikke_char_v2_{name.ToLowerInvariant()}";
+        // v3 cache key to invalidate old v2 cached data
+        var cacheKey = $"nikke_char_v3_{name.ToLowerInvariant()}";
         return await _cache.GetOrAddAsync(
             new TypedKey<NikkeCharacter>(cacheKey),
             async () => await GetCharacterFactoryAsync(name),
@@ -62,20 +65,20 @@ public class NikkeService : INService
 
     private async Task<NikkeCharacter> GetCharacterFactoryAsync(string name)
     {
-        // 1. Try local JSON first (exact match)
-        var local = _localCharacters.FirstOrDefault(c =>
-            string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
-        if (local != null)
-            return local;
-
-        // 2. Try NIKKE.gg API
+        // 1. Try NIKKE.gg API first (live data is the source of truth)
         try
         {
             var apiChar = await FetchFromApiAsync(name);
             if (apiChar != null)
                 return apiChar;
         }
-        catch { /* fallback to local fuzzy */ }
+        catch { /* API error, fall through to local */ }
+
+        // 2. Try local JSON (exact match)
+        var local = _localCharacters.FirstOrDefault(c =>
+            string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (local != null)
+            return local;
 
         // 3. Fuzzy local fallback
         var fuzzy = _localCharacters.FirstOrDefault(c =>
@@ -86,19 +89,24 @@ public class NikkeService : INService
 
     private async Task<NikkeCharacter> FetchFromApiAsync(string name)
     {
-        using var http = _httpFactory.CreateClient();
-        http.Timeout = TimeSpan.FromSeconds(10);
+        // Fetch character list (cached for 10 minutes)
+        if (_cachedApiList == null || DateTime.UtcNow - _cachedApiListTime > TimeSpan.FromMinutes(10))
+        {
+            using var listHttp = _httpFactory.CreateClient();
+            listHttp.Timeout = TimeSpan.FromSeconds(15);
 
-        // Fetch character list to find slug
-        var listJson = await http.GetStringAsync(CHARACTERS_API);
-        var list = JsonConvert.DeserializeObject<List<DotggCharacterListItem>>(listJson);
-        if (list == null || list.Count == 0)
+            var listJson = await listHttp.GetStringAsync(CHARACTERS_API);
+            _cachedApiList = JsonConvert.DeserializeObject<List<DotggCharacterListItem>>(listJson);
+            _cachedApiListTime = DateTime.UtcNow;
+        }
+
+        if (_cachedApiList == null || _cachedApiList.Count == 0)
             return null;
 
         // Find matching character (exact first, then fuzzy)
-        var match = list.FirstOrDefault(c =>
+        var match = _cachedApiList.FirstOrDefault(c =>
             string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase)) ??
-            list.FirstOrDefault(c =>
+            _cachedApiList.FirstOrDefault(c =>
                 c.Name.Contains(name, StringComparison.OrdinalIgnoreCase) ||
                 name.Contains(c.Name, StringComparison.OrdinalIgnoreCase));
 
@@ -106,8 +114,11 @@ public class NikkeService : INService
             return null;
 
         // Fetch character details
-        var detailJson = await http.GetStringAsync($"{CHARACTER_API}{match.Url}");
+        using var detailHttp = _httpFactory.CreateClient();
+        detailHttp.Timeout = TimeSpan.FromSeconds(15);
+        var detailJson = await detailHttp.GetStringAsync($"{CHARACTER_API}{match.Url}");
         var detail = JsonConvert.DeserializeObject<DotggCharacterDetail>(detailJson);
+
         if (detail == null)
             return null;
 

@@ -53,7 +53,8 @@ public partial class NikkeCommands : NadekoModule
         if (!string.IsNullOrEmpty(character.Weapon))
             details.Add($"**Weapon:** {character.Weapon}{(string.IsNullOrEmpty(character.WeaponName) ? "" : $" ({character.WeaponName})")}");
 
-        embed.AddField("Details", string.Join("\n", details), inline: true);
+        if (details.Count > 0)
+            embed.AddField("Details", string.Join("\n", details), inline: true);
 
         // Stats
         if (character.Stats != null && (character.Stats.Hp.HasValue || character.Stats.Atk.HasValue || character.Stats.Def.HasValue))

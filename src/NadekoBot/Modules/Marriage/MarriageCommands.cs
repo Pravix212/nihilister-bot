@@ -27,9 +27,9 @@ public partial class Marriage : NadekoModule
                 var proposer = await ctx.Client.GetUserAsync(proposal.ProposerId);
                 var targetUser = await ctx.Client.GetUserAsync(proposal.TargetId);
                 if (proposal.Type == "marriage")
-                    await channel.SendMessageAsync($"ðŸ’” {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                    await channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
                 else
-                    await channel.SendMessageAsync($"ðŸ‘¨â€ðŸ‘©â€ðŸ‘§ {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
+                    await channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
             }
             catch { /* channel/guild access issue */ }
         }
@@ -53,9 +53,9 @@ public partial class Marriage : NadekoModule
                     var proposer = await client.GetUserAsync(proposerId);
                     var targetUser = await client.GetUserAsync(targetId);
                     if (type == "marriage")
-                        await channel.SendMessageAsync($"ðŸ’” {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
+                        await channel.SendMessageAsync($"💔 {proposer?.Mention ?? "Someone"}'s marriage proposal to {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.marry`.");
                     else
-                        await channel.SendMessageAsync($"ðŸ‘¨â€ðŸ‘©â€ðŸ‘§ {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
+                        await channel.SendMessageAsync($"👨‍👩‍👧 {proposer?.Mention ?? "Someone"}'s adoption proposal for {targetUser?.Mention ?? "someone"} expired after 1 minute! Try again with `.adopt`.");
                 }
                 catch { }
             }
@@ -76,7 +76,7 @@ public partial class Marriage : NadekoModule
 
         if (target.IsBot)
         {
-            await Response().Error("You can't marry a bot! ðŸ’”").SendAsync();
+            await Response().Error("You can't marry a bot! 💔").SendAsync();
             return;
         }
 
@@ -88,7 +88,7 @@ public partial class Marriage : NadekoModule
 
         if (await _svc.IsMarriedAsync(target.Id))
         {
-            await Response().Error($"{target.Mention} is already married! ðŸ’”").SendAsync();
+            await Response().Error($"{target.Mention} is already married! 💔").SendAsync();
             return;
         }
 
@@ -110,7 +110,7 @@ public partial class Marriage : NadekoModule
         MarriageService.ProposalChannels.Set(ctx.User.Id, target.Id, "marriage", ctx.Channel.Id, ctx.Guild.Id);
         ScheduleExpirationTimer(ctx.User.Id, target.Id, "marriage");
 
-        await Response().Confirm($"ðŸ’ {ctx.User.Mention} has proposed to {target.Mention}!\n\n{target.Mention}, type `.accept` to accept! (Expires in 1 minute)").SendAsync();
+        await Response().Confirm($"💍 {ctx.User.Mention} has proposed to {target.Mention}!\n\n{target.Mention}, type `.accept` to accept! (Expires in 1 minute)").SendAsync();
     }
 
     [Cmd]
@@ -126,7 +126,7 @@ public partial class Marriage : NadekoModule
             if (await _svc.TryAcceptAsync(ctx.User.Id, marriageProposer.Value))
             {
                 var proposer = await ctx.Guild.GetUserAsync(marriageProposer.Value);
-                await Response().Confirm($"ðŸ’• {ctx.User.Mention} and {proposer?.Mention ?? "someone"} are now married! ðŸ’").SendAsync();
+                await Response().Confirm($"💕 {ctx.User.Mention} and {proposer?.Mention ?? "someone"} are now married! 💍").SendAsync();
                 return;
             }
         }
@@ -146,7 +146,7 @@ public partial class Marriage : NadekoModule
             return;
         }
 
-        await Response().Error("You don't have any pending proposals to accept! ðŸ’”").SendAsync();
+        await Response().Error("You don't have any pending proposals to accept! 💔").SendAsync();
     }
 
     [Cmd]
@@ -164,17 +164,17 @@ public partial class Marriage : NadekoModule
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {
-            await Response().Error("You're not married! ðŸ’” Use .marry @user to find your soulmate.").SendAsync();
+            await Response().Error("You're not married! 💔 Use .marry @user to find your soulmate.").SendAsync();
             return;
         }
 
         var spouse = await ctx.Guild.GetUserAsync(spouseId.Value);
-        var duration = await _svc.GetDurationAsync(ctx.User.Id);
-        var durationStr = duration.HasValue ? FormatDuration(duration.Value) : "just now";
+        var marriage = await _svc.GetMarriageAsync(ctx.User.Id);
+        var durationStr = marriage != null ? FormatDuration(marriage.MarriedAt) : "just now";
 
         var embed = new EmbedBuilder()
-            .WithTitle("ðŸ’• Marriage Certificate")
-            .WithDescription($"**{ctx.User.Username}** is married to **{spouse?.Username ?? "Unknown User"}**\n\nMarried for: **{durationStr}** ðŸ’")
+            .WithTitle("💕 Marriage Certificate")
+            .WithDescription($"**{ctx.User.Username}** is married to **{spouse?.Username ?? "Unknown User"}**\n\nMarried for: **{durationStr}** 💍")
             .WithColor(Color.Magenta)
             .WithThumbnailUrl(spouse?.GetAvatarUrl() ?? ctx.User.GetAvatarUrl())
             .WithFooter("Use .divorce to end the marriage")
@@ -192,7 +192,7 @@ public partial class Marriage : NadekoModule
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {
-            await Response().Error("You're not married! ðŸ’”").SendAsync();
+            await Response().Error("You're not married! 💔").SendAsync();
             return;
         }
 
@@ -203,14 +203,14 @@ public partial class Marriage : NadekoModule
             if (timeSinceMarriage < TimeSpan.FromHours(1))
             {
                 var remaining = TimeSpan.FromHours(1) - timeSinceMarriage;
-                await Response().Error($"You can only divorce after 1 hour! Time remaining: **{FormatDuration(remaining)}** ðŸ’”").SendAsync();
+                await Response().Error($"You can only divorce after 1 hour! Time remaining: **{FormatShortDuration(remaining)}** 💔").SendAsync();
                 return;
             }
         }
 
         var spouse = await ctx.Guild.GetUserAsync(spouseId.Value);
         await _svc.DivorceAsync(ctx.User.Id);
-        await Response().Confirm($"ðŸ’” {ctx.User.Mention} has divorced {spouse?.Mention ?? "their spouse"}. The marriage is over.").SendAsync();
+        await Response().Confirm($"💔 {ctx.User.Mention} has divorced {spouse?.Mention ?? "their spouse"}. The marriage is over.").SendAsync();
     }
 
     [Cmd]
@@ -222,13 +222,13 @@ public partial class Marriage : NadekoModule
         var spouseId = await _svc.GetSpouseAsync(ctx.User.Id);
         if (spouseId == null)
         {
-            await Response().Error("You need to be married to take the love quiz! ðŸ’”").SendAsync();
+            await Response().Error("You need to be married to take the love quiz! 💔").SendAsync();
             return;
         }
 
         var spouse = await ctx.Guild.GetUserAsync(spouseId.Value);
-        var duration = await _svc.GetDurationAsync(ctx.User.Id);
-        var durationStr = duration.HasValue ? FormatDuration(duration.Value) : "just now";
+        var marriage = await _svc.GetMarriageAsync(ctx.User.Id);
+        var durationStr = marriage != null ? FormatDuration(marriage.MarriedAt) : "just now";
 
         var seed = (long)ctx.User.Id + (long)spouseId.Value + (long)DateTime.UtcNow.Date.Ticks;
         var rng = new Random((int)(seed & 0x7FFFFFFF));
@@ -236,25 +236,60 @@ public partial class Marriage : NadekoModule
 
         var rating = score switch
         {
-            >= 95 => "Soulmates ðŸ’•âœ¨",
-            >= 85 => "Perfect Match ðŸ’•",
-            >= 75 => "Great Couple ðŸ’–",
-            >= 65 => "Good Match ðŸ’",
-            _ => "Work in Progress ðŸ’—"
+            >= 95 => "Soulmates 💕✨",
+            >= 85 => "Perfect Match 💕",
+            >= 75 => "Great Couple 💖",
+            >= 65 => "Good Match 💝",
+            _ => "Work in Progress 💗"
         };
 
         var embed = new EmbedBuilder()
-            .WithTitle("ðŸ’• Love Quiz Results")
-            .WithDescription($"**{ctx.User.Username}** + **{spouse?.Username ?? "Unknown"}**\n\nCompatibility Score: **{score}/100**\nRating: **{rating}**\n\nMarried for: **{durationStr}** ðŸ’")
+            .WithTitle("💕 Love Quiz Results")
+            .WithDescription($"**{ctx.User.Username}** + **{spouse?.Username ?? "Unknown"}**\n\nCompatibility Score: **{score}/100**\nRating: **{rating}**\n\nMarried for: **{durationStr}** 💍")
             .WithColor(score >= 85 ? Color.Gold : Color.Magenta)
             .Build();
 
         await ctx.Channel.SendMessageAsync(embed: embed);
     }
 
-    private static string FormatDuration(TimeSpan ts)
+    private static string FormatDuration(DateTime startUtc)
     {
-        if (ts.TotalDays >= 1) return $"{ts.Days}d {ts.Hours}h {ts.Minutes}m";
+        var endUtc = DateTime.UtcNow;
+
+        var years = endUtc.Year - startUtc.Year;
+        var months = endUtc.Month - startUtc.Month;
+        var days = endUtc.Day - startUtc.Day;
+
+        if (days < 0)
+        {
+            months--;
+            var previousMonth = endUtc.AddMonths(-1);
+            days += DateTime.DaysInMonth(previousMonth.Year, previousMonth.Month);
+        }
+
+        if (months < 0)
+        {
+            years--;
+            months += 12;
+        }
+
+        var parts = new List<string>();
+
+        if (years > 0)
+            parts.Add($"{years} year{(years == 1 ? "" : "s")}");
+
+        if (months > 0)
+            parts.Add($"{months} month{(months == 1 ? "" : "s")}");
+
+        if (days > 0 || parts.Count == 0)
+            parts.Add($"{days} day{(days == 1 ? "" : "s")}");
+
+        return string.Join(", ", parts);
+    }
+
+    private static string FormatShortDuration(TimeSpan ts)
+    {
+        if (ts.TotalDays >= 1) return $"{(int)ts.TotalDays}d {ts.Hours}h {ts.Minutes}m";
         if (ts.TotalHours >= 1) return $"{ts.Hours}h {ts.Minutes}m";
         return $"{ts.Minutes}m {ts.Seconds}s";
     }

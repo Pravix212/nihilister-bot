@@ -79,7 +79,7 @@ public partial class Marriage
 
         var success = await _svc.DisownAsync(ctx.User.Id, target.Id);
         if (success)
-            await Response().Confirm($"You have disowned {target.Mention}. They are no longer your child. ðŸ’”").SendAsync();
+            await Response().Confirm($"You have disowned {target.Mention}. They are no longer your child. 💔").SendAsync();
         else
             await Response().Error("Something went wrong. Could not disown.").SendAsync();
     }
@@ -122,7 +122,7 @@ public partial class Marriage
         if (spouse != null)
         {
             var marriage = await _svc.GetMarriageAsync(user.Id);
-            var duration = marriage != null ? FormatDuration(DateTime.UtcNow - marriage.MarriedAt) : "unknown";
+            var duration = marriage != null ? FormatDuration(marriage.MarriedAt) : "unknown";
             embed.AddField("Spouse", $"{spouse.Mention}\nMarried: {duration}", true);
         }
 
@@ -370,7 +370,7 @@ public partial class Marriage
         if (spouseId.HasValue)
         {
             sb.AppendLine($"    \"{spouseId.Value}\" {BuildNode(spouseId.Value, names, avatarPaths, roleSpouse)};");
-            sb.AppendLine($"    \"{userId}\" -> \"{spouseId.Value}\" [dir=none, color=\"#FF6B6B\", penwidth=3, label=\"â™¥\"];");
+            sb.AppendLine($"    \"{userId}\" -> \"{spouseId.Value}\" [dir=none, color=\"#FF6B6B\", penwidth=3, label=\"♥\"];");
         }
 
         // Parents

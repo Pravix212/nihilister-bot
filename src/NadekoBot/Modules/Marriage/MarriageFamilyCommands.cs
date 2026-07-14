@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -79,7 +79,7 @@ public partial class Marriage
 
         var success = await _svc.DisownAsync(ctx.User.Id, target.Id);
         if (success)
-            await Response().Confirm($"You have disowned {target.Mention}. They are no longer your child. 💔").SendAsync();
+            await Response().Confirm($"You have disowned {target.Mention}. They are no longer your child. ðŸ’”").SendAsync();
         else
             await Response().Error("Something went wrong. Could not disown.").SendAsync();
     }
@@ -370,7 +370,7 @@ public partial class Marriage
         if (spouseId.HasValue)
         {
             sb.AppendLine($"    \"{spouseId.Value}\" {BuildNode(spouseId.Value, names, avatarPaths, roleSpouse)};");
-            sb.AppendLine($"    \"{userId}\" -> \"{spouseId.Value}\" [dir=none, color=\"#FF6B6B\", penwidth=3, label=\"♥\"];");
+            sb.AppendLine($"    \"{userId}\" -> \"{spouseId.Value}\" [dir=none, color=\"#FF6B6B\", penwidth=3, label=\"â™¥\"];");
         }
 
         // Parents

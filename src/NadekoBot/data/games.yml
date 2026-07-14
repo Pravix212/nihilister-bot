@@ -1,4 +1,4 @@
-# DO NOT CHANGE
+﻿# DO NOT CHANGE
 version: 6
 # Hangman related settings (.hangman command)
 hangman:
@@ -35,7 +35,17 @@ eightBallResponses:
   - My sources say no.
   - Don't even think about it.
   - Definitely no.
-  - NO - It may cause disease contraction!
+  - I dont know, go ask Prav or something.
+  - Kill yourself.
+  - Yeah sure, Fuck it we ball
+  - Ask me again in 5 minutes, I might have an answer by then.
+  - I dont know. But i do know that Shaun is gay!
+  - Fuck you.
+  - My lawyer has advised me not to answer that question.
+  - I'm sure Prav knows the answer to that question.
+  - Hahaha... no. 
+  - I beg your pardon...?
+  - To unlock the answer to this question, you must first Donate $100 via .donate
 # List of animals which will be used for the animal race game (.race)
 raceAnimals:
   - icon: "🐼"

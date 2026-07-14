@@ -46,6 +46,8 @@ eightBallResponses:
   - Hahaha... no. 
   - I beg your pardon...?
   - To unlock the answer to this question, you must first Donate $100 via .donate
+  - Why don't you ask Google instead?'
+  
 # List of animals which will be used for the animal race game (.race)
 raceAnimals:
   - icon: "🐼"

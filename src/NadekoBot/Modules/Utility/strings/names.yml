@@ -1,4 +1,4 @@
-afk:
+﻿afk:
   - afk
 channelid:
   - channelid
@@ -90,3 +90,7 @@ verboseerror:
 whosplaying:
   - whosplaying
   - whpl
+edate:
+  - edate
+  - match
+  - date

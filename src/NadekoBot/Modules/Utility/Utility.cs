@@ -1,4 +1,4 @@
-using NadekoBot.Modules.Utility.Services;
+﻿using NadekoBot.Modules.Utility.Services;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -11,6 +11,8 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
+using Discord.WebSocket;
+using System.Linq;
 
 namespace NadekoBot.Modules.Utility;
 
@@ -953,6 +955,39 @@ public partial class Utility : NadekoModule
         var filledPart = new string('█', filled);
         var emptyPart = new string('░', empty);
         return $"`{filledPart}{emptyPart}`";
+    }
+
+    [Cmd]
+    [RequireContext(ContextType.Guild)]
+    public async Task Edate()
+    {
+        var guild = ctx.Guild as SocketGuild;
+        if (guild == null)
+        {
+            await Response().Error("This command can only be used in a guild.").SendAsync();
+            return;
+        }
+
+        var members = guild.Users
+            .Where(u => !u.IsBot && u.Id != ctx.User.Id)
+            .ToList();
+
+        if (members.Count == 0)
+        {
+            await Response().Error("No eligble users found! You're one lonely fuck bro").SendAsync();
+            return;
+        }
+
+        var match = members[Random.Shared.Next(members.Count)];
+
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("💘 E-Date Matchmaker")
+            .WithDescription($"**{match.Mention}** would be the perfect match for you!")
+            .WithThumbnailUrl(match.GetDisplayAvatarUrl() ?? match.GetDefaultAvatarUrl())
+            .WithFooter($"Requested by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
+
+        await Response().Embed(eb).SendAsync();
     }
 
 }

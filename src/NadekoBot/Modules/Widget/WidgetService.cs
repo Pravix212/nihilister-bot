@@ -37,6 +37,52 @@ public class WidgetService : INService
         _httpFactory = httpFactory;
     }
 
+    private long _savedCommandsRan = 0;
+    private bool _isSavedLoaded = false;
+    private readonly object _saveLock = new();
+
+    private void LoadSavedStats()
+    {
+        lock (_saveLock)
+        {
+            if (_isSavedLoaded) return;
+            try
+            {
+                if (File.Exists("data/widget_stats.json"))
+                {
+                    var json = File.ReadAllText("data/widget_stats.json");
+                    using var doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("commandsRan", out var prop))
+                    {
+                        _savedCommandsRan = prop.GetInt64();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to load widget stats from file");
+            }
+            _isSavedLoaded = true;
+        }
+    }
+
+    private void SaveStats(long newTotal)
+    {
+        lock (_saveLock)
+        {
+            try
+            {
+                var data = new { commandsRan = newTotal };
+                var json = JsonSerializer.Serialize(data);
+                File.WriteAllText("data/widget_stats.json", json);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to save widget stats to file");
+            }
+        }
+    }
+
     /// <summary>
     /// Gets the OAuth2 authorization URL for the Social Layer scope.
     /// </summary>
@@ -83,18 +129,28 @@ public class WidgetService : INService
     /// </summary>
     private object BuildPayload()
     {
-        // type 1 = string, type 2 = number, type 3 = image
-        var commandsRan = _stats.CommandsRan;
+        LoadSavedStats();
+
+        // Calculate persistent total commands ran
+        var sessionCommandsRan = _stats.CommandsRan;
+        var totalCommandsRan = _savedCommandsRan + sessionCommandsRan;
+        SaveStats(totalCommandsRan);
+
         var uptime = _stats.GetUptimeString();
         var totalCommands = _cmds.Commands.Select(c => c.Aliases[0]).Distinct().Count();
-        var messagesSeen = _stats.MessageCounter;
+        
+        // Sum total user count across all guilds
+        var totalUsers = _client.Guilds.Sum(g => g.MemberCount);
 
+        // type 1 = string, type 2 = number, type 3 = image
+        // Change total_commands to type = 1 string so it displays correctly on a text/custom string element
         var dynamicData = new List<object>
         {
-            new { type = 1, name = "commands_ran", value = $"{commandsRan:N0}" },
+            new { type = 1, name = "commands_ran", value = $"{totalCommandsRan:N0}" },
             new { type = 1, name = "uptime", value = uptime },
-            new { type = 2, name = "total_commands", value = totalCommands },
-            new { type = 1, name = "messages_seen", value = $"{messagesSeen:N0}" },
+            new { type = 1, name = "total_commands", value = $"{totalCommands:N0}" },
+            new { type = 1, name = "messages_seen", value = $"{totalUsers:N0}" }, // Expose user count under messages_seen so existing layouts automatically show it
+            new { type = 1, name = "users", value = $"{totalUsers:N0}" }
         };
 
         return new

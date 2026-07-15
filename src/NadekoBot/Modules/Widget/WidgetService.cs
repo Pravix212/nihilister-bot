@@ -25,6 +25,8 @@ public class WidgetService : INService
 
     private double _grokBalance = 5.88;
     private double _grokLimit = 20.00;
+    private ulong? _customAppId;
+    private string? _customBotToken;
 
     public WidgetService(
         DiscordSocketClient client,
@@ -67,6 +69,21 @@ public class WidgetService : INService
                     {
                         _grokLimit = limProp.GetDouble();
                     }
+                    if (doc.RootElement.TryGetProperty("customAppId", out var customAppIdProp))
+                    {
+                        if (ulong.TryParse(customAppIdProp.GetString(), out var appIdVal))
+                        {
+                            _customAppId = appIdVal;
+                        }
+                        else if (customAppIdProp.ValueKind == JsonValueKind.Number)
+                        {
+                            _customAppId = customAppIdProp.GetUInt64();
+                        }
+                    }
+                    if (doc.RootElement.TryGetProperty("customBotToken", out var customTokenProp))
+                    {
+                        _customBotToken = customTokenProp.GetString();
+                    }
                 }
             }
             catch (Exception ex)
@@ -87,7 +104,9 @@ public class WidgetService : INService
                 {
                     commandsRan = newTotal,
                     grokBalance = _grokBalance,
-                    grokLimit = _grokLimit
+                    grokLimit = _grokLimit,
+                    customAppId = _customAppId?.ToString(),
+                    customBotToken = _customBotToken
                 };
                 var json = JsonSerializer.Serialize(data);
                 File.WriteAllText("data/widget_stats.json", json);
@@ -139,7 +158,8 @@ public class WidgetService : INService
     /// </summary>
     public string GetOAuth2Url()
     {
-        var appId = _client.CurrentUser.Id;
+        LoadSavedStats();
+        var appId = _customAppId ?? _client.CurrentUser.Id;
         return $"https://discord.com/oauth2/authorize?client_id={appId}&response_type=token&scope=openid+sdk.social_layer";
     }
 
@@ -148,7 +168,9 @@ public class WidgetService : INService
     /// </summary>
     public async Task<(bool Success, string? Error)> RefreshWidgetAsync(ulong userId)
     {
-        var appId = _client.CurrentUser.Id;
+        LoadSavedStats();
+        var appId = _customAppId ?? _client.CurrentUser.Id;
+        var token = !string.IsNullOrWhiteSpace(_customBotToken) ? _customBotToken : _creds.Token;
         var payload = BuildPayload();
 
         var json = JsonSerializer.Serialize(payload, _jsonOptions);
@@ -157,7 +179,7 @@ public class WidgetService : INService
         var url = $"https://discord.com/api/v9/applications/{appId}/users/{userId}/identities/0/profile";
 
         using var http = _httpFactory.CreateClient();
-        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", _creds.Token);
+        http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", token);
         http.DefaultRequestHeaders.Add("User-Agent",
             "DiscordBot (https://github.com/Pravix212/nihilister-bot, 1.0.0)");
 

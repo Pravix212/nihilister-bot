@@ -1,0 +1,9 @@
+widgetsetup:
+  - widgetsetup
+  - wsetup
+widgetrefresh:
+  - widgetrefresh
+  - wrefresh
+widgetauto:
+  - widgetauto
+  - wauto

@@ -1,0 +1,17 @@
+widgetsetup:
+  desc: Sets up the Discord profile widget by providing an OAuth2 authorization link.
+  ex:
+    - ''
+  params: []
+
+widgetrefresh:
+  desc: Manually refreshes the Discord profile widget with live bot stats (commands ran, uptime, etc.).
+  ex:
+    - ''
+  params: []
+
+widgetauto:
+  desc: Toggles automatic widget refresh every 5 minutes. Run again to stop.
+  ex:
+    - ''
+  params: []

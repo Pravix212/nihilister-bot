@@ -213,7 +213,9 @@ public class WidgetService : INService
             new { type = 1, name = "grok_limit", value = $"${_grokLimit:F2}" },
             new { type = 2, name = "grok_percent", value = grokPercent },
             new { type = 1, name = "grok_percent_str", value = $"{grokPercent}%" },
-            new { type = 1, name = "grok_tokens_left", value = $"{grokPercent}%" },
+            new { type = 2, name = "grok_tokens_left", value = (int)Math.Round(_grokBalance * 100.0) }, // Current value in cents
+            new { type = 2, name = "grok_tokens_max", value = (int)Math.Round(_grokLimit * 100.0) },   // Max value in cents
+            new { type = 1, name = "grok_tokens_left_str", value = $"{grokPercent}%" },
             new { type = 1, name = "grok_usage_left", value = $"{grokPercent}%" }
         };
 

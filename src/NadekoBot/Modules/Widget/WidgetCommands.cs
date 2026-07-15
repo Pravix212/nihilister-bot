@@ -1,4 +1,4 @@
-﻿namespace NadekoBot.Modules.Widget;
+namespace NadekoBot.Modules.Widget;
 
 public partial class Widget : NadekoModule<WidgetService>
 {
@@ -111,5 +111,39 @@ public partial class Widget : NadekoModule<WidgetService>
 
             await Response().Embed(eb).SendAsync();
         }
+    }
+
+    [Cmd]
+    [OwnerOnly]
+    public async Task WidgetBalance(double amount)
+    {
+        _service.SetGrokBalance(amount);
+        
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("💰 Grok Balance Updated")
+            .WithDescription($"Grok API remaining balance set to **${amount:F2}**.")
+            .AddField("Current Limit", $"${_service.GetGrokLimit():F2}", true)
+            .AddField("Calculated Left", $"{(_service.GetGrokBalance() / _service.GetGrokLimit()) * 100:F0}%", true)
+            .WithFooter("Run .widgetrefresh to update the widget immediately.");
+
+        await Response().Embed(eb).SendAsync();
+    }
+
+    [Cmd]
+    [OwnerOnly]
+    public async Task WidgetLimit(double amount)
+    {
+        _service.SetGrokLimit(amount);
+        
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle("⚙️ Grok Budget Limit Updated")
+            .WithDescription($"Grok API total budget limit set to **${amount:F2}**.")
+            .AddField("Current Balance", $"${_service.GetGrokBalance():F2}", true)
+            .AddField("Calculated Left", $"{(_service.GetGrokBalance() / _service.GetGrokLimit()) * 100:F0}%", true)
+            .WithFooter("Run .widgetrefresh to update the widget immediately.");
+
+        await Response().Embed(eb).SendAsync();
     }
 }

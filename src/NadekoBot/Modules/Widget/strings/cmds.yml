@@ -15,3 +15,20 @@ widgetauto:
   ex:
     - ''
   params: []
+
+widgetbalance:
+  desc: Sets the remaining prepaid balance for Grok/AI API token cost calculation.
+  ex:
+    - '5.88'
+  params:
+    - amount:
+        desc: The remaining balance in USD.
+
+widgetlimit:
+  desc: Sets the total budget limit for Grok/AI API token cost percentage calculation.
+  ex:
+    - '20.00'
+  params:
+    - amount:
+        desc: The maximum budget limit in USD.
+

@@ -3,13 +3,16 @@ using System.Text.Json;
 using OneOf;
 using OneOf.Types;
 
+using NadekoBot.Modules.Widget;
+
 namespace NadekoBot.Modules.Utility.AiAgent;
 
 public readonly record struct AiProviderInfo(string Url, string AuthValue);
 
 public sealed class AiAgentSession(
     IHttpClientFactory httpFactory,
-    IBotCredsProvider credsProvider) : IAiAgentSession, INService
+    IBotCredsProvider credsProvider,
+    WidgetService widgetService) : IAiAgentSession, INService
 {
     private static readonly JsonSerializerOptions _jsonOpts = new()
     {
@@ -96,6 +99,19 @@ public sealed class AiAgentSession(
             };
 
             var response = await CallLlmInternalAsync(provider, config, request, ct);
+            if (response?.Usage is not null)
+            {
+                double cost = 0.0;
+                if (response.Usage.CostInUsdTicks.HasValue)
+                {
+                    cost = response.Usage.CostInUsdTicks.Value / 10_000_000_000.0;
+                }
+                else
+                {
+                    cost = (response.Usage.PromptTokens * 1.25 + response.Usage.CompletionTokens * 2.50) / 1_000_000.0;
+                }
+                widgetService.DeductGrokCost(cost);
+            }
             if (response is null)
                 return new Error<string>("Failed to get response from AI provider.");
 

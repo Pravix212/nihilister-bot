@@ -133,4 +133,7 @@ public sealed class AgentUsage
 
     [JsonPropertyName("total_tokens")]
     public int TotalTokens { get; init; }
+
+    [JsonPropertyName("cost_in_usd_ticks")]
+    public long? CostInUsdTicks { get; init; }
 }

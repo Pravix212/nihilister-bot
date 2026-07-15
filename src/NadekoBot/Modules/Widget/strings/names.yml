@@ -7,3 +7,9 @@ widgetrefresh:
 widgetauto:
   - widgetauto
   - wauto
+widgetbalance:
+  - widgetbalance
+  - wbalance
+widgetlimit:
+  - widgetlimit
+  - wlimit

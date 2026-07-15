@@ -23,6 +23,9 @@ public class WidgetService : INService
 
     public bool IsAutoRefreshRunning => _autoRefreshTask is { IsCompleted: false };
 
+    private double _grokBalance = 5.88;
+    private double _grokLimit = 20.00;
+
     public WidgetService(
         DiscordSocketClient client,
         IStatsService stats,
@@ -56,6 +59,14 @@ public class WidgetService : INService
                     {
                         _savedCommandsRan = prop.GetInt64();
                     }
+                    if (doc.RootElement.TryGetProperty("grokBalance", out var balProp))
+                    {
+                        _grokBalance = balProp.GetDouble();
+                    }
+                    if (doc.RootElement.TryGetProperty("grokLimit", out var limProp))
+                    {
+                        _grokLimit = limProp.GetDouble();
+                    }
                 }
             }
             catch (Exception ex)
@@ -72,7 +83,12 @@ public class WidgetService : INService
         {
             try
             {
-                var data = new { commandsRan = newTotal };
+                var data = new
+                {
+                    commandsRan = newTotal,
+                    grokBalance = _grokBalance,
+                    grokLimit = _grokLimit
+                };
                 var json = JsonSerializer.Serialize(data);
                 File.WriteAllText("data/widget_stats.json", json);
             }
@@ -82,6 +98,41 @@ public class WidgetService : INService
             }
         }
     }
+
+    public double GetGrokBalance()
+    {
+        LoadSavedStats();
+        return _grokBalance;
+    }
+
+    public double GetGrokLimit()
+    {
+        LoadSavedStats();
+        return _grokLimit;
+    }
+
+    public void SetGrokBalance(double balance)
+    {
+        LoadSavedStats();
+        _grokBalance = balance;
+        SaveStats(_savedCommandsRan + _stats.CommandsRan);
+    }
+
+    public void SetGrokLimit(double limit)
+    {
+        LoadSavedStats();
+        _grokLimit = limit;
+        SaveStats(_savedCommandsRan + _stats.CommandsRan);
+    }
+
+    public void DeductGrokCost(double cost)
+    {
+        LoadSavedStats();
+        _grokBalance = Math.Max(0.0, _grokBalance - cost);
+        SaveStats(_savedCommandsRan + _stats.CommandsRan);
+        Log.Information("Deducted Grok cost of ${Cost:F6}. New balance: ${NewBalance:F4}", cost, _grokBalance);
+    }
+
 
     /// <summary>
     /// Gets the OAuth2 authorization URL for the Social Layer scope.
@@ -142,6 +193,13 @@ public class WidgetService : INService
         // Sum total user count across all guilds
         var totalUsers = _client.Guilds.Sum(g => g.MemberCount);
 
+        // Calculate Grok budget percentage remaining
+        var grokPercent = 0;
+        if (_grokLimit > 0.0)
+        {
+            grokPercent = (int)Math.Clamp(Math.Round((_grokBalance / _grokLimit) * 100.0), 0, 100);
+        }
+
         // type 1 = string, type 2 = number, type 3 = image
         // Change total_commands to type = 1 string so it displays correctly on a text/custom string element
         var dynamicData = new List<object>
@@ -150,7 +208,13 @@ public class WidgetService : INService
             new { type = 1, name = "uptime", value = uptime },
             new { type = 1, name = "total_commands", value = $"{totalCommands:N0}" },
             new { type = 1, name = "messages_seen", value = $"{totalUsers:N0}" }, // Expose user count under messages_seen so existing layouts automatically show it
-            new { type = 1, name = "users", value = $"{totalUsers:N0}" }
+            new { type = 1, name = "users", value = $"{totalUsers:N0}" },
+            new { type = 1, name = "grok_balance", value = $"${_grokBalance:F2}" },
+            new { type = 1, name = "grok_limit", value = $"${_grokLimit:F2}" },
+            new { type = 2, name = "grok_percent", value = grokPercent },
+            new { type = 1, name = "grok_percent_str", value = $"{grokPercent}%" },
+            new { type = 1, name = "grok_tokens_left", value = $"{grokPercent}%" },
+            new { type = 1, name = "grok_usage_left", value = $"{grokPercent}%" }
         };
 
         return new

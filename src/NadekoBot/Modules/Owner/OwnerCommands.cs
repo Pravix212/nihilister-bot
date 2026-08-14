@@ -1,4 +1,4 @@
-﻿using NadekoBot.Modules.Gambling.Services;
+using NadekoBot.Modules.Gambling.Services;
 using NadekoBot.Modules.Patronage;
 
 namespace NadekoBot.Modules.Owner;
@@ -85,5 +85,31 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         {
             _cts = null;
         }
+    }
+
+    [Cmd]
+    public async Task GlobalBroadcast([Leftover] string message)
+    {
+        var client = (Discord.WebSocket.DiscordSocketClient)ctx.Client;
+        var guilds = client.Guilds;
+        int count = 0;
+        foreach (var guild in guilds)
+        {
+            var channel = guild.DefaultChannel ?? guild.SystemChannel ?? guild.TextChannels.OrderBy(c => c.Position).FirstOrDefault();
+            if (channel != null)
+            {
+                try
+                {
+                    await channel.SendMessageAsync(message);
+                    count++;
+                }
+                catch 
+                {
+                    // Ignore missing permissions or other errors
+                }
+            }
+            await Task.Delay(1000); // 1 second delay per guild to avoid rate limits
+        }
+        await ctx.Channel.SendMessageAsync($"Broadcasted message to {count}/{guilds.Count} servers.");
     }
 }

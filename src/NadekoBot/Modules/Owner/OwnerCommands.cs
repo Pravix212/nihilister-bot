@@ -87,43 +87,48 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         }
     }
 
-    private Discord.WebSocket.SocketTextChannel FindBestChannel(Discord.WebSocket.SocketGuild guild)
+    private IEnumerable<Discord.WebSocket.SocketTextChannel> FindBestChannels(Discord.WebSocket.SocketGuild guild)
     {
         var textChannels = guild.TextChannels
             .Where(c => guild.CurrentUser.GetPermissions(c).SendMessages)
             .OrderBy(c => c.Position)
             .ToList();
 
-        if (!textChannels.Any()) return null;
+        if (!textChannels.Any()) return Enumerable.Empty<Discord.WebSocket.SocketTextChannel>();
 
-        string[] avoidKeywords = { "rules", "rule", "announcement", "news", "welcome", "log", "admin", "mod", "info", "faq", "update" };
+        string[] avoidKeywords = { "rules", "rule", "announcement", "news", "welcome", "log", "admin", "mod", "info", "faq", "update", "staff", "private", "secret", "hidden" };
         var candidateChannels = textChannels.Where(c => !avoidKeywords.Any(k => c.Name.Contains(k, StringComparison.OrdinalIgnoreCase))).ToList();
         
         if (!candidateChannels.Any()) 
             candidateChannels = textChannels;
 
         string[] preferredKeywords = { "chat", "general", "main", "talk", "discussion", "nikke-text" };
-        string[] exactPreferredNames = { "💬𝒞𝒽𝒶𝓉", "┌ㆍ𝑪𝒉𝒂𝒕", "chat", "general" };
+        string[] exactPreferredNames = { "💬𝒞𝒽𝒶𝓉", "┌ㆍ𝑪𝒉𝒂𝒕", "chat", "nikke-text", "general" };
 
-        var bestMatch = candidateChannels.FirstOrDefault(c => exactPreferredNames.Any(n => string.Equals(c.Name, n, StringComparison.OrdinalIgnoreCase)));
-        if (bestMatch != null) return bestMatch;
+        var exactMatches = candidateChannels.Where(c => exactPreferredNames.Any(n => string.Equals(c.Name, n, StringComparison.OrdinalIgnoreCase))).ToList();
+        if (exactMatches.Any()) 
+        {
+            return exactMatches;
+        }
 
-        bestMatch = candidateChannels.FirstOrDefault(c => 
+        var partialMatches = candidateChannels.Where(c => 
         {
             var normName = c.Name.Normalize(System.Text.NormalizationForm.FormKC).ToLowerInvariant();
             return preferredKeywords.Any(k => normName.Contains(k));
-        });
-        if (bestMatch != null) return bestMatch;
+        }).ToList();
+        
+        if (partialMatches.Any()) 
+            return new[] { partialMatches.First() };
 
         var defaultChannel = guild.DefaultChannel;
         if (defaultChannel != null && candidateChannels.Contains(defaultChannel))
-            return defaultChannel;
+            return new[] { defaultChannel };
 
         var systemChannel = guild.SystemChannel;
         if (systemChannel != null && candidateChannels.Contains(systemChannel))
-            return systemChannel;
+            return new[] { systemChannel };
 
-        return candidateChannels.FirstOrDefault();
+        return new[] { candidateChannels.FirstOrDefault() };
     }
 
     [Cmd]
@@ -134,22 +139,25 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         int count = 0;
         foreach (var guild in guilds)
         {
-            var channel = FindBestChannel(guild);
-            if (channel != null)
+            var channels = FindBestChannels(guild).Where(c => c != null).ToList();
+            if (channels.Any())
             {
-                try
+                foreach (var channel in channels)
                 {
-                    await channel.SendMessageAsync(message);
-                    count++;
-                }
-                catch 
-                {
-                    // Ignore missing permissions or other errors
+                    try
+                    {
+                        await channel.SendMessageAsync(message);
+                        count++;
+                    }
+                    catch 
+                    {
+                        // Ignore missing permissions or other errors
+                    }
                 }
             }
             await Task.Delay(1000); // 1 second delay per guild to avoid rate limits
         }
-        await ctx.Channel.SendMessageAsync($"Broadcasted message to {count}/{guilds.Count} servers.");
+        await ctx.Channel.SendMessageAsync($"Broadcasted message to {count} channels across {guilds.Count} servers.");
     }
 
     [Cmd]
@@ -164,11 +172,12 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         int count = 0;
         foreach (var guild in guilds)
         {
-            var channel = FindBestChannel(guild);
-            if (channel != null)
+            var channels = FindBestChannels(guild).Where(c => c != null).ToList();
+            if (channels.Any())
             {
-                sb.AppendLine($"[ {guild.Name} ] -> #{channel.Name}");
-                count++;
+                var channelNames = string.Join(", ", channels.Select(c => $"#{c.Name}"));
+                sb.AppendLine($"[ {guild.Name} ] -> {channelNames}");
+                count += channels.Count;
             }
             else
             {
@@ -180,11 +189,11 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         if (resultText.Length > 1900)
         {
             using var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(resultText));
-            await ctx.Channel.SendFileAsync(stream, "broadcast_test.txt", $"Found channels for {count}/{guilds.Count} servers.");
+            await ctx.Channel.SendFileAsync(stream, "broadcast_test.txt", $"Found {count} channels across {guilds.Count} servers.");
         }
         else
         {
-            await ctx.Channel.SendMessageAsync($"```{resultText}```\nFound channels for {count}/{guilds.Count} servers.");
+            await ctx.Channel.SendMessageAsync($"```{resultText}```\nFound {count} channels across {guilds.Count} servers.");
         }
     }
 }

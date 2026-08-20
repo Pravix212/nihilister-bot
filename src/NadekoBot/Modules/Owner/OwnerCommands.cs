@@ -151,4 +151,40 @@ public partial class Owner(VoteRewardService vrs, IPatronageService ps) : Nadeko
         }
         await ctx.Channel.SendMessageAsync($"Broadcasted message to {count}/{guilds.Count} servers.");
     }
+
+    [Cmd]
+    public async Task TestBroadcast()
+    {
+        var client = (Discord.WebSocket.DiscordSocketClient)ctx.Client;
+        var guilds = client.Guilds;
+        
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Broadcast dry-run results:");
+        
+        int count = 0;
+        foreach (var guild in guilds)
+        {
+            var channel = FindBestChannel(guild);
+            if (channel != null)
+            {
+                sb.AppendLine($"[ {guild.Name} ] -> #{channel.Name}");
+                count++;
+            }
+            else
+            {
+                sb.AppendLine($"[ {guild.Name} ] -> NO VALID CHANNEL FOUND");
+            }
+        }
+
+        var resultText = sb.ToString();
+        if (resultText.Length > 1900)
+        {
+            using var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(resultText));
+            await ctx.Channel.SendFileAsync(stream, "broadcast_test.txt", $"Found channels for {count}/{guilds.Count} servers.");
+        }
+        else
+        {
+            await ctx.Channel.SendMessageAsync($"```{resultText}```\nFound channels for {count}/{guilds.Count} servers.");
+        }
+    }
 }

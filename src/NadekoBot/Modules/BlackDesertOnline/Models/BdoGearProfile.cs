@@ -16,6 +16,21 @@ public class BdoGearProfile
     [JsonPropertyName("garmothLink")]
     public string? GarmothLink { get; set; }
 
+    [JsonPropertyName("characterName")]
+    public string CharacterName { get; set; } = "";
+
+    [JsonPropertyName("level")]
+    public int Level { get; set; }
+
+    [JsonPropertyName("className")]
+    public string ClassName { get; set; } = "";
+
+    [JsonPropertyName("spec")]
+    public string Spec { get; set; } = "succ";
+
+    [JsonPropertyName("buildName")]
+    public string BuildName { get; set; } = "Current";
+
     // Core stats
     [JsonPropertyName("ap")]
     public int Ap { get; set; }
@@ -31,43 +46,65 @@ public class BdoGearProfile
 
     // Offense - Succession
     [JsonPropertyName("totalAttackAp")]
-    public int TotalAttackAp { get; set; }
+    public double TotalAttackAp { get; set; }
+
+    [JsonPropertyName("adventureAp")]
+    public double AdventureAp { get; set; }
 
     [JsonPropertyName("monsterAp")]
-    public int MonsterAp { get; set; }
+    public double MonsterAp { get; set; }
 
     [JsonPropertyName("humanAp")]
-    public int HumanAp { get; set; }
+    public double HumanAp { get; set; }
 
     [JsonPropertyName("demihumanAp")]
-    public int DemihumanAp { get; set; }
+    public double DemihumanAp { get; set; }
+
+    [JsonPropertyName("kamaAp")]
+    public double KamaAp { get; set; }
+
+    [JsonPropertyName("edaniaAp")]
+    public double EdaniaAp { get; set; }
+
+    [JsonPropertyName("normalAp")]
+    public double NormalAp { get; set; }
 
     [JsonPropertyName("hiddenAp")]
-    public int HiddenAp { get; set; }
+    public double HiddenAp { get; set; }
 
     // Offense - Awakening
     [JsonPropertyName("totalAwakeningAp")]
-    public int TotalAwakeningAp { get; set; }
-
-    [JsonPropertyName("monsterAap")]
-    public int MonsterAap { get; set; }
-
-    [JsonPropertyName("humanAap")]
-    public int HumanAap { get; set; }
-
-    [JsonPropertyName("demihumanAap")]
-    public int DemihumanAap { get; set; }
+    public double TotalAwakeningAp { get; set; }
 
     // Defense
-    [JsonPropertyName("evasion")]
-    public int Evasion { get; set; }
-
-    [JsonPropertyName("damageReduction")]
-    public int DamageReduction { get; set; }
-
     [JsonPropertyName("accuracy")]
     public int Accuracy { get; set; }
 
+    [JsonPropertyName("evasionMelee")]
+    public int EvasionMelee { get; set; }
+
+    [JsonPropertyName("evasionRanged")]
+    public int EvasionRanged { get; set; }
+
+    [JsonPropertyName("evasionMagic")]
+    public int EvasionMagic { get; set; }
+
+    [JsonPropertyName("drMelee")]
+    public int DrMelee { get; set; }
+
+    [JsonPropertyName("drRanged")]
+    public int DrRanged { get; set; }
+
+    [JsonPropertyName("drMagic")]
+    public int DrMagic { get; set; }
+
+    [JsonPropertyName("drRate")]
+    public double DrRate { get; set; } = 30.0;
+
     [JsonPropertyName("maxHp")]
     public int MaxHp { get; set; }
+
+    // Gear slots json
+    [JsonPropertyName("gearRaw")]
+    public string? GearRaw { get; set; }
 }

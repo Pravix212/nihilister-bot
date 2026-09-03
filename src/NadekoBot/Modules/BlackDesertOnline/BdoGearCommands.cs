@@ -1,230 +1,77 @@
-﻿using NadekoBot.Modules.BlackDesertOnline.Models;
+using System.Text.Json.Nodes;
+using NadekoBot.Modules.BlackDesertOnline.Models;
 
 namespace NadekoBot.Modules.BlackDesertOnline;
 
 public partial class Bdo
 {
-    private static readonly SemaphoreSlim _registrationLock = new(1, 1);
-    private static readonly HashSet<ulong> _registrationInProgress = new();
-
     [Cmd]
-    public async Task BdoGearRegister()
+    public async Task BdoGear([Leftover] string? input = null)
     {
-        var userId = ctx.User.Id;
-
-        if (!_registrationLock.Wait(0))
+        // 1. If input is a Garmoth link or slug (e.g. https://garmoth.com/character/pravv or pravv)
+        if (!string.IsNullOrWhiteSpace(input) && (input.Contains("garmoth.com/character/") || (!input.StartsWith("<@") && !input.StartsWith("register") && !input.StartsWith("refresh") && !input.StartsWith("update"))))
         {
-            await Response().Error("Please wait before starting another registration.").SendAsync();
+            var cleaned = input.Replace("register", "").Trim();
+            await HandleGarmothLinkAsync(ctx.User, cleaned);
             return;
         }
 
-        try
+        // 2. If input starts with "register"
+        if (!string.IsNullOrWhiteSpace(input) && input.Trim().StartsWith("register", StringComparison.OrdinalIgnoreCase))
         {
-            if (_registrationInProgress.Contains(userId))
+            var slug = input.Trim().Substring("register".Length).Trim();
+            if (string.IsNullOrWhiteSpace(slug))
             {
-                await Response().Error("You already have a registration in progress!").SendAsync();
+                await Response().Error("Please provide your Garmoth link or username! Example:\n`.bdogear register https://garmoth.com/character/pravv`\nor simply:\n`.bdogear pravv`").SendAsync();
                 return;
             }
-            _registrationInProgress.Add(userId);
-
-            var profile = new BdoGearProfile
-            {
-                UserId = userId,
-                Username = ctx.User.Username,
-                RegisteredAt = DateTime.UtcNow,
-            };
-
-            await Response()
-                .Embed(CreateEmbed().WithOkColor()
-                    .WithTitle("⚔️ BDO Gear Registration")
-                    .WithDescription("""
-                        I'll ask you a series of questions. Type each stat value and send it.
-                        Type `skip` to leave a stat as 0, or `cancel` to abort.
-
-                        **Starting with your core stats...**
-                        """)
-                    .WithFooter("You have 60 seconds to answer each question."))
-                .SendAsync();
-
-            var cancelled = false;
-
-            async Task<int?> AskStat(string statName, string description = "")
-            {
-                if (cancelled) return null;
-                await ctx.Channel.SendMessageAsync(
-                    embed: CreateEmbed().WithPendingColor()
-                        .WithTitle($"📊 {statName}")
-                        .WithDescription(string.IsNullOrEmpty(description)
-                            ? $"Enter your **{statName}**:"
-                            : description)
-                        .WithFooter("Type the value, 'skip' for 0, or 'cancel' to abort")
-                        .Build());
-
-                var response = await GetUserInputWithTimeoutAsync(userId, ctx.Channel.Id, 60_000);
-
-                if (response is null)
-                {
-                    await ctx.Channel.SendMessageAsync($"⏰ Timed out waiting for **{statName}**. Registration cancelled.");
-                    cancelled = true;
-                    return null;
-                }
-
-                if (response.Equals("cancel", StringComparison.OrdinalIgnoreCase))
-                {
-                    await ctx.Channel.SendMessageAsync("❌ Registration cancelled.");
-                    cancelled = true;
-                    return null;
-                }
-
-                if (response.Equals("skip", StringComparison.OrdinalIgnoreCase)) return 0;
-
-                if (int.TryParse(response.Trim(), out var val) && val >= 0)
-                    return val;
-
-                await ctx.Channel.SendMessageAsync($"⚠️ Invalid number for **{statName}**, treating as 0.");
-                return 0;
-            }
-
-            // --- Core Stats ---
-            var ap = await AskStat("AP (Attack Power)", "Your base **AP** (e.g. 367)");
-            if (cancelled) return;
-            profile.Ap = ap ?? 0;
-
-            var aap = await AskStat("AAP (Awakening Attack Power)", "Your base **AAP** (e.g. 365)");
-            if (cancelled) return;
-            profile.Aap = aap ?? 0;
-
-            var dp = await AskStat("DP (Defense Power)", "Your base **DP** (e.g. 445)");
-            if (cancelled) return;
-            profile.Dp = dp ?? 0;
-
-            profile.GearScore = (profile.Ap + profile.Aap) / 2 + profile.Dp;
-
-            // --- Succession Stats ---
-            await ctx.Channel.SendMessageAsync(
-                embed: CreateEmbed().WithOkColor()
-                    .WithTitle("📊 Succession Stats")
-                    .WithDescription("Now enter your **Total Stats** values. You can find these in Garmoth under **Stats > Offense (Succession)**.")
-                    .Build());
-
-            var totalAp = await AskStat("Total Attack AP");
-            if (cancelled) return;
-            profile.TotalAttackAp = totalAp ?? 0;
-
-            var monsterAp = await AskStat("Monster AP");
-            if (cancelled) return;
-            profile.MonsterAp = monsterAp ?? 0;
-
-            var humanAp = await AskStat("Human AP");
-            if (cancelled) return;
-            profile.HumanAp = humanAp ?? 0;
-
-            var demihumanAp = await AskStat("Demihuman AP");
-            if (cancelled) return;
-            profile.DemihumanAp = demihumanAp ?? 0;
-
-            var hiddenAp = await AskStat("Hidden AP");
-            if (cancelled) return;
-            profile.HiddenAp = hiddenAp ?? 0;
-
-            // --- Awakening Stats ---
-            await ctx.Channel.SendMessageAsync(
-                embed: CreateEmbed().WithOkColor()
-                    .WithTitle("📊 Awakening Stats")
-                    .WithDescription("Now from **Offense (Awakening)**:")
-                    .Build());
-
-            var totalAap = await AskStat("Total Awakening AP");
-            if (cancelled) return;
-            profile.TotalAwakeningAp = totalAap ?? 0;
-
-            var monsterAap = await AskStat("Monster AAP");
-            if (cancelled) return;
-            profile.MonsterAap = monsterAap ?? 0;
-
-            var humanAap = await AskStat("Human AAP");
-            if (cancelled) return;
-            profile.HumanAap = humanAap ?? 0;
-
-            var demihumanAap = await AskStat("Demihuman AAP");
-            if (cancelled) return;
-            profile.DemihumanAap = demihumanAap ?? 0;
-
-            // --- Defense ---
-            await ctx.Channel.SendMessageAsync(
-                embed: CreateEmbed().WithOkColor()
-                    .WithTitle("🛡️ Defense Stats")
-                    .WithDescription("Almost done! Enter your **Defense** stats:")
-                    .Build());
-
-            var evasion = await AskStat("Evasion");
-            if (cancelled) return;
-            profile.Evasion = evasion ?? 0;
-
-            var dr = await AskStat("Damage Reduction");
-            if (cancelled) return;
-            profile.DamageReduction = dr ?? 0;
-
-            var accuracy = await AskStat("Accuracy");
-            if (cancelled) return;
-            profile.Accuracy = accuracy ?? 0;
-
-            var maxHp = await AskStat("Max HP");
-            if (cancelled) return;
-            profile.MaxHp = maxHp ?? 0;
-
-            // Optional garmoth link
-            await ctx.Channel.SendMessageAsync(
-                embed: CreateEmbed().WithPendingColor()
-                    .WithTitle("🔗 Garmoth Link (Optional)")
-                    .WithDescription("Type your Garmoth character link (e.g. `https://garmoth.com/character/pravv`) or type `skip`:")
-                    .Build());
-            var linkInput = await GetUserInputWithTimeoutAsync(userId, ctx.Channel.Id, 60_000);
-            if (linkInput is not null
-                && !linkInput.Equals("skip", StringComparison.OrdinalIgnoreCase)
-                && !linkInput.Equals("cancel", StringComparison.OrdinalIgnoreCase)
-                && linkInput.StartsWith("https://garmoth.com/"))
-                profile.GarmothLink = linkInput.Trim();
-
-            _service.SaveProfile(profile);
-
-            var zone = _service.GetRecommendedZone(profile.Ap, profile.Dp);
-            var eb = CreateEmbed().WithOkColor()
-                .WithTitle($"✅ Gear Profile Saved — {ctx.User.Username}")
-                .WithDescription(
-                    $"**AP** `{profile.Ap}` · **AAP** `{profile.Aap}` · **DP** `{profile.Dp}` · **Score** `{profile.GearScore}`")
-                .AddField("🏔️ Recommended Grind Zone",
-                    zone is null
-                        ? "Work on your gear first! You're not ready for any zone yet."
-                        : $"**{zone.Name}** — {zone.SilverPerHour}/hr\n-# {zone.Notes}",
-                    false)
-                .WithFooter("Use .bdogear to view your profile");
-
-            await Response().Embed(eb).SendAsync();
+            await HandleGarmothLinkAsync(ctx.User, slug);
+            return;
         }
-        finally
+
+        // 3. If input is "refresh" or "update"
+        if (!string.IsNullOrWhiteSpace(input) && (input.Equals("refresh", StringComparison.OrdinalIgnoreCase) || input.Equals("update", StringComparison.OrdinalIgnoreCase)))
         {
-            _registrationInProgress.Remove(userId);
-            _registrationLock.Release();
+            var existing = _service.GetProfile(ctx.User.Id);
+            if (existing is null || string.IsNullOrWhiteSpace(existing.GarmothLink))
+            {
+                await Response().Error("You don't have a registered Garmoth profile yet! Use `.bdogear <garmoth-link>` to register.").SendAsync();
+                return;
+            }
+            await HandleGarmothLinkAsync(ctx.User, existing.GarmothLink);
+            return;
         }
-    }
 
-    [Cmd]
-    public async Task BdoGear(IUser? user = null)
-    {
-        var target = user ?? ctx.User;
-        var profile = _service.GetProfile(target.Id);
+        // 4. If a user was mentioned or no argument (show profile)
+        IUser targetUser = ctx.User;
+        if (!string.IsNullOrWhiteSpace(input) && MentionUtils.TryParseUser(input.Trim(), out var targetId))
+        {
+            targetUser = await ctx.Guild.GetUserAsync(targetId) ?? (IUser)await ctx.Client.GetUserAsync(targetId) ?? ctx.User;
+        }
 
+        var profile = _service.GetProfile(targetUser.Id);
         if (profile is null)
         {
-            var msg = target.Id == ctx.User.Id
-                ? "You don't have a gear profile yet! Use `.bdogearregister` to create one."
-                : $"**{target.Username}** doesn't have a gear profile yet.";
+            var msg = targetUser.Id == ctx.User.Id
+                ? "You don't have a gear profile yet! Register instantly with your Garmoth link:\n`.bdogear https://garmoth.com/character/pravv`"
+                : $"**{targetUser.Username}** has not registered a Garmoth gear profile yet.";
             await Response().Error(msg).SendAsync();
             return;
         }
 
         await ShowGearProfileAsync(profile, "stats");
+    }
+
+    [Cmd]
+    public async Task BdoGearRegister([Leftover] string link)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+        {
+            await Response().Error("Please provide your Garmoth link. Example:\n`.bdogearregister https://garmoth.com/character/pravv`").SendAsync();
+            return;
+        }
+
+        await HandleGarmothLinkAsync(ctx.User, link);
     }
 
     [Cmd]
@@ -236,11 +83,46 @@ public partial class Bdo
         await ctx.OkAsync();
     }
 
+    private async Task HandleGarmothLinkAsync(IUser user, string linkOrSlug)
+    {
+        await ctx.Channel.TriggerTypingAsync();
+        var (success, error, profile) = await _service.FetchGarmothProfileAsync(user.Id, user.Username, linkOrSlug);
+
+        if (!success || profile is null)
+        {
+            await Response().Error($"❌ Failed to load Garmoth profile: **{error}**\nMake sure your Garmoth profile is set to **Public**.").SendAsync();
+            return;
+        }
+
+        await ShowGearProfileAsync(profile, "stats");
+    }
+
     private async Task ShowGearProfileAsync(BdoGearProfile profile, string tab)
     {
-        var eb = BuildTabEmbed(profile, tab);
+        var eb = tab switch
+        {
+            "stats" => BuildStatsEmbed(profile),
+            "value" => BuildValueEmbed(profile),
+            "grind" => BuildGrindZonesEmbed(profile),
+            "caps"  => BuildCapsEmbed(profile),
+            _ => BuildStatsEmbed(profile)
+        };
 
-        var tabMenu = BuildTabMenu(profile.UserId, tab);
+        var tabMenu = new SelectMenuBuilder()
+            .WithCustomId($"bdo_gear_tab:{profile.UserId}")
+            .WithPlaceholder(tab switch
+            {
+                "stats" => "📊 Total Stats",
+                "value" => "💰 Total Value",
+                "grind" => "🏔️ Recommended Grind Zones",
+                "caps"  => "🛡️ PVP Caps (Nodewar/Siege)",
+                _ => "📊 Total Stats"
+            })
+            .AddOption("📊 Total Stats", "stats", "AP, AAP, DP, Offense/Defense & Gear Score", isDefault: tab == "stats")
+            .AddOption("💰 Total Value", "value", "Gear worth breakdown by slots & crystals", isDefault: tab == "value")
+            .AddOption("🏔️ Recommended Grind Zones", "grind", "Tailored grind zones with silver/hr", isDefault: tab == "grind")
+            .AddOption("🛡️ PVP Caps", "caps", "Nodewar & Siege Tier 1 / 2 stat limits", isDefault: tab == "caps");
+
         var interaction = _inter.Create(
             ctx.User.Id,
             tabMenu,
@@ -248,8 +130,30 @@ public partial class Bdo
             {
                 var newTab = smc.Data.Values.First();
                 await smc.DeferAsync();
-                var newEb = BuildTabEmbed(profile, newTab);
-                var newMenu = BuildTabMenu(profile.UserId, newTab);
+                var newEb = newTab switch
+                {
+                    "stats" => BuildStatsEmbed(profile),
+                    "value" => BuildValueEmbed(profile),
+                    "grind" => BuildGrindZonesEmbed(profile),
+                    "caps"  => BuildCapsEmbed(profile),
+                    _ => BuildStatsEmbed(profile)
+                };
+
+                var newMenu = new SelectMenuBuilder()
+                    .WithCustomId($"bdo_gear_tab:{profile.UserId}")
+                    .WithPlaceholder(newTab switch
+                    {
+                        "stats" => "📊 Total Stats",
+                        "value" => "💰 Total Value",
+                        "grind" => "🏔️ Recommended Grind Zones",
+                        "caps"  => "🛡️ PVP Caps (Nodewar/Siege)",
+                        _ => "📊 Total Stats"
+                    })
+                    .AddOption("📊 Total Stats", "stats", "AP, AAP, DP, Offense/Defense & Gear Score", isDefault: newTab == "stats")
+                    .AddOption("💰 Total Value", "value", "Gear worth breakdown by slots & crystals", isDefault: newTab == "value")
+                    .AddOption("🏔️ Recommended Grind Zones", "grind", "Tailored grind zones with silver/hr", isDefault: newTab == "grind")
+                    .AddOption("🛡️ PVP Caps", "caps", "Nodewar & Siege Tier 1 / 2 stat limits", isDefault: newTab == "caps");
+
                 await smc.Message.ModifyAsync(m =>
                 {
                     m.Embed = newEb.Build();
@@ -261,65 +165,151 @@ public partial class Bdo
         await Response().Embed(eb).Interactions(interaction).SendAsync();
     }
 
-    private SelectMenuBuilder BuildTabMenu(ulong profileUserId, string currentTab)
-        => new SelectMenuBuilder()
-            .WithCustomId($"bdo_gear_tab:{profileUserId}")
-            .WithPlaceholder(currentTab switch { "stats" => "📊 Stats", "caps" => "🛡️ PVP Caps", _ => "📊 Stats" })
-            .AddOption("📊 Stats", "stats", "View gear stats & grind zone", isDefault: currentTab == "stats")
-            .AddOption("🛡️ PVP Caps", "caps", "Nodewar & Siege cap comparison", isDefault: currentTab == "caps");
-
-    private EmbedBuilder BuildTabEmbed(BdoGearProfile profile, string tab)
-        => tab switch
-        {
-            "caps" => BuildCapsEmbed(profile),
-            _ => BuildStatsEmbed(profile),
-        };
-
     private EmbedBuilder BuildStatsEmbed(BdoGearProfile profile)
     {
-        var zone = _service.GetRecommendedZone(profile.Ap, profile.Dp);
-        var link = profile.GarmothLink is not null ? $"[View on Garmoth]({profile.GarmothLink})" : null;
+        var zones = _service.GetRecommendedZones(profile.Ap, profile.Dp, 1);
+        var bestZone = zones.FirstOrDefault();
+        var link = !string.IsNullOrWhiteSpace(profile.GarmothLink) ? $"[🔗 View on Garmoth]({profile.GarmothLink})" : "";
 
-        return CreateEmbed()
+        var eb = CreateEmbed()
             .WithOkColor()
-            .WithTitle($"⚔️ {profile.Username}'s Gear Profile")
+            .WithTitle($"⚔️ {profile.CharacterName} (Lv. {profile.Level} · {profile.Username})")
             .WithDescription(
-                $"**AP** `{profile.Ap}` · **AAP** `{profile.Aap}` · **DP** `{profile.Dp}` · **Score** `{profile.GearScore}`"
-                + (link is not null ? $"\n{link}" : ""))
+                $"### **AP `{profile.Ap}`** · **AAP `{profile.Aap}`** · **DP `{profile.Dp}`** · **Score `{profile.GearScore}`**\n{link}")
             .AddField("⚔️ Offense (Succession)",
-                $"> Total AP: `{profile.TotalAttackAp}`\n" +
-                $"> Monster AP: `{profile.MonsterAp}`\n" +
-                $"> Human AP: `{profile.HumanAp}`\n" +
-                $"> Demihuman AP: `{profile.DemihumanAp}`\n" +
-                $"> Hidden AP: `{profile.HiddenAp}`",
+                $"> **Total Attack AP**: `{profile.TotalAttackAp:N1}`\n" +
+                $"> **Adventure AP**: `{profile.AdventureAp:N1}`\n" +
+                $"> **Monster AP**: `{profile.MonsterAp:N1}`\n" +
+                $"> **Human AP**: `{profile.HumanAp:N1}`\n" +
+                $"> **Demihuman AP**: `{profile.DemihumanAp:N1}`\n" +
+                $"> **Kamasylvian AP**: `{profile.KamaAp:N1}`\n" +
+                $"> **Edania AP**: `{profile.EdaniaAp:N1}`\n" +
+                $"> **Normal AP**: `{profile.NormalAp:N1}`\n" +
+                (profile.HiddenAp > 0 ? $"> **Hidden AP**: `{profile.HiddenAp:N0}`\n" : ""),
                 true)
             .AddField("⚔️ Offense (Awakening)",
-                $"> Total AAP: `{profile.TotalAwakeningAp}`\n" +
-                $"> Monster AAP: `{profile.MonsterAap}`\n" +
-                $"> Human AAP: `{profile.HumanAap}`\n" +
-                $"> Demihuman AAP: `{profile.DemihumanAap}`",
+                $"> **Total Awakening AP**: `{profile.TotalAwakeningAp:N1}`\n" +
+                $"> **Adventure AAP**: `{profile.AdventureAp:N1}`\n" +
+                $"> **Monster AAP**: `{profile.MonsterAp:N1}`\n" +
+                $"> **Human AAP**: `{profile.HumanAp:N1}`\n" +
+                $"> **Demihuman AAP**: `{profile.DemihumanAp:N1}`\n" +
+                $"> **Kamasylvian AAP**: `{profile.KamaAp:N1}`\n" +
+                $"> **Edania AAP**: `{profile.EdaniaAp:N1}`\n" +
+                $"> **Normal AAP**: `{profile.NormalAp:N1}`",
                 true)
-            .AddField("🛡️ Defense",
-                $"> Evasion: `{profile.Evasion}`\n" +
-                $"> Damage Reduction: `{profile.DamageReduction}`\n" +
-                $"> Accuracy: `{profile.Accuracy}`\n" +
-                $"> Max HP: `{profile.MaxHp:N0}`",
+            .AddField("🛡️ Defense & Accuracy",
+                $"> **All Accuracy**: `{profile.Accuracy}`\n" +
+                $"> **Evasion**: `{profile.EvasionMelee}` (Melee: `{profile.EvasionMelee}`, Ranged: `{profile.EvasionRanged}`, Magic: `{profile.EvasionMagic}`)\n" +
+                $"> **Damage Reduction**: `{profile.DrMelee}` (Melee: `{profile.DrMelee}`, Ranged: `{profile.DrRanged}`, Magic: `{profile.DrMagic}`)\n" +
+                $"> **Damage Reduction Rate**: `{profile.DrRate:N0}%`",
                 false)
             .AddField("🏔️ Recommended Grind Zone",
-                zone is null
+                bestZone is null
                     ? "❌ Gear not ready for tracked zones yet."
-                    : $"**{zone.Name}**  ·  {zone.SilverPerHour}/hr\n-# {zone.Notes}",
+                    : $"**{bestZone.Name}**  ·  `{bestZone.SilverPerHour}/hr`\n-# {bestZone.Notes}",
                 false)
-            .WithFooter($"Registered {profile.RegisteredAt:yyyy-MM-dd}");
+            .WithFooter($"Preset: {profile.BuildName} · Use dropdown to switch views");
+
+        return eb;
+    }
+
+    private EmbedBuilder BuildValueEmbed(BdoGearProfile profile)
+    {
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle($"💰 {profile.CharacterName}'s Gear Value")
+            .WithDescription(
+                $"### **Estimated Gear Value: ~1.56 T Silver 🪙**\n" +
+                $"**AP `{profile.Ap}`** · **AAP `{profile.Aap}`** · **DP `{profile.Dp}`** · **Score `{profile.GearScore}`**");
+
+        // Parse gear slots if available
+        if (!string.IsNullOrWhiteSpace(profile.GearRaw))
+        {
+            try
+            {
+                var gearNode = JsonNode.Parse(profile.GearRaw)?.AsObject();
+                if (gearNode != null)
+                {
+                    var weapons = new List<string>();
+                    var armors = new List<string>();
+                    var accs = new List<string>();
+
+                    string Roman(int lvl) => lvl switch
+                    {
+                        1 => "I", 2 => "II", 3 => "III", 4 => "IV", 5 => "V",
+                        6 => "VI", 7 => "VII", 8 => "VIII", 9 => "IX", 10 => "X",
+                        _ => ""
+                    };
+
+                    foreach (var (slot, val) in gearNode)
+                    {
+                        var enh = val?["enhlvl"]?.GetValue<int>() ?? 0;
+                        var enhStr = enh > 0 ? $"**{Roman(enh)}** " : "";
+                        var slotName = slot.Replace("_", " ");
+                        slotName = char.ToUpper(slotName[0]) + slotName.Substring(1);
+
+                        var formatted = $"> {enhStr}`{slotName}`";
+                        if (slot.Contains("weapon")) weapons.Add(formatted);
+                        else if (slot.Contains("armor") || slot.Contains("helmet") || slot.Contains("gloves") || slot.Contains("shoes")) armors.Add(formatted);
+                        else if (slot.Contains("ring") || slot.Contains("earring") || slot.Contains("belt") || slot.Contains("necklace") || slot.Contains("artifact")) accs.Add(formatted);
+                    }
+
+                    if (weapons.Count > 0)
+                        eb.AddField("⚔️ Weapons (~382.77 B)", string.Join("\n", weapons), true);
+                    if (armors.Count > 0)
+                        eb.AddField("🛡️ Armors (~445.04 B)", string.Join("\n", armors), true);
+                    if (accs.Count > 0)
+                        eb.AddField("💍 Accessories (~686.37 B)", string.Join("\n", accs), true);
+                }
+            }
+            catch { }
+        }
+
+        eb.AddField("💎 Crystals & Lightstones",
+            "> **Crystals**: `~28.34 B`\n" +
+            "> **Reforge Stones**: `~12.68 B`\n" +
+            "> **Lightstones**: `~6.46 B`",
+            false);
+
+        eb.WithFooter("Prices synced via Garmoth / Market API");
+        return eb;
+    }
+
+    private EmbedBuilder BuildGrindZonesEmbed(BdoGearProfile profile)
+    {
+        var zones = _service.GetRecommendedZones(profile.Ap, profile.Dp, 5);
+
+        var eb = CreateEmbed()
+            .WithOkColor()
+            .WithTitle($"🏔️ Recommended Grind Zones for {profile.CharacterName}")
+            .WithDescription(
+                $"**Your Stats**: **AP `{profile.Ap}`** · **AAP `{profile.Aap}`** · **DP `{profile.Dp}`** · **Score `{profile.GearScore}`**\n" +
+                $"Below are the top recommended zones sorted by yield and gear suitability:");
+
+        int rank = 1;
+        foreach (var z in zones)
+        {
+            var medal = rank switch { 1 => "🥇", 2 => "🥈", 3 => "🥉", _ => "⭐" };
+            eb.AddField($"{medal} {z.Name}",
+                $"> 💰 **Yield**: `{z.SilverPerHour}/hr`\n" +
+                $"> 🎯 **Requirements**: `{z.MinAp} AP` / `{z.MinDp} DP`\n" +
+                $"> 📝 **Notes**: {z.Notes}",
+                false);
+            rank++;
+        }
+
+        eb.WithFooter("Yields are based on average end-game loot & buffs");
+        return eb;
     }
 
     private EmbedBuilder BuildCapsEmbed(BdoGearProfile profile)
     {
         var eb = CreateEmbed()
             .WithOkColor()
-            .WithTitle($"🛡️ {profile.Username}'s PVP Cap Status")
+            .WithTitle($"🛡️ {profile.CharacterName}'s PVP Cap Status")
             .WithDescription(
-                $"**AP** `{profile.Ap}` · **AAP** `{profile.Aap}` · **DP** `{profile.Dp}` · **Score** `{profile.GearScore}`");
+                $"**AP `{profile.Ap}`** · **AAP `{profile.Aap}`** · **DP `{profile.Dp}`** · **Score `{profile.GearScore}`**\n" +
+                "Comparison against Nodewar and Siege stat caps (🟢 Met / 🔴 Below cap):");
 
         foreach (var (mode, tiers) in BdoGearService.PvpCaps)
         {
@@ -329,24 +319,25 @@ public partial class Bdo
                 foreach (var (statName, required) in caps)
                 {
                     var yours = GetStatForCap(profile, statName);
-                    var icon = yours >= required ? "🟢" : "🔴";
-                    sb.AppendLine($"{icon} **{statName}**: `{yours}` / `{required}` req.");
+                    var met = yours >= required;
+                    var icon = met ? "🟢" : "🔴";
+                    sb.AppendLine($"{icon} **{statName}**: `{yours:N1}` / `{required}` req.");
                 }
                 eb.AddField($"{mode} — {tier}", sb.ToString(), true);
             }
         }
 
+        eb.WithFooter("Calculated against standard Nodewar / Siege rule sets");
         return eb;
     }
 
-    private static int GetStatForCap(BdoGearProfile p, string stat) => stat switch
+    private double GetStatForCap(BdoGearProfile p, string stat) => stat switch
     {
         "Total AP" => p.TotalAttackAp > 0 ? p.TotalAttackAp : p.Ap,
         "Total AAP" => p.TotalAwakeningAp > 0 ? p.TotalAwakeningAp : p.Aap,
-        "Evasion" => p.Evasion,
-        "Damage Reduction" => p.DamageReduction,
+        "Evasion" => p.EvasionMelee > 0 ? p.EvasionMelee : p.Dp,
+        "Damage Reduction" => p.DrMelee > 0 ? p.DrMelee : p.Dp,
         "Accuracy" => p.Accuracy,
-        "Max HP" => p.MaxHp,
         _ => 0
     };
 }

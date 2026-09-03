@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using NadekoBot.Modules.BlackDesertOnline.Models;
 using NadekoBot.Services;
 
@@ -12,22 +14,23 @@ public class BdoGearService : INService
 
     public static readonly List<BdoGrindZone> GrindZones = new()
     {
-        new() { Name = "Olucas Farm",              MinAp = 260, MinDp = 260, SilverPerHour = "~300M",  Notes = "Beginner zone" },
-        new() { Name = "Aakman Temple",             MinAp = 280, MinDp = 300, SilverPerHour = "~400M",  Notes = "Mid-tier" },
-        new() { Name = "Gyfin Rhasia (Surface)",    MinAp = 300, MinDp = 320, SilverPerHour = "~500M",  Notes = "Party recommended" },
-        new() { Name = "Kratuga Ancient Ruins",     MinAp = 310, MinDp = 340, SilverPerHour = "~600M",  Notes = "Efficient solo" },
-        new() { Name = "Ash Forest",                MinAp = 320, MinDp = 360, SilverPerHour = "~700M",  Notes = "Good drops" },
-        new() { Name = "Thornwood Forest",          MinAp = 330, MinDp = 370, SilverPerHour = "~800M",  Notes = "Elvia-based" },
-        new() { Name = "Hystria Ruins",             MinAp = 340, MinDp = 380, SilverPerHour = "~900M",  Notes = "Great crystals" },
-        new() { Name = "Star's End",                MinAp = 360, MinDp = 390, SilverPerHour = "~1.1B",  Notes = "High yield" },
-        new() { Name = "Sycraia Underwater Ruins",  MinAp = 370, MinDp = 400, SilverPerHour = "~1.3B",  Notes = "Top tier" },
-        new() { Name = "Gyfin Rhasia (Underground)",MinAp = 380, MinDp = 410, SilverPerHour = "~1.5B",  Notes = "Best party zone" },
-        new() { Name = "Mountain of Eternal Winter", MinAp = 390, MinDp = 420, SilverPerHour = "~1.7B", Notes = "Elvia top-tier" },
-        new() { Name = "Dehkia's Pit",              MinAp = 400, MinDp = 430, SilverPerHour = "~2B+",   Notes = "Endgame" },
+        new() { Name = "Olucas Farm",               MinAp = 260, MinDp = 260, SilverPerHour = "~300M - 400M", Notes = "Starter Zone · Easy entry" },
+        new() { Name = "Aakman Temple",              MinAp = 280, MinDp = 300, SilverPerHour = "~450M - 600M", Notes = "Mid-tier · Good trash value" },
+        new() { Name = "Gyfin Rhasia (Surface)",     MinAp = 300, MinDp = 320, SilverPerHour = "~600M - 750M", Notes = "Party recommended · Exp focus" },
+        new() { Name = "Kratuga Ancient Ruins",      MinAp = 310, MinDp = 340, SilverPerHour = "~700M - 850M", Notes = "Efficient solo · Elkarr crystals" },
+        new() { Name = "Ash Forest",                MinAp = 320, MinDp = 360, SilverPerHour = "~800M - 950M", Notes = "Deboreka Necklace drops" },
+        new() { Name = "Thornwood Forest (Elvia)",   MinAp = 330, MinDp = 370, SilverPerHour = "~900M - 1.1B", Notes = "Elvia Calpheon · Despair drops" },
+        new() { Name = "Hystria Ruins",              MinAp = 340, MinDp = 380, SilverPerHour = "~1.0B - 1.2B", Notes = "Great artifacts & accessories" },
+        new() { Name = "Star's End",                 MinAp = 340, MinDp = 390, SilverPerHour = "~1.1B - 1.3B", Notes = "Distortion Earrings · High RNG yield" },
+        new() { Name = "Sycraia Underwater (Abyssal)",MinAp = 350, MinDp = 400, SilverPerHour = "~1.3B - 1.5B", Notes = "Tungrad Rings · Consistent silver" },
+        new() { Name = "Gyfin Rhasia (Underground)", MinAp = 360, MinDp = 410, SilverPerHour = "~1.5B - 1.7B", Notes = "Top solo tier · High Caphras & accessories" },
+        new() { Name = "Mountain of Eternal Winter",  MinAp = 370, MinDp = 420, SilverPerHour = "~1.7B - 2.0B", Notes = "Flame of Frost · Top endgame zone" },
+        new() { Name = "Dehkia's Lantern (Hystria/Aakman)", MinAp = 380, MinDp = 430, SilverPerHour = "~2.0B - 2.5B+", Notes = "Dehkia endgame · Extreme silver/hr" },
+        new() { Name = "Edania: Throne & High Spire",MinAp = 390, MinDp = 440, SilverPerHour = "~2.5B - 3.0B+", Notes = "Primordial Sovereign & Edana region" }
     };
 
     // PVP Caps
-    public static readonly Dictionary<string, Dictionary<string, Dictionary<string, int>>> PvpCaps = new()
+    public static readonly Dictionary<string, Dictionary<string, Dictionary<string, double>>> PvpCaps = new()
     {
         ["Nodewar"] = new()
         {
@@ -38,7 +41,6 @@ public class BdoGearService : INService
                 ["Evasion"] = 908,
                 ["Damage Reduction"] = 530,
                 ["Accuracy"] = 820,
-                ["Max HP"] = 11000,
             },
             ["Tier 2"] = new()
             {
@@ -47,7 +49,6 @@ public class BdoGearService : INService
                 ["Evasion"] = 1050,
                 ["Damage Reduction"] = 600,
                 ["Accuracy"] = 900,
-                ["Max HP"] = 13000,
             },
         },
         ["Siege"] = new()
@@ -59,7 +60,6 @@ public class BdoGearService : INService
                 ["Evasion"] = 1000,
                 ["Damage Reduction"] = 580,
                 ["Accuracy"] = 870,
-                ["Max HP"] = 12000,
             },
             ["Tier 2"] = new()
             {
@@ -68,7 +68,6 @@ public class BdoGearService : INService
                 ["Evasion"] = 1100,
                 ["Damage Reduction"] = 650,
                 ["Accuracy"] = 950,
-                ["Max HP"] = 14000,
             },
         },
     };
@@ -113,9 +112,101 @@ public class BdoGearService : INService
         SaveProfiles();
     }
 
-    public BdoGrindZone? GetRecommendedZone(int ap, int dp)
-        => GrindZones
-            .Where(z => ap >= z.MinAp && dp >= z.MinDp)
+    public List<BdoGrindZone> GetRecommendedZones(int ap, int dp, int count = 3)
+    {
+        return GrindZones
+            .Where(z => ap >= z.MinAp - 15 && dp >= z.MinDp - 20)
             .OrderByDescending(z => z.MinAp)
-            .FirstOrDefault();
+            .Take(count)
+            .ToList();
+    }
+
+    public async Task<(bool Success, string? Error, BdoGearProfile? Profile)> FetchGarmothProfileAsync(
+        ulong userId,
+        string username,
+        string slugOrUrl)
+    {
+        try
+        {
+            var scriptPath = Path.Combine("data", "bdo_garmoth_fetcher.py");
+            if (!File.Exists(scriptPath))
+            {
+                scriptPath = Path.Combine(AppContext.BaseDirectory, "data", "bdo_garmoth_fetcher.py");
+            }
+
+            var pythonExe = OperatingSystem.IsWindows() ? "python" : "python3";
+            var psi = new ProcessStartInfo
+            {
+                FileName = pythonExe,
+                Arguments = $"\"{scriptPath}\" \"{slugOrUrl.Trim()}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(psi);
+            if (process is null)
+                return (false, "Could not launch Python fetcher process.", null);
+
+            var stdout = await process.StandardOutput.ReadToEndAsync();
+            var stderr = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (string.IsNullOrWhiteSpace(stdout))
+                return (false, $"Fetcher returned no output: {stderr}", null);
+
+            var doc = JsonNode.Parse(stdout);
+            if (doc is null)
+                return (false, "Could not parse JSON output from Garmoth fetcher.", null);
+
+            if (doc["success"]?.GetValue<bool>() != true)
+            {
+                var err = doc["error"]?.GetValue<string>() ?? "Unknown error fetching Garmoth character.";
+                return (false, err, null);
+            }
+
+            var profile = new BdoGearProfile
+            {
+                UserId = userId,
+                Username = username,
+                RegisteredAt = DateTime.UtcNow,
+                GarmothLink = doc["url"]?.GetValue<string>() ?? slugOrUrl,
+                CharacterName = doc["name"]?.GetValue<string>() ?? "Unknown",
+                Level = doc["level"]?.GetValue<int>() ?? 0,
+                Spec = doc["spec"]?.GetValue<string>() ?? "succ",
+                BuildName = doc["build_name"]?.GetValue<string>() ?? "Current",
+                Ap = doc["ap"]?.GetValue<int>() ?? 0,
+                Aap = doc["aap"]?.GetValue<int>() ?? 0,
+                Dp = doc["dp"]?.GetValue<int>() ?? 0,
+                GearScore = doc["score"]?.GetValue<int>() ?? 0,
+                TotalAttackAp = doc["totalap"]?.GetValue<double>() ?? 0,
+                AdventureAp = doc["adventureap"]?.GetValue<double>() ?? 0,
+                MonsterAp = doc["monsterap"]?.GetValue<double>() ?? 0,
+                HumanAp = doc["humanap"]?.GetValue<double>() ?? 0,
+                KamaAp = doc["kamaap"]?.GetValue<double>() ?? 0,
+                DemihumanAp = doc["demiap"]?.GetValue<double>() ?? 0,
+                EdaniaAp = doc["edaniaap"]?.GetValue<double>() ?? 0,
+                NormalAp = doc["normalap"]?.GetValue<double>() ?? 0,
+                HiddenAp = doc["hiddenap"]?.GetValue<double>() ?? 0,
+                TotalAwakeningAp = doc["totalaap"]?.GetValue<double>() ?? 0,
+                Accuracy = doc["acc"]?.GetValue<int>() ?? 0,
+                EvasionMelee = doc["evasion_melee"]?.GetValue<int>() ?? 0,
+                EvasionRanged = doc["evasion_ranged"]?.GetValue<int>() ?? 0,
+                EvasionMagic = doc["evasion_magic"]?.GetValue<int>() ?? 0,
+                DrMelee = doc["dr_melee"]?.GetValue<int>() ?? 0,
+                DrRanged = doc["dr_ranged"]?.GetValue<int>() ?? 0,
+                DrMagic = doc["dr_magic"]?.GetValue<int>() ?? 0,
+                DrRate = doc["dr_rate"]?.GetValue<double>() ?? 30.0,
+                GearRaw = doc["gear"]?.ToJsonString()
+            };
+
+            SaveProfile(profile);
+            return (true, null, profile);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message, null);
+        }
+    }
 }

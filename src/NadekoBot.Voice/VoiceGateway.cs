@@ -1,4 +1,4 @@
-﻿using NadekoBot.Voice.Models;
+using NadekoBot.Voice.Models;
 using Discord.Models.Gateway;
 using Newtonsoft.Json.Linq;
 using Serilog;
@@ -611,9 +611,17 @@ namespace NadekoBot.Voice
                 return ResumeAsync();
             }
 
-            DaveManager?.Dispose();
-            DaveManager = new DaveSessionManager(_channelId, _userId);
-            Log.Information("DAVE: Created new session manager for channel={ChannelId}, user={UserId}", _channelId, _userId);
+            try
+            {
+                DaveManager?.Dispose();
+                DaveManager = new DaveSessionManager(_channelId, _userId);
+                Log.Information("DAVE: Created new session manager for channel={ChannelId}, user={UserId}", _channelId, _userId);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "DAVE: Failed to initialize DAVE session manager (libdave not loaded), falling back to standard voice protocol: {Message}", ex.Message);
+                DaveManager = null;
+            }
 
             return IdentifyAsync();
         }
@@ -628,7 +636,7 @@ namespace NadekoBot.Voice
                     SessionId = _sessionId,
                     Token = _token,
                     UserId = _userId.ToString(),
-                    MaxDaveProtocolVersion = 1,
+                    MaxDaveProtocolVersion = DaveManager != null ? 1 : 0,
                 })
             });
 

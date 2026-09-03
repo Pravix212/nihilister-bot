@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using NadekoBot.Modules.BlackDesertOnline.Models;
 
 namespace NadekoBot.Modules.BlackDesertOnline;
@@ -99,13 +99,16 @@ public partial class Bdo
 
     private async Task ShowGearProfileAsync(BdoGearProfile profile, string tab)
     {
+        var imgPath = _service.GetGearImagePath(profile.UserId);
+        var hasImage = File.Exists(imgPath);
+
         var eb = tab switch
         {
-            "stats" => BuildStatsEmbed(profile),
-            "value" => BuildValueEmbed(profile),
-            "grind" => BuildGrindZonesEmbed(profile),
-            "caps"  => BuildCapsEmbed(profile),
-            _ => BuildStatsEmbed(profile)
+            "stats" => BuildStatsEmbed(profile, hasImage),
+            "value" => BuildValueEmbed(profile, hasImage),
+            "grind" => BuildGrindZonesEmbed(profile, hasImage),
+            "caps"  => BuildCapsEmbed(profile, hasImage),
+            _ => BuildStatsEmbed(profile, hasImage)
         };
 
         var tabMenu = new SelectMenuBuilder()
@@ -132,11 +135,11 @@ public partial class Bdo
                 await smc.DeferAsync();
                 var newEb = newTab switch
                 {
-                    "stats" => BuildStatsEmbed(profile),
-                    "value" => BuildValueEmbed(profile),
-                    "grind" => BuildGrindZonesEmbed(profile),
-                    "caps"  => BuildCapsEmbed(profile),
-                    _ => BuildStatsEmbed(profile)
+                    "stats" => BuildStatsEmbed(profile, hasImage),
+                    "value" => BuildValueEmbed(profile, hasImage),
+                    "grind" => BuildGrindZonesEmbed(profile, hasImage),
+                    "caps"  => BuildCapsEmbed(profile, hasImage),
+                    _ => BuildStatsEmbed(profile, hasImage)
                 };
 
                 var newMenu = new SelectMenuBuilder()
@@ -162,10 +165,18 @@ public partial class Bdo
             },
             singleUse: false);
 
-        await Response().Embed(eb).Interactions(interaction).SendAsync();
+        if (hasImage)
+        {
+            using var fs = File.OpenRead(imgPath);
+            await Response().File(fs, "gear.png").Embed(eb).Interactions(interaction).SendAsync();
+        }
+        else
+        {
+            await Response().Embed(eb).Interactions(interaction).SendAsync();
+        }
     }
 
-    private EmbedBuilder BuildStatsEmbed(BdoGearProfile profile)
+    private EmbedBuilder BuildStatsEmbed(BdoGearProfile profile, bool hasImage)
     {
         var zones = _service.GetRecommendedZones(profile.Ap, profile.Dp, 1);
         var bestZone = zones.FirstOrDefault();
@@ -210,10 +221,13 @@ public partial class Bdo
                 false)
             .WithFooter($"Preset: {profile.BuildName} · Use dropdown to switch views");
 
+        if (hasImage)
+            eb.WithImageUrl("attachment://gear.png");
+
         return eb;
     }
 
-    private EmbedBuilder BuildValueEmbed(BdoGearProfile profile)
+    private EmbedBuilder BuildValueEmbed(BdoGearProfile profile, bool hasImage)
     {
         var eb = CreateEmbed()
             .WithOkColor()
@@ -222,7 +236,6 @@ public partial class Bdo
                 $"### **Estimated Gear Value: ~1.56 T Silver 🪙**\n" +
                 $"**AP `{profile.Ap}`** · **AAP `{profile.Aap}`** · **DP `{profile.Dp}`** · **Score `{profile.GearScore}`**");
 
-        // Parse gear slots if available
         if (!string.IsNullOrWhiteSpace(profile.GearRaw))
         {
             try
@@ -272,10 +285,13 @@ public partial class Bdo
             false);
 
         eb.WithFooter("Prices synced via Garmoth / Market API");
+        if (hasImage)
+            eb.WithImageUrl("attachment://gear.png");
+
         return eb;
     }
 
-    private EmbedBuilder BuildGrindZonesEmbed(BdoGearProfile profile)
+    private EmbedBuilder BuildGrindZonesEmbed(BdoGearProfile profile, bool hasImage)
     {
         var zones = _service.GetRecommendedZones(profile.Ap, profile.Dp, 5);
 
@@ -299,10 +315,13 @@ public partial class Bdo
         }
 
         eb.WithFooter("Yields are based on average end-game loot & buffs");
+        if (hasImage)
+            eb.WithImageUrl("attachment://gear.png");
+
         return eb;
     }
 
-    private EmbedBuilder BuildCapsEmbed(BdoGearProfile profile)
+    private EmbedBuilder BuildCapsEmbed(BdoGearProfile profile, bool hasImage)
     {
         var eb = CreateEmbed()
             .WithOkColor()
@@ -328,6 +347,9 @@ public partial class Bdo
         }
 
         eb.WithFooter("Calculated against standard Nodewar / Siege rule sets");
+        if (hasImage)
+            eb.WithImageUrl("attachment://gear.png");
+
         return eb;
     }
 

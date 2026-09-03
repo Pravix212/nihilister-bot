@@ -107,4 +107,7 @@ public class BdoGearProfile
     // Gear slots json
     [JsonPropertyName("gearRaw")]
     public string? GearRaw { get; set; }
+
+    [JsonPropertyName("imagePath")]
+    public string? ImagePath { get; set; }
 }

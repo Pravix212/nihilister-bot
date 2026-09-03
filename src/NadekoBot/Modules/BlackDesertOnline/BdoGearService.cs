@@ -9,6 +9,7 @@ namespace NadekoBot.Modules.BlackDesertOnline;
 public class BdoGearService : INService
 {
     private readonly string _profilesPath = Path.Combine("data", "bdo_profiles.json");
+    private readonly string _imagesDir = Path.Combine("data", "bdo_gear_images");
     private Dictionary<ulong, BdoGearProfile> _profiles = new();
     private readonly JsonSerializerOptions _jsonOpts = new() { WriteIndented = true, PropertyNameCaseInsensitive = true };
 
@@ -74,6 +75,7 @@ public class BdoGearService : INService
 
     public BdoGearService()
     {
+        Directory.CreateDirectory(_imagesDir);
         LoadProfiles();
     }
 
@@ -112,6 +114,11 @@ public class BdoGearService : INService
         SaveProfiles();
     }
 
+    public string GetGearImagePath(ulong userId)
+    {
+        return Path.Combine(_imagesDir, $"{userId}.png");
+    }
+
     public List<BdoGrindZone> GetRecommendedZones(int ap, int dp, int count = 3)
     {
         return GrindZones
@@ -128,6 +135,9 @@ public class BdoGearService : INService
     {
         try
         {
+            Directory.CreateDirectory(_imagesDir);
+            var imageOutPath = Path.GetFullPath(GetGearImagePath(userId));
+
             var scriptPath = Path.Combine("data", "bdo_garmoth_fetcher.py");
             if (!File.Exists(scriptPath))
             {
@@ -138,7 +148,7 @@ public class BdoGearService : INService
             var psi = new ProcessStartInfo
             {
                 FileName = pythonExe,
-                Arguments = $"\"{scriptPath}\" \"{slugOrUrl.Trim()}\"",
+                Arguments = $"\"{scriptPath}\" \"{slugOrUrl.Trim()}\" \"{imageOutPath}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -198,7 +208,8 @@ public class BdoGearService : INService
                 DrRanged = doc["dr_ranged"]?.GetValue<int>() ?? 0,
                 DrMagic = doc["dr_magic"]?.GetValue<int>() ?? 0,
                 DrRate = doc["dr_rate"]?.GetValue<double>() ?? 30.0,
-                GearRaw = doc["gear"]?.ToJsonString()
+                GearRaw = doc["gear"]?.ToJsonString(),
+                ImagePath = File.Exists(imageOutPath) ? imageOutPath : null
             };
 
             SaveProfile(profile);

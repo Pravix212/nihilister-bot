@@ -1,9 +1,9 @@
-﻿# DO NOT CHANGE
+# DO NOT CHANGE
 version: 13
 # Currency settings
 currency:
   # What is the emoji/character which represents the currency
-  sign: " 🔥Flame"
+  sign: "🔥"
   # What is the name of the currency
   name: Nihilister Flames
   # For how long (in days) will the transactions be kept in the database (curtrs)
@@ -52,10 +52,10 @@ generation:
 timely:
   # How much currency will the users get every time they run .timely command
   # setting to 0 or less will disable this feature
-  amount: 120
+  amount: 1000
   # How often (in hours) can users claim currency with .timely command
   # setting to 0 or less will disable this feature
-  cooldown: 12
+  cooldown: 24
   # How will timely be protected?
   # None, Button (users have to click the button) or Captcha (users have to type the captcha from an image)
   protType: Captcha

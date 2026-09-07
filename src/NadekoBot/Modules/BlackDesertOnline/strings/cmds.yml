@@ -1,0 +1,30 @@
+bdomarket:
+  desc: Search the Black Desert Central Market for an item and price history.
+  ex:
+    - Caphras Stone
+  params:
+    - query:
+        desc: The item name to search for.
+bdogearregister:
+  desc: Register your Black Desert character gear via your public Garmoth link.
+  ex:
+    - https://garmoth.com/character/ABC123XYZ
+  params:
+    - link:
+        desc: Your public Garmoth character link.
+bdogear:
+  desc: View registered Black Desert gear, stats, and grind zone recommendations.
+  ex:
+    - ''
+    - '@User'
+  params:
+    - user:
+        desc: The user whose gear profile you want to view.
+bdogeardelete:
+  desc: Delete a registered Black Desert gear profile.
+  ex:
+    - ''
+    - '@User'
+  params:
+    - user:
+        desc: The user whose gear profile you want to delete.

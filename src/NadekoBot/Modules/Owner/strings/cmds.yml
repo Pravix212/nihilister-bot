@@ -24,3 +24,16 @@ patronadd:
         desc: "The pledge amount in cents (e.g. 500 = $5.00)."
       userId:
         desc: "The Discord user ID to grant patron benefits to."
+globalbroadcast:
+  desc: Broadcast a message to all servers the bot is in.
+  ex:
+    - 'Hello everyone!'
+  params:
+    - message:
+        desc: The message to broadcast.
+testbroadcast:
+  desc: Dry-run test of global broadcast to verify channel reachability.
+  ex:
+    - ''
+  params:
+    - {}

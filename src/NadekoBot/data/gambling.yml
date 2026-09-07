@@ -58,7 +58,7 @@ timely:
   cooldown: 24
   # How will timely be protected?
   # None, Button (users have to click the button) or Captcha (users have to type the captcha from an image)
-  protType: Captcha
+  protType: None
 # How much will each user's owned currency decay over time.
 decay:
   # Percentage of user's current currency which will be deducted every 24h.

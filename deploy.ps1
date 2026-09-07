@@ -1,40 +1,24 @@
-# === CONFIG ===
-$publishPath = "C:\Users\Prav2\Publish\Nihilister-Linux"
-$dropletIp = "157.230.120.222"
-$botUser = "root"
-$remotePath = "/root/bot-publish"
-# ==============
+param(
+    [string]$Message = "Update bot"
+)
 
-# NOTE: We build ON the droplet because the Windows .NET 10 SDK has a NuGet bug.
-# This script pushes your code to GitHub, then triggers a rebuild on the server.
+$ErrorActionPreference = "Stop"
 
-# 1. Set default merge strategy so git doesn't complain about divergent branches
-git config pull.rebase false
-
-# 2. Stage and push local changes
-Write-Host "Committing and pushing changes..."
-Set-Location "C:\Users\Prav2\AppData\Roaming\NadekoHub\Bots\Nihilister Clone"
-$msg = Read-Host "Enter commit message (or press Enter for 'Update bot')"
-if ([string]::IsNullOrWhiteSpace($msg)) { $msg = "Update bot" }
-
+Write-Host "`n==> 1. Staging local changes..." -ForegroundColor Cyan
 git add .
-git commit -m "$msg" 2>$null
 
-# If push fails due to divergent branches, pull merge then push again
-git push origin v6
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Push failed due to divergent branches. Pulling and retrying..."
-    git pull origin v6 --no-rebase
-    git push origin v6
+$status = git status --porcelain
+if ($status) {
+    Write-Host "==> 2. Committing changes: '$Message'..." -ForegroundColor Cyan
+    git commit -m "$Message"
+} else {
+    Write-Host "==> 2. No changes to commit, continuing..." -ForegroundColor Yellow
 }
 
-# 3. Trigger remote build + restart
-Write-Host "Pulling latest code and rebuilding on droplet..."
-$sshCommand = @"
-cd /root/nihilister-bot && git config pull.rebase false && git pull origin v6 --no-rebase && dotnet publish src/NadekoBot/NadekoBot.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-publish -p:UseSharedCompilation=false && systemctl restart nihilister-bot && systemctl status nihilister-bot --no-pager
-"@
+Write-Host "==> 3. Pushing to GitHub (v6)..." -ForegroundColor Cyan
+git push origin v6
 
-ssh "${botUser}@${dropletIp}" "$sshCommand"
+Write-Host "==> 4. Updating Droplet & Restarting Bot..." -ForegroundColor Cyan
+ssh root@157.230.120.222 "/root/deploy.sh"
 
-Write-Host "Done! Bot deployed and restarted."
-Write-Host "Tip: If you only changed config files (creds.yml, ai-agent.yml), just SCP them instead of a full rebuild."
+Write-Host "`n==> Deploy Complete! Bot is running with latest changes." -ForegroundColor Green

@@ -5,3 +5,7 @@ votefeed:
 patronadd:
   - patronadd
   - pa
+globalbroadcast:
+  - globalbroadcast
+testbroadcast:
+  - testbroadcast

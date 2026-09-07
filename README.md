@@ -12,6 +12,7 @@ This is a personal project maintained by Pravix212, with custom features, brandi
 - **Gambling & Economy** — Custom currency system with slots, betting, leaderboards
 - **Moderation** — Advanced admin tools, auto-moderation, greet/bye messages
 - **Music** — YouTube playback with queue management
+- **Black Desert Online** — Central Market lookups, Garmoth gear profile sync & grind zone guides
 - **Utility** — Custom commands, aliases, XP system, and more
 - **Uptime Display** — Live status showing bot uptime
 
@@ -32,5 +33,5 @@ For issues, feature requests, or donations, visit [prav.lol](http://www.prav.lol
 
 ---
 
-**Nihilister** — *Not just a bot, but n experience!*
+**Nihilister** — *Not just a bot, but an experience!*
 

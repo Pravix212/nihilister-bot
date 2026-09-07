@@ -1,4 +1,4 @@
-﻿using NadekoBot.Modules.Utility.Services;
+using NadekoBot.Modules.Utility.Services;
 using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Text;
@@ -904,14 +904,27 @@ public partial class Utility : NadekoModule
             return;
         }
 
+        IGuildUser target1;
+        IGuildUser target2;
+
         // If only one user is provided, ship the caller with that user
         if (user2 is null)
         {
-            user2 = user1;
-            user1 = (IGuildUser)ctx.User;
+            target1 = (IGuildUser)ctx.User;
+            target2 = user1!;
+        }
+        else if (user1 is null)
+        {
+            target1 = (IGuildUser)ctx.User;
+            target2 = user2;
+        }
+        else
+        {
+            target1 = user1;
+            target2 = user2;
         }
 
-        var percentage = CalculateLovePercentage(user1.Id, user2.Id);
+        var percentage = CalculateLovePercentage(target1.Id, target2.Id);
         var description = GetShipDescription(percentage);
         var bar = BuildProgressBar(percentage);
 
@@ -919,17 +932,23 @@ public partial class Utility : NadekoModule
             .WithOkColor()
             .WithTitle("💕 Love Calculator")
             .WithDescription(
-                $"**{user1.DisplayName}** ❤️ **{user2.DisplayName}**\n\n" +
+                $"**{target1.DisplayName}** ❤️ **{target2.DisplayName}**\n\n" +
                 $"**{percentage}%** — {description}\n" +
                 $"{bar}")
-            .WithThumbnailUrl(user1.GetDisplayAvatarUrl() ?? user1.GetDefaultAvatarUrl())
+            .WithThumbnailUrl(target1.GetDisplayAvatarUrl() ?? target1.GetDefaultAvatarUrl())
             .WithFooter($"Shipped by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
 
         await Response().Embed(eb).SendAsync();
     }
 
+    private const ulong PRAVIXX_ID = 971429702415822938;
+    private const ulong BYONGOKU_ID = 739855937786871921;
+
     private static int CalculateLovePercentage(ulong id1, ulong id2)
     {
+        if ((id1 == PRAVIXX_ID && id2 == BYONGOKU_ID) || (id1 == BYONGOKU_ID && id2 == PRAVIXX_ID))
+            return 200;
+
         // Random percentage for fun — same pair gets different results every time!
         return Random.Shared.Next(0, 101);
     }
@@ -944,14 +963,18 @@ public partial class Utility : NadekoModule
             <= 60 => "😊 A decent match!",
             <= 80 => "😍 Pretty compatible!",
             <= 95 => "💖 Strong connection!",
-            _ => "🔥 Perfect match! Soulmates!"
+            <= 100 => "🔥 Perfect match! Soulmates!",
+            _ => "💞 Transcendent love! True eternal soulmates! 💍✨"
         };
     }
 
     private static string BuildProgressBar(int percentage)
     {
-        var filled = (int)Math.Round(percentage / 10.0);
-        var empty = 10 - filled;
+        if (percentage >= 200)
+            return "`████████████████████`";
+
+        var filled = Math.Clamp((int)Math.Round(percentage / 10.0), 0, 10);
+        var empty = Math.Max(0, 10 - filled);
         var filledPart = new string('█', filled);
         var emptyPart = new string('░', empty);
         return $"`{filledPart}{emptyPart}`";

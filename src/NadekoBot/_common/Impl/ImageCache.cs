@@ -34,11 +34,15 @@ public sealed class ImageCache : IImageCache, INService
                 try
                 {
                     using var http = _httpFactory.CreateClient();
+                    http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
                     var bytes = await http.GetByteArrayAsync(url);
+                    if (bytes is null || bytes.Length == 0)
+                        return null;
                     return bytes;
                 }
-                catch (HttpRequestException)
+                catch (Exception ex)
                 {
+                    Log.Warning("Failed downloading image {Url}: {Message}", url, ex.Message);
                     return null;
                 }
             },
@@ -61,8 +65,27 @@ public sealed class ImageCache : IImageCache, INService
     public Task<byte[]?> GetTailsImageAsync()
         => GetRandomImageDataAsync(_ic.Data.Coins.Tails);
 
-    public Task<byte[]?> GetCurrencyImageAsync()
-        => GetRandomImageDataAsync(_ic.Data.Currency);
+    public async Task<byte[]?> GetCurrencyImageAsync()
+    {
+        var data = await GetRandomImageDataAsync(_ic.Data.Currency);
+        if (data is not null && data.Length > 0)
+            return data;
+
+        var localPath = Path.Combine("data", "currency.png");
+        if (File.Exists(localPath))
+        {
+            try
+            {
+                return await File.ReadAllBytesAsync(localPath);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed loading fallback currency image: {Message}", ex.Message);
+            }
+        }
+
+        return null;
+    }
 
     public Task<byte[]?> GetXpBackgroundImageAsync()
         => GetImageDataAsync(_ic.Data.Xp.Bg);

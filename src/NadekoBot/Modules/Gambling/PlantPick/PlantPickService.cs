@@ -95,8 +95,8 @@ public class PlantPickService(
     {
         var curImg = await images.GetCurrencyImageAsync();
 
-        if (curImg is null)
-            return (new MemoryStream(), null);
+        if (curImg is null || curImg.Length == 0)
+            return (Stream.Null, null);
 
         if (string.IsNullOrWhiteSpace(pass))
         {
@@ -220,8 +220,15 @@ public class PlantPickService(
                         IUserMessage sent;
                         var (stream, ext) = await GetRandomCurrencyImageAsync(pw);
 
-                        await using (stream)
-                            sent = await channel.SendFileAsync(stream, $"currency_image.{ext}", toSend);
+                        if (stream != Stream.Null && stream.Length > 0 && !string.IsNullOrWhiteSpace(ext))
+                        {
+                            await using (stream)
+                                sent = await channel.SendFileAsync(stream, $"currency_image.{ext}", toSend);
+                        }
+                        else
+                        {
+                            sent = await channel.SendMessageAsync(toSend);
+                        }
 
                         var res = await AddPlantToDatabase(channel.GuildId,
                             channel.Id,

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Memory;
 using OneOf;
 using OneOf.Types;
 
@@ -48,8 +48,14 @@ public sealed class MemoryBotCache : IBotCache
         => await _cache.GetOrCreateAsync(key.Key,
             async ce =>
             {
-                ce.AbsoluteExpirationRelativeToNow = expiry;
                 var val = await createFactory();
+                if (val is null)
+                {
+                    ce.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(5);
+                    return default;
+                }
+
+                ce.AbsoluteExpirationRelativeToNow = expiry;
                 return val;
             });
 

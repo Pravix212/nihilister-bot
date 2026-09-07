@@ -7,13 +7,8 @@ cd /root/nihilister-bot
 rm -f src/NadekoBot/data/.*.sw* 2>/dev/null || true
 
 echo "==> 1. Fetching latest from GitHub branch v6..."
-if [ -n "$GITHUB_TOKEN" ]; then
-    git fetch https://x-access-token:${GITHUB_TOKEN}@github.com/Pravix212/nihilister-bot.git v6
-    git reset --hard FETCH_HEAD
-else
-    git fetch origin
-    git reset --hard origin/v6
-fi
+git fetch origin
+git reset --hard origin/v6
 
 echo "==> 2. Publishing to /root/bot-publish..."
 dotnet publish src/NadekoBot/NadekoBot.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-publish -p:UseSharedCompilation=false

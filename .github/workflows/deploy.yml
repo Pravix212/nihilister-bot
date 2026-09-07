@@ -15,7 +15,4 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_KEY }}
           command_timeout: 10m
-          envs: GITHUB_TOKEN
-          script: |
-            export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-            /root/nihilister-bot/deploy.sh
+          script: /root/nihilister-bot/deploy.sh

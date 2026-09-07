@@ -15,4 +15,4 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.DROPLET_KEY }}
           command_timeout: 10m
-          script: /root/nihilister-bot/deploy.sh
+          script: bash /root/nihilister-bot/deploy.sh

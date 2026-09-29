@@ -19,6 +19,6 @@ Write-Host "==> 3. Pushing to GitHub (v6)..." -ForegroundColor Cyan
 git push origin v6
 
 Write-Host "==> 4. Updating Droplet & Restarting Bot..." -ForegroundColor Cyan
-ssh root@157.230.120.222 "/root/deploy.sh"
+ssh root@157.230.120.222 "bash /root/deploy.sh"
 
 Write-Host "`n==> Deploy Complete! Bot is running with latest changes." -ForegroundColor Green

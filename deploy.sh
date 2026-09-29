@@ -26,3 +26,4 @@ sleep 3
 echo "==> 5. Service Status:"
 systemctl is-active nihilister-bot
 echo "==> Deploy Complete!"
+exit 0

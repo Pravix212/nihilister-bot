@@ -322,3 +322,15 @@ edate:
     Picks a random user from the server and matches them with the one executing the command.
   ex:
     - ''
+impregnate:
+  desc: |-
+    Impregnates a user with a random percentage chance of success. The user executing the command is the one doing the impregnating.
+  ex:
+    - '@Someone'
+    - '@User1 @User2'
+  params:
+    - user1:
+        desc: The user to impregnate. Defaults to yourself if only one user is provided.
+    - user2:
+        desc: The user to impregnate (optional).
+ 

@@ -1,18 +1,19 @@
-using NadekoBot.Modules.Utility.Services;
-using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using Discord.WebSocket;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using NadekoBot.Modules.Searches.Common;
+using NadekoBot.Modules.Utility.Services;
+using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Gif;
 using SixLabors.ImageSharp.PixelFormats;
-using Image = SixLabors.ImageSharp.Image;
-using Discord.WebSocket;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using static System.Net.WebRequestMethods;
+using Image = SixLabors.ImageSharp.Image;
 
 namespace NadekoBot.Modules.Utility;
 
@@ -139,7 +140,7 @@ public partial class Utility : NadekoModule
             {
                 var eb = CreateEmbed()
                     .WithTitle(GetText(strs.whos_playing_game(userNames.Count, game)));
-                
+
                 if (names.Count == 0)
                 {
                     return CreateEmbed()
@@ -1012,5 +1013,75 @@ public partial class Utility : NadekoModule
 
         await Response().Embed(eb).SendAsync();
     }
+    private static readonly string[] ImpregnateGifs =
+    [
+        "https://i.ibb.co/FkXm0yK6/6a6e6f3566f1b178904733.gif",
+        "https://i.ibb.co/r2cYvnYT/8a3ae5fdd43bff14ae5b142057c2fff5.gif",
+        "https://i.ibb.co/vGKXxGT/9odbzvf1lw1d1.gif",
+        "https://i.ibb.co/wZpzjHVp/981edd37-e3cd-498c-b44c-a3534704006d.gif",
+        "https://i.ibb.co/YTjHKRWs/mnqc58jw7al41.gif",
+        "https://i.ibb.co/zWqBF4fL/Yelan-genshin-impact-Genshin-impact-fandoms-Aether-Genshin-impact-8833596.gif"
+    ];
 
+    [Cmd]
+    [RequireContext(ContextType.Guild)]
+    public async Task Impregnate(IGuildUser? user1 = null, IGuildUser? user2 = null)
+    {
+        if (user1 is null && user2 is null)
+        {
+            await Response()
+                .Error("You need to mention someone! Usage: `.impregnate @user` or `.impregnate @user1 @user2`")
+                .SendAsync();
+            return;
+        }
+
+        IGuildUser target1;
+        IGuildUser target2;
+
+        //If only 1 user mentioned, user1 is the caller and user2 is the target
+        if (user2 is null)
+        {
+            target1 = (IGuildUser)ctx.User;
+            target2 = user1!;
+        }
+        else if (user1 is null)
+        {
+            target1 = (IGuildUser)ctx.User;
+            target2 = user2;
+        }
+        else
+        {
+            target1 = user1;
+            target2 = user2;
+        }
+
+        // Pick a random gif from the list
+        var gifUrl = ImpregnateGifs[Random.Shared.Next(ImpregnateGifs.Length)];
+
+        // Roll 1 to 100
+        var roll = Random.Shared.Next(1, 101);
+        var success = roll > 50; // 50% chance to succeed
+
+        if (success)
+        {
+            var eb = CreateEmbed()
+                .WithOkColor()
+                .WithTitle("💕 Breeding Time — Success!")
+                .WithDescription($"**{target1.DisplayName}** successfully impregnated **{target2.DisplayName}**!\n-# 🎲 Chance: {roll}% (Needed >50%)")
+                .WithImageUrl(gifUrl)
+                .WithFooter($"Requested by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
+
+            await Response().Embed(eb).SendAsync();
+        }
+        else
+        {
+            var eb = CreateEmbed()
+                .WithErrorColor()
+                .WithTitle("💨 Breeding Time — Failed!")
+                .WithDescription($"**{target1.DisplayName}** tried to impregnate **{target2.DisplayName}**, but failed!\n-# 🎲 Chance: {roll}% (Needed >50%)")
+                .WithFooter($"Requested by {ctx.User.Username}", ctx.User.GetDisplayAvatarUrl() ?? ctx.User.GetDefaultAvatarUrl());
+
+            await Response().Embed(eb).SendAsync();
+        }
+    }
 }

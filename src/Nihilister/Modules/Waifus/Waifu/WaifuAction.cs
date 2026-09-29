@@ -1,0 +1,11 @@
+﻿namespace Nihilister.Modules.Waifus.Waifu;
+
+public enum WaifuAction
+{
+    Hug,
+    Kiss,
+    Pat,
+    Nom,
+    Spit,
+    Explode
+}

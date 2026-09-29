@@ -1,0 +1,34 @@
+﻿using Nihilister.Common.Configs;
+
+namespace Nihilister.Modules.Music;
+
+public sealed class AudioFileCacheConfigService : ConfigServiceBase<AudioFileCacheConfig>
+{
+    private const string FILE_PATH = "data/music.yml";
+    private static readonly TypedKey<AudioFileCacheConfig> _changeKey = new("config.music.updated");
+
+    public override string Name
+        => "music";
+
+    public AudioFileCacheConfigService(
+        IConfigSeria serializer,
+        IPubSub pubSub)
+        : base(FILE_PATH, serializer, pubSub, _changeKey)
+    {
+        AddParsedProp("maxcachesizegb",
+            static c => c.MaxCacheSizeGb,
+            static (c, v) => c.MaxCacheSizeGb = v,
+            int.TryParse,
+            ConfigPrinters.ToString,
+            "Maximum total cache size in gigabytes. Minimum 1. Default 10",
+            static val => val >= 1);
+
+        Migrate();
+    }
+
+    private void Migrate()
+    {
+        if (Data.Version < 1)
+            ModifyConfig(c => { c.Version = 1; });
+    }
+}

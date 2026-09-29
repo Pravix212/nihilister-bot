@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/root/bot-publish
-ExecStart=/root/bot-publish/NadekoBot
+ExecStart=/root/bot-publish/Nihilister
 Restart=always
 RestartSec=5
 Environment=DOTNET_ENVIRONMENT=Production

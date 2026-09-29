@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="4.3.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="NSubstitute" Version="5.3.0" />
+        <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\Nihilister\Nihilister.csproj" />
+        <ProjectReference Include="..\Nihilister.StringsMerger\Nihilister.StringsMerger.csproj" GlobalPropertiesToRemove="OutputPath" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="testdata/**/*" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <UsingTask TaskName="MergeStringsTask" AssemblyFile="$(MSBuildThisFileDirectory)../Nihilister.StringsMerger/bin/$(Configuration)/netstandard2.0/Nihilister.StringsMerger.dll" />
+
+    <ItemGroup>
+        <ResToMerge Include="../Nihilister/Modules/**/strings/*.yml" />
+    </ItemGroup>
+
+    <Target Name="MergeStringsTask" BeforeTargets="AfterBuild">
+        <MergeStringsTask InputYmls="@(ResToMerge)" OutputDir="$(TargetDir)strings/" />
+    </Target>
+
+</Project>

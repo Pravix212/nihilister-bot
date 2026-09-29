@@ -1,0 +1,64 @@
+﻿#nullable disable
+using System.Collections.Frozen;
+using Nihilister.Db.Models;
+
+namespace Nihilister.Modules.Administration;
+
+public enum ProtectionType
+{
+    Raiding,
+    Spamming,
+    Alting
+}
+
+public class AntiRaidStats
+{
+    public AntiRaidSetting AntiRaidSettings { get; set; }
+    private int _usersCount;
+    public int UsersCount => _usersCount;
+    public ConcurrentHashSet<IGuildUser> RaidUsers { get; set; } = new();
+
+    public int IncrementUsers()
+        => Interlocked.Increment(ref _usersCount);
+
+    public int DecrementUsers()
+        => Interlocked.Decrement(ref _usersCount);
+
+    public void ResetUsers()
+        => Interlocked.Exchange(ref _usersCount, 0);
+}
+
+public class AntiSpamStats
+{
+    public AntiSpamSetting AntiSpamSettings { get; set; }
+    public ConcurrentDictionary<ulong, UserSpamStats> UserStats { get; set; } = new();
+    public FrozenSet<ulong> IgnoredChannelIds { get; set; } = FrozenSet<ulong>.Empty;
+}
+
+public class AntiAltStats
+{
+    public PunishmentAction Action
+        => _setting.Action;
+
+    public int ActionDurationMinutes
+        => _setting.ActionDurationMinutes;
+
+    public ulong? RoleId
+        => _setting.RoleId;
+
+    public TimeSpan MinAge
+        => _setting.MinAge;
+
+    public int Counter
+        => counter;
+
+    private readonly AntiAltSetting _setting;
+
+    private int counter;
+
+    public AntiAltStats(AntiAltSetting setting)
+        => _setting = setting;
+
+    public void Increment()
+        => Interlocked.Increment(ref counter);
+}

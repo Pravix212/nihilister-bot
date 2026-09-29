@@ -1,4 +1,4 @@
-#Manually added files
+﻿#Manually added files
 
 # AI agent config — contains sensitive API keys. Use environment variables instead.
 src/NadekoBot/data/ai-agent.yml
@@ -20,6 +20,17 @@ src/NadekoBot/creds.yml
 src/NadekoBot/data/creds.yml
 src/NadekoBot/Command Errors*.txt
 src/NadekoBot/data/NadekoBot.db*
+src/Nihilister/data/ai-agent.yml
+src/Nihilister/data/ai-agent.yml.bak
+src/Nihilister/data/last_known_version.txt
+src/Nihilister/data/music_cache/
+src/Nihilister/data/medusae/
+src/Nihilister/output
+src/Nihilister/creds.yml
+src/Nihilister/data/creds.yml
+src/Nihilister/Command Errors*.txt
+src/Nihilister/data/NadekoBot.db*
+src/Nihilister/data/Nihilister.db*
 
 # Created by https://www.gitignore.io/api/visualstudio,visualstudiocode,windows,linux,macos
 

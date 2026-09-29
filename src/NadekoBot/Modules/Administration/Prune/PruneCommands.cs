@@ -257,5 +257,35 @@ public partial class Administration
                     break;
             }
         }
+        //pruneword <word> [count=100]
+        [Cmd]
+        [RequireContext(ContextType.Guild)]
+        [UserPerm(ChannelPerm.ManageMessages)]
+        [BotPerm(ChannelPerm.ManageMessages)]
+        [Priority(0)]
+        public async Task PruneWord(string word, int count = 100)
+        {
+            if (string.IsNullOrWhiteSpace(word) || count < 1)
+                return;
+
+            if (count > 1000)
+                count = 1000;
+
+            // Show progress message in chat
+            var progressMsg = await Response().Pending(strs.prune_progress(0, count)).SendAsync();
+            var progress = GetProgressTracker(progressMsg);
+
+            //Prune messages containing the specified word
+            var result = await _service.PruneWhere(
+                ctx.User.Id,
+                ctx.Channel,
+                count,
+                m => m.Id != progressMsg.Id
+                    && m.Content.Contains(word, StringComparison.OrdinalIgnoreCase),
+                progress);
+
+            await SendResult(result);
+            await progressMsg.DeleteAsync();
+        }
     }
 }

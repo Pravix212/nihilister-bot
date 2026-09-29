@@ -1,6 +1,9 @@
-prune:
+﻿prune:
   - prune
   - clear
 prunecancel:
   - prunecancel
   - prunec
+pruneword:
+  - pruneword
+  - pw

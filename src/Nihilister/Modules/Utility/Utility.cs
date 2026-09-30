@@ -1019,8 +1019,6 @@ public partial class Utility : NadekoModule
         "https://i.ibb.co/r2cYvnYT/8a3ae5fdd43bff14ae5b142057c2fff5.gif",
         "https://i.ibb.co/vGKXxGT/9odbzvf1lw1d1.gif",
         "https://i.ibb.co/wZpzjHVp/981edd37-e3cd-498c-b44c-a3534704006d.gif",
-        "https://i.ibb.co/YTjHKRWs/mnqc58jw7al41.gif",
-        "https://i.ibb.co/zWqBF4fL/Yelan-genshin-impact-Genshin-impact-fandoms-Aether-Genshin-impact-8833596.gif"
     ];
 
     [Cmd]

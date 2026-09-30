@@ -3,8 +3,9 @@ set -e
 
 cd /root/nihilister-bot
 
-# Clean any temporary editor swap files
+# Clean any temporary editor swap files and stale build workers
 rm -f src/Nihilister/data/.*.sw* 2>/dev/null || true
+dotnet build-server shutdown 2>/dev/null || true
 
 echo "==> 1. Fetching latest from GitHub branch v6..."
 git fetch origin
@@ -12,7 +13,7 @@ git reset --hard origin/v6
 
 echo "==> 2. Building and publishing to staging directory..."
 rm -rf /root/bot-staging
-dotnet publish src/Nihilister/Nihilister.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-staging -p:UseSharedCompilation=false
+dotnet publish src/Nihilister/Nihilister.csproj -c Release -r linux-x64 --self-contained false -o /root/bot-staging -p:UseSharedCompilation=false -nodeReuse:false
 
 echo "==> 3. Stopping service and updating binaries..."
 systemctl stop nihilister-bot || true

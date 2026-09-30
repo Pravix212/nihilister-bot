@@ -1,4 +1,4 @@
-name: Deploy NadekoBot Docs
+name: Deploy Nihilister Docs
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   deploy:
-    if: ${{ github.repository == 'nadeko-bot/nadekobot' }}
+    if: ${{ github.repository == 'Pravix212/nihilister-bot' }}
     runs-on: ubuntu-latest
 
     steps:

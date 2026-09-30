@@ -27,7 +27,7 @@ jobs:
       run: dotnet --version
 
     - name: Build StringMerger first (dependency for MergeStringsTask)
-      run: dotnet build src/NadekoBot.StringsMerger/NadekoBot.StringsMerger.csproj -c Release
+      run: dotnet build src/Nihilister.StringsMerger/Nihilister.StringsMerger.csproj -c Release
 
     - name: Restore dependencies
       run: dotnet restore "Nihilister Bot.sln"

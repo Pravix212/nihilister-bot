@@ -998,7 +998,7 @@ public partial class Utility : NadekoModule
 
         if (members.Count == 0)
         {
-            await Response().Error("No eligble users found! You're one lonely fuck bro").SendAsync();
+            await Response().Error("No eligble users found! You're one lonely soul.").SendAsync();
             return;
         }
 

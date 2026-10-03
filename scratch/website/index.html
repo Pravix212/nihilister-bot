@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prav — Software Engineer, Musician, Competitor</title>
+  <meta name="description" content="Prav. Swiss software engineer, phonk/funk/EDM producer, former pro Valorant/CS:GO player for mYinsanity, and ex-pro Street Fighter 6 competitor.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <!-- HUD corners -->
+  <div class="hud-corner hud-corner--tl"></div>
+  <div class="hud-corner hud-corner--tr"></div>
+  <div class="hud-corner hud-corner--bl"></div>
+  <div class="hud-corner hud-corner--br"></div>
+
+  <div class="parallax-bg" id="parallaxBg"></div>
+
+  <!-- ========== MUSIC PLAYER ========== -->
+  <div class="music-player" id="musicPlayer">
+    <button class="music-player__close" id="hidePlayer">Hide</button>
+    <button class="music-player__btn" id="muteBtn" title="Mute/Unmute" aria-label="Toggle mute">&#128264;</button>
+    <div class="music-player__info">
+      <div class="music-player__title" id="trackTitle">Loading...</div>
+      <div class="music-player__meta" id="trackMeta">Click mute to stop</div>
+    </div>
+    <div class="music-player__time" id="trackTime">0:00 / 0:00</div>
+    <div class="music-player__links" id="trackLinks"></div>
+    <button class="music-player__btn" id="nextBtn" title="Next track" aria-label="Next track">&#9197;</button>
+  </div>
+  <audio id="audioEl" preload="auto"></audio>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="nav" id="navbar">
+    <div class="nav__inner">
+      <a href="./" class="nav__brand">
+        <img src="https://cdn.discordapp.com/avatars/1258877669560303678/6e31d71c7a80c51cddd1a0f7a1d2a43f.png" alt="Prav avatar" class="nav__avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%2216%22 fill=%22%23372d23%22/%3E%3Ctext x=%2216%22 y=%2220%22 text-anchor=%22middle%22 fill=%22%23ddd2c0%22 font-size=%2214%22%3EP%3C/text%3E%3C/svg%3E'">
+        <span class="nav__title">Prav</span>
+      </a>
+      <div class="nav__links nav__links--desktop">
+        <a href="./" class="nav__link nav__link--active">Home</a>
+        <a href="#projects" class="nav__link">Projects</a>
+        <a href="./nihilister/" class="nav__link">Nihilister</a>
+        <a href="#whois" class="nav__link">Who is Prav?</a>
+        <a href="#music" class="nav__link">Music</a>
+        <a href="https://github.com/Pravix212" class="nav__link nav__link--external" target="_blank" rel="noopener">
+          GitHub
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 1h7v7M10.5 1.5l-8 8M7 1H1.5v9h9"/></svg>
+        </a>
+      </div>
+      <button class="nav__toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+        <span class="nav__toggle-bar"></span>
+      </button>
+    </div>
+    <div class="nav__mobile" id="navMobile">
+      <a href="./" class="nav__link nav__link--active">Home</a>
+      <a href="#projects" class="nav__link">Projects</a>
+      <a href="./nihilister/" class="nav__link">Nihilister</a>
+      <a href="#whois" class="nav__link">Who is Prav?</a>
+      <a href="#music" class="nav__link">Music</a>
+      <a href="https://github.com/Pravix212" class="nav__link" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero hero--terminal">
+    <div class="container">
+      <div class="hero__header">
+        <a href="./nihilister/" class="nihilister-badge" title="Visit Nihilister Bot">
+          <span class="nihilister-badge__dot"></span>
+          <span class="nihilister-badge__text">Nihilister Active</span>
+          <span class="nihilister-badge__arrow">&#10132;</span>
+        </a>
+        <div class="hero__telemetry">
+          <span class="telemetry-item"><span class="telemetry-dot"></span> SWITZERLAND</span>
+          <span class="telemetry-item">STACK: C# / .NET / PYTHON</span>
+          <span class="telemetry-item">STATUS: ONLINE</span>
+        </div>
+      </div>
+      <div class="terminal-window">
+        <div class="terminal-header">
+          <div class="terminal-buttons">
+            <span class="terminal-btn terminal-btn--close"></span>
+            <span class="terminal-btn terminal-btn--min"></span>
+            <span class="terminal-btn terminal-btn--max"></span>
+          </div>
+          <div class="terminal-title">prav@terminal — ~</div>
+        </div>
+        <div class="terminal-body">
+          <div class="system-status">
+            <span class="system-status__label">SYSTEM STATUS:</span>
+            <span class="system-status__value">ONLINE</span>
+            <div class="system-status__bar"><div class="system-status__bar-fill"></div></div>
+            <span>SECURE CONNECTION</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">root@prav:~$</span>
+            <span class="terminal-cmd" data-text="whoami"></span>
+          </div>
+          <div class="terminal-line terminal-output">
+            <h1 class="hero__title glitch" data-text="Prav">Prav</h1>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">root@prav:~$</span>
+            <span class="terminal-cmd" data-text="cat about.txt"></span>
+          </div>
+          <div class="terminal-line terminal-output">
+            <p class="hero__subtitle">Software Engineer from Switzerland. Phonk producer. Former pro Valorant & CS:GO player for mYinsanity. Ex-pro Street Fighter 6 competitor who traveled the world.</p>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">root@prav:~$</span>
+            <span class="terminal-cmd" data-text="ls -la socials/"></span>
+          </div>
+          <div class="terminal-line terminal-output">
+            <div class="terminal-links">
+              <a href="https://github.com/Pravix212" class="terminal-link" target="_blank" rel="noopener">github.com/Pravix212</a>
+              <a href="https://www.instagram.com/pravix_prav/" class="terminal-link" target="_blank" rel="noopener">instagram.com/pravix_prav</a>
+              <a href="https://open.spotify.com/artist/13rsGdGYXGume62AXjymaJ" class="terminal-link" target="_blank" rel="noopener">spotify.com/artist/13rsGdGYXGume62AXjymaJ</a>
+              <a href="./nihilister/" class="terminal-link terminal-link--highlight">./nihilister/ (ACTIVE)</a>
+            </div>
+          </div>
+          <div class="terminal-line">
+            <div class="access-granted">ACCESS GRANTED</div>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">root@prav:~$</span>
+            <span class="terminal-cursor">&#x258B;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WHO IS PRAV? ========== -->
+  <section class="section" id="whois" style="background: rgba(0,0,0,0.15);">
+    <div class="container">
+      <div class="section-header fade-in-up">
+        <div class="status-badge">BIO_DATA // LOADED</div>
+        <h2 class="section-header__title">Who is Prav?</h2>
+        <p class="section-header__subtitle">Engineer, musician, competitor.</p>
+      </div>
+
+      <div class="bio-block">
+        <div class="bio-text slide-in-left">
+          <p>
+            I'm a software engineer, music producer, and former esports competitor in CS:GO, Valorant, and Street Fighter. I'm currently focused on music and bot development. My current project, <a href="./nihilister/">Nihilister</a>, can be found here.
+          </p>
+        </div>
+        <div class="bio-photo slide-in-right" onclick="openLightbox(this)">
+          <img src="/media/photos/pc-setup.jpg" alt="Battle station">
+        </div>
+      </div>
+
+      <div class="bio-block bio-block--reverse">
+        <div class="bio-text slide-in-right">
+          <p>
+            When I'm not staring at code, I'm making music in my own home studio using FL Studio. I create phonk, funk, and various EDM genres — whatever I'm feeling like.
+          </p>
+          <p>
+            You can find all my released music <a href="https://open.spotify.com/artist/13rsGdGYXGume62AXjymaJ?si=BtR825S-RYS_02FgZS3qsg" target="_blank" rel="noopener">here on Spotify</a>.
+          </p>
+        </div>
+        <div class="bio-photo slide-in-left" onclick="openLightbox(this)">
+          <img src="/media/photos/bucket-hat.png" alt="Bucket hat energy">
+        </div>
+      </div>
+
+      <div class="bio-block">
+        <div class="bio-text slide-in-left">
+          <p>
+            I used to be a professional CS:GO and Valorant player for <strong>mYinsanity Switzerland</strong>, one of the country's top esports organizations.
+          </p>
+          <p>
+            We competed against some of the best teams in Europe.
+          </p>
+        </div>
+        <div class="bio-photo slide-in-right" onclick="openLightbox(this)">
+          <img src="/media/photos/valorant.png" alt="Pro Valorant match">
+        </div>
+      </div>
+
+      <div class="bio-block bio-block--reverse">
+        <div class="bio-text slide-in-right">
+          <p>
+            After FPS, I went fighting. I became a pro Street Fighter 6 player and traveled the world, competing in tournaments across multiple countries, grinding matchups, and living the FGC life.
+          </p>
+          <div class="bio-tags">
+            <span class="bio-tag">Swiss</span>
+            <span class="bio-tag">Software Engineer</span>
+            <span class="bio-tag">Phonk Producer</span>
+            <span class="bio-tag">Ex-Pro Valorant</span>
+            <span class="bio-tag">Ex-Pro CS:GO</span>
+            <span class="bio-tag">Ex-Pro SF6</span>
+            <span class="bio-tag">Tournament Traveler</span>
+            <span class="bio-tag">FL Studio</span>
+          </div>
+        </div>
+        <div class="bio-photo slide-in-left" onclick="openLightbox(this)">
+          <img src="/media/photos/sf6-2.png" alt="SF6 tournament">
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="gap:16px;margin-top:32px">
+        <div class="bio-photo scale-in" onclick="openLightbox(this)">
+          <img src="/media/photos/sf6-1.png" alt="SF6 tournament">
+        </div>
+        <div class="bio-photo scale-in" onclick="openLightbox(this)">
+          <img src="/media/photos/sf6-3.png" alt="SF6 tournament">
+        </div>
+        <div class="bio-photo scale-in" onclick="openLightbox(this)">
+          <img src="/media/photos/goofy.jpg" alt="Being goofy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MUSIC / TRACKS ========== -->
+  <section class="section" id="music">
+    <div class="container section-frame">
+      <div class="section-header fade-in-up">
+        <div class="status-badge">AUDIO_STREAM // READY</div>
+        <h2 class="section-header__title">Music</h2>
+        <p class="section-header__subtitle">Produced in FL Studio. Released everywhere.</p>
+      </div>
+
+      <div style="max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
+        <div class="track-card fade-in-up stagger-1">
+          <button class="track-card__play" data-src="/media/music/afterglow.wav" data-title="Afterglow" data-artist="Prav" onclick="playTrackFromCard(this)">&#9654;</button>
+          <div class="track-card__info">
+            <div class="track-card__title">Afterglow</div>
+            <div class="track-card__artist">Prav</div>
+          </div>
+          <div class="track-card__links">
+            <span class="track-card__link track-card__link--soon">Coming Soon</span>
+          </div>
+        </div>
+
+        <div class="track-card fade-in-up stagger-2">
+          <button class="track-card__play" data-src="/media/music/lumiere.wav" data-title="Lumiere" data-artist="Prav" data-spotify="https://open.spotify.com/track/3LCKyHPQBDnB4Piif4YmAx?si=51ea90203b9f4565" data-youtube="https://www.youtube.com/watch?v=6wf7g3EzP-8" onclick="playTrackFromCard(this)">&#9654;</button>
+          <div class="track-card__info">
+            <div class="track-card__title">Lumiere</div>
+            <div class="track-card__artist">Prav</div>
+          </div>
+          <div class="track-card__links">
+            <a href="https://open.spotify.com/track/3LCKyHPQBDnB4Piif4YmAx?si=51ea90203b9f4565" class="track-card__link" target="_blank" rel="noopener">Spotify</a>
+            <a href="https://www.youtube.com/watch?v=6wf7g3EzP-8" class="track-card__link" target="_blank" rel="noopener">YouTube</a>
+          </div>
+        </div>
+
+        <div class="track-card fade-in-up stagger-3">
+          <button class="track-card__play" data-src="/media/music/stamp-on-the-ground.wav" data-title="Stamp on the Ground (Remix)" data-artist="Prav" data-spotify="https://open.spotify.com/track/66rMsuuAxB2CABJMWwdHc0?si=f75f972440dd4292" data-youtube="https://www.youtube.com/watch?v=ssdJDll8HaE" onclick="playTrackFromCard(this)">&#9654;</button>
+          <div class="track-card__info">
+            <div class="track-card__title">Stamp on the Ground (Remix)</div>
+            <div class="track-card__artist">Prav</div>
+          </div>
+          <div class="track-card__links">
+            <a href="https://open.spotify.com/track/66rMsuuAxB2CABJMWwdHc0?si=f75f972440dd4292" class="track-card__link" target="_blank" rel="noopener">Spotify</a>
+            <a href="https://www.youtube.com/watch?v=ssdJDll8HaE" class="track-card__link" target="_blank" rel="noopener">YouTube</a>
+          </div>
+        </div>
+
+        <div class="track-card fade-in-up stagger-4">
+          <button class="track-card__play" data-src="/media/music/how-its-done.wav" data-title="How It's Done (Remix)" data-artist="Prav" data-youtube="https://www.youtube.com/watch?v=BbUalbTCbjU" data-apple="https://music.apple.com/us/album/how-its-done/1849863322?i=1849863323" onclick="playTrackFromCard(this)">&#9654;</button>
+          <div class="track-card__info">
+            <div class="track-card__title">How It's Done (Remix)</div>
+            <div class="track-card__artist">Prav</div>
+          </div>
+          <div class="track-card__links">
+            <a href="https://www.youtube.com/watch?v=BbUalbTCbjU" class="track-card__link" target="_blank" rel="noopener">YouTube</a>
+            <a href="https://music.apple.com/us/album/how-its-done/1849863322?i=1849863323" class="track-card__link" target="_blank" rel="noopener">Apple Music</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="fade-in-up" style="text-align:center;margin-top:32px">
+        <a href="https://open.spotify.com/artist/13rsGdGYXGume62AXjymaJ?si=BtR825S-RYS_02FgZS3qsg" class="btn btn--secondary" target="_blank" rel="noopener">View All on Spotify</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INSTAGRAM ========== -->
+  <section class="section" id="instagram">
+    <div class="container section-frame">
+      <div class="section-header fade-in-up">
+        <div class="status-badge">VISUAL_FEED // STANDBY</div>
+        <h2 class="section-header__title">Instagram</h2>
+        <p class="section-header__subtitle">Behind the scenes. Travel, production, and everything in between.</p>
+      </div>
+      <div style="text-align:center" class="fade-in-up">
+        <a href="https://www.instagram.com/pravix_prav/" class="btn btn--primary" target="_blank" rel="noopener">
+          &#128247; Follow @pravix_prav
+        </a>
+        <p style="color:var(--bone-dim);margin-top:12px;font-size:0.875rem">
+          Instagram embedded feed coming soon. For now, click through to see the full gallery.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PROJECTS ========== -->
+  <section class="section" id="projects">
+    <div class="container section-frame">
+      <div class="section-header fade-in-up">
+        <div class="status-badge">PROJECTS // ACTIVE</div>
+        <h2 class="section-header__title">Projects</h2>
+        <p class="section-header__subtitle">Things I've built.</p>
+      </div>
+      <div class="grid grid-3">
+        <!-- Project 1: Nihilister -->
+        <div class="project-card fade-in-up stagger-1">
+          <div class="project-card__tags">
+            <span class="badge badge--thorn">Active // Discord Bot</span>
+          </div>
+          <h3 class="project-card__title">Nihilister</h3>
+          <p class="project-card__desc">A powerful, dark-themed Discord bot built on .NET 9. Features an autonomous Grok AI agent, deep casino gambling system, server moderation, and a live web dashboard.</p>
+          <div class="project-card__tech">
+            <span class="tech-tag">C# / .NET 9</span>
+            <span class="tech-tag">Discord.Net</span>
+            <span class="tech-tag">Grok AI</span>
+          </div>
+          <div class="project-card__links">
+            <a href="./nihilister/" class="project-card__link project-card__link--primary">Website &rarr;</a>
+            <a href="https://github.com/Pravix212/nihilister-bot" class="project-card__link" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+
+        <!-- Project 2: Pravix Image Upscaler -->
+        <div class="project-card fade-in-up stagger-2">
+          <div class="project-card__tags">
+            <span class="badge badge--cyan">Active // Desktop App</span>
+          </div>
+          <h3 class="project-card__title">Pravix Image Upscaler</h3>
+          <p class="project-card__desc">A 100% offline, GPU-accelerated desktop app. Restores portraits with GFPGAN AI, upscales images with 6 Vulkan NCNN models, and batch-optimizes animated GIFs for Discord upload limits.</p>
+          <div class="project-card__tech">
+            <span class="tech-tag">Python</span>
+            <span class="tech-tag">Vulkan NCNN</span>
+            <span class="tech-tag">GFPGAN AI</span>
+          </div>
+          <div class="project-card__links">
+            <a href="https://github.com/Pravix212/PravixImageUpscaler" class="project-card__link project-card__link--primary" target="_blank" rel="noopener">GitHub &rarr;</a>
+            <a href="https://github.com/Pravix212/PravixImageUpscaler/releases" class="project-card__link" target="_blank" rel="noopener">Releases</a>
+          </div>
+        </div>
+
+        <!-- Project 3: BDO Cron Calculator -->
+        <div class="project-card fade-in-up stagger-3">
+          <div class="project-card__tags">
+            <span class="badge badge--gold">Utility // Gaming Tool</span>
+          </div>
+          <h3 class="project-card__title">BDO Cron Calculator</h3>
+          <p class="project-card__desc">Enhancement cost and Cron Stone efficiency calculator for Black Desert Online players. Calculates enhancement attempt costs, marketplace silver value comparisons, and optimal gear progression paths.</p>
+          <div class="project-card__tech">
+            <span class="tech-tag">C# / .NET</span>
+            <span class="tech-tag">Black Desert Online</span>
+          </div>
+          <div class="project-card__links">
+            <a href="https://github.com/Pravix212/BdoCronCalculator" class="project-card__link project-card__link--primary" target="_blank" rel="noopener">GitHub &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SKILLS ========== -->
+  <section class="section" id="skills">
+    <div class="container section-frame">
+      <div class="section-header fade-in-up">
+        <div class="status-badge">SKILL_MATRIX // LOADED</div>
+        <h2 class="section-header__title">Skills</h2>
+        <p class="section-header__subtitle">Tools and technologies I work with.</p>
+      </div>
+      <div class="skills-grid fade-in-up">
+        <div class="skill-item">
+          <span class="skill-item__icon">&#128187;</span>
+          <span class="skill-item__name">C# / .NET</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#128376;</span>
+          <span class="skill-item__name">Discord Bots</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#127760;</span>
+          <span class="skill-item__name">Web Development</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#127482;</span>
+          <span class="skill-item__name">Linux / VPS</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#128295;</span>
+          <span class="skill-item__name">DevOps</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#127911;</span>
+          <span class="skill-item__name">FL Studio</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#127918;</span>
+          <span class="skill-item__name">Game Development</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-item__icon">&#128200;</span>
+          <span class="skill-item__name">System Design</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div>
+          <h4 class="footer__col-title">Prav</h4>
+          <div class="footer__links">
+            <a href="./" class="footer__link">Home</a>
+            <a href="./nihilister/" class="footer__link">Nihilister</a>
+            <a href="https://github.com/Pravix212" class="footer__link" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Connect</h4>
+          <div class="footer__links">
+            <a href="https://www.instagram.com/pravix_prav/" class="footer__link" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://open.spotify.com/artist/13rsGdGYXGume62AXjymaJ?si=BtR825S-RYS_02FgZS3qsg" class="footer__link" target="_blank" rel="noopener">Spotify</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="footer__col-title">Legal</h4>
+          <div class="footer__links">
+            <a href="#" class="footer__link">License</a>
+            <a href="#" class="footer__link">Privacy</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>Built with <span style="color:var(--thorn-bright)">heresy</span> by Prav</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== LIGHTBOX ========== -->
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <!-- ========== SCRIPTS ========== -->
+  <script>
+    // ===== NAVIGATION =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('nav--scrolled', window.scrollY > 20);
+    });
+
+    const navToggle = document.getElementById('navToggle');
+    const navMobile = document.getElementById('navMobile');
+    navToggle.addEventListener('click', () => {
+      const open = navbar.classList.toggle('nav--open');
+      navToggle.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    navMobile.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navbar.classList.remove('nav--open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // ===== PARALLAX BACKGROUND =====
+    const parallaxBg = document.getElementById('parallaxBg');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      parallaxBg.style.transform = 'translateY(' + (scrolled * 0.3) + 'px)';
+    });
+
+    // ===== SCROLL ANIMATIONS =====
+    const animObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          animObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll, .slide-in-left, .slide-in-right, .fade-in-up, .scale-in').forEach(el => {
+      animObserver.observe(el);
+    });
+
+    // ===== MUSIC PLAYER =====
+    const TRACKS = [
+      { src: '/media/music/afterglow.wav', title: 'Afterglow', artist: 'Prav', links: [], soon: true },
+      { src: '/media/music/lumiere.wav', title: 'Lumiere', artist: 'Prav', links: [
+        { label: 'Spotify', url: 'https://open.spotify.com/track/3LCKyHPQBDnB4Piif4YmAx?si=51ea90203b9f4565' },
+        { label: 'YouTube', url: 'https://www.youtube.com/watch?v=6wf7g3EzP-8' }
+      ]},
+      { src: '/media/music/stamp-on-the-ground.wav', title: 'Stamp on the Ground (Remix)', artist: 'Prav', links: [
+        { label: 'Spotify', url: 'https://open.spotify.com/track/66rMsuuAxB2CABJMWwdHc0?si=f75f972440dd4292' },
+        { label: 'YouTube', url: 'https://www.youtube.com/watch?v=ssdJDll8HaE' }
+      ]},
+      { src: '/media/music/how-its-done.wav', title: "How It's Done (Remix)", artist: 'Prav', links: [
+        { label: 'YouTube', url: 'https://www.youtube.com/watch?v=BbUalbTCbjU' },
+        { label: 'Apple Music', url: 'https://music.apple.com/us/album/how-its-done/1849863322?i=1849863323' }
+      ]}
+    ];
+
+    let currentTrackIndex = Math.floor(Math.random() * TRACKS.length);
+    let isMuted = false;
+    const audio = document.getElementById('audioEl');
+    const trackTitleEl = document.getElementById('trackTitle');
+    const trackMetaEl = document.getElementById('trackMeta');
+    const trackTimeEl = document.getElementById('trackTime');
+    const trackLinksEl = document.getElementById('trackLinks');
+    const muteBtn = document.getElementById('muteBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const hideBtn = document.getElementById('hidePlayer');
+    const player = document.getElementById('musicPlayer');
+
+    function formatTime(secs) {
+      if (!isFinite(secs)) return '0:00';
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    function loadTrack(index) {
+      const track = TRACKS[index];
+      audio.src = track.src;
+      trackTitleEl.textContent = track.title + ' — ' + track.artist;
+      trackMetaEl.textContent = track.soon ? 'Coming soon to streaming' : 'Click play icon on track cards to jump';
+
+      trackLinksEl.innerHTML = '';
+      if (track.links.length > 0) {
+        track.links.forEach(link => {
+          const a = document.createElement('a');
+          a.href = link.url;
+          a.className = 'music-player__link';
+          a.textContent = link.label;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          trackLinksEl.appendChild(a);
+        });
+      } else if (track.soon) {
+        const span = document.createElement('span');
+        span.className = 'music-player__link music-player__link--disabled';
+        span.textContent = 'Coming Soon';
+        trackLinksEl.appendChild(span);
+      }
+
+      audio.play().catch(() => {
+        trackMetaEl.textContent = 'Click mute button to start playing';
+      });
+    }
+
+    function nextTrack() {
+      currentTrackIndex = (currentTrackIndex + 1) % TRACKS.length;
+      loadTrack(currentTrackIndex);
+    }
+
+    function updateTime() {
+      if (audio.duration) {
+        trackTimeEl.textContent = formatTime(audio.currentTime) + ' / ' + formatTime(audio.duration);
+      } else {
+        trackTimeEl.textContent = formatTime(audio.currentTime) + ' / --:--';
+      }
+    }
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('ended', nextTrack);
+
+    muteBtn.addEventListener('click', () => {
+      isMuted = !isMuted;
+      audio.muted = isMuted;
+      muteBtn.innerHTML = isMuted ? '&#128263;' : '&#128264;';
+      muteBtn.title = isMuted ? 'Unmute' : 'Mute';
+      if (!isMuted && audio.paused) {
+        audio.play().catch(() => {});
+      }
+    });
+
+    nextBtn.addEventListener('click', nextTrack);
+
+    hideBtn.addEventListener('click', () => {
+      player.classList.toggle('hidden');
+      hideBtn.textContent = player.classList.contains('hidden') ? 'Show' : 'Hide';
+    });
+
+    window.playTrackFromCard = function(btn) {
+      const src = btn.dataset.src;
+      const idx = TRACKS.findIndex(t => t.src === src);
+      if (idx >= 0) {
+        currentTrackIndex = idx;
+        loadTrack(idx);
+      }
+    };
+
+    loadTrack(currentTrackIndex);
+
+    // ===== LIGHTBOX =====
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    window.openLightbox = function(el) {
+      const img = el.querySelector('img');
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightbox.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeLightbox = function() {
+      lightbox.style.display = 'none';
+      document.body.style.overflow = '';
+    };
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // ===== TERMINAL TYPING ANIMATION =====
+    function typeText(el, text, speed) {
+      speed = speed || 50;
+      return new Promise(function(resolve) {
+        el.textContent = '';
+        var i = 0;
+        var interval = setInterval(function() {
+          el.textContent += text[i];
+          i++;
+          if (i >= text.length) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, speed);
+      });
+    }
+    function delay(ms) {
+      return new Promise(function(r) { setTimeout(r, ms); });
+    }
+    async function runTerminal() {
+      var cmds = document.querySelectorAll('.terminal-cmd');
+      var outputs = document.querySelectorAll('.terminal-output');
+      var speeds = [60, 40, 35];
+      outputs.forEach(function(o) {
+        o.style.opacity = '0';
+        o.style.transform = 'translateY(8px)';
+        o.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      });
+      for (var i = 0; i < cmds.length; i++) {
+        var text = cmds[i].dataset.text;
+        await typeText(cmds[i], text, speeds[i] || 50);
+        await delay(300);
+        if (outputs[i]) {
+          outputs[i].style.opacity = '1';
+          outputs[i].style.transform = 'translateY(0)';
+        }
+        await delay(500);
+      }
+    }
+    runTerminal();
+  </script>
+</body>
+</html>
